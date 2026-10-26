@@ -667,6 +667,9 @@ const PRO_CATEGORY: Record<string, CategoryId> = {
   "agent-open": "ai-input",
   "agent-compose": "ai-input",
   "trend-type": "text",
+  "hype-reel": "scenes",
+  "depth-swap": "scenes",
+  "find-yours": "text",
   "echo-stack": "text",
   "mood-board": "scenes",
   "column-cut": "scenes",
@@ -678,6 +681,7 @@ const PRO_CATEGORY: Record<string, CategoryId> = {
   "task-stream": "ai-input",
   "glass-prompt": "ai-input",
   "search-retype": "ai-input",
+  "ember-reveal": "text",
   "prompt-roll": "ai-input",
   "dot-dissolve": "transitions",
 };

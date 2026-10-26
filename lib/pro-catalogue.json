@@ -302,10 +302,34 @@
     "added": "2026-10-14"
   },
   {
+    "name": "hype-reel",
+    "title": "Hype Reel",
+    "description": "A vertical video post going viral in three seconds: a close-up on its view count racing up, a cut out to the whole card under its caption, then avatars, chat bubbles and reactions spring in around it while the count tops out at 999k. The camera, the card's border and glow, every comment's place and the springs are measured frame by frame off a screen recording.",
+    "added": "2026-10-26"
+  },
+  {
+    "name": "depth-swap",
+    "title": "Depth Swap",
+    "description": "A headline swaps inside a wall of pictures with real depth. The camera dollies back out of a defocused wall while the first line blurs up out of nothing and each picture comes into focus at its own distance; on the beat the line cuts to the second, sharp in the middle and blurred at its ends, and the camera slides sideways as the nearest picture swings across, growing. Replayed from a screen recording: one pinhole camera fitted to every card and both lines at once, each card's edge and picture blur, shadow and out-of-focus spill are measured tables.",
+    "added": "2026-10-26"
+  },
+  {
+    "name": "ember-reveal",
+    "title": "Ember Reveal",
+    "description": "A soft blue brush sweeps across a white frame and blooms into a glow, and the line writes itself out of the glow behind it, settling with a faint halo. The brush's centre line and width, its bloom and the reveal edge are measured frame by frame off a screen recording.",
+    "added": "2026-10-26"
+  },
+  {
     "name": "echo-stack",
     "title": "Echo Stack",
     "description": "One word with copies of itself stacked above and below in horizontal windows, fading as they go. The echoes open out from behind the word while the stack eases back, in one move on a flat field. The face, every echo's offset, opacity and window are measured off a screen recording.",
     "added": "2026-10-14"
+  },
+  {
+    "name": "find-yours",
+    "title": "Find Yours",
+    "description": "\"Find yours\" rises in word by word while a list of what you could make rolls up beside it through a soft fade: slow, then a motion-blurred rush, then a long brake onto one answer. A hard cut to the name, still drifting with the camera, which gains a dot and then its domain, and a last cut to the mark and wordmark. Replayed from a screen recording fitted frame by frame: the face and weight, every word's place, the list's offset, blur window, fade and each row's gradient are measured tables.",
+    "added": "2026-10-26"
   },
   {
     "name": "mood-board",
