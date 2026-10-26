@@ -135,6 +135,14 @@ const SEARCH_LEADS: Record<string, string> = {
     "AI chat input animation: a composer builds itself, types a prompt and sends it.",
   "trend-type":
     "Typewriter headline animation: gradient words type in while a trend line draws below.",
+  "ember-reveal":
+    "Glow text reveal animation: a brush sweeps across and blooms into a glow that writes the line.",
+  "hype-reel":
+    "Viral post animation: a video card's views race up as comments and reactions spring in.",
+  "depth-swap":
+    "Depth-of-field text swap: a headline cuts over a photo wall the camera dollies out of.",
+  "find-yours":
+    "Rolling word list animation: words roll past a fixed line with motion blur, then cut to your name.",
   "echo-stack":
     "Echo text animation: a word stacked with fading copies of itself above and below.",
   "mood-board":
