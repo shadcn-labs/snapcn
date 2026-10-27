@@ -158,9 +158,9 @@ export const REELS: readonly Reel[] = [
     description:
       "One new feature, asked for and delivered: a dark agent-style announcement with a soft, low-saturation accent.",
     fps: 30,
-    v: "c0078cb449",
-    v1080: "f7d3f49c10",
-    stills: ["f3b15cd031", "b3bb7507ab", "27ab071679"],
+    v: "a631479e00",
+    v1080: "f2a5e6f947",
+    stills: ["f3b15cd031", "83b2bac849", "27ab071679"],
     beats: [
       {
         label: "Meet \u2014 the new feature",
@@ -180,7 +180,7 @@ export const REELS: readonly Reel[] = [
       {
         label: "Reply \u2014 three cuts back",
         component: "Creative Reply",
-        frames: 236,
+        frames: 139,
       },
       {
         label: "Build \u2014 from the recording",

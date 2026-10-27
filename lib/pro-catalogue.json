@@ -320,6 +320,12 @@
     "added": "2026-10-26"
   },
   {
+    "name": "spark-question",
+    "title": "Spark Question",
+    "description": "A question asked one phrase at a time: each phrase lands huge and settles while the camera keeps pulling back, its words blurring up into place one after another as small four-point sparkles dart past, and a hard cut swaps in the next. The last phrase lands over a soft circle backdrop whose rings drift outward. Timing and geometry are measured frame by frame off a screen recording: every phrase's ink box, the pull-back and each sparkle's flight are fitted tables.",
+    "added": "2026-10-27"
+  },
+  {
     "name": "echo-stack",
     "title": "Echo Stack",
     "description": "One word with copies of itself stacked above and below in horizontal windows, fading as they go. The echoes open out from behind the word while the stack eases back, in one move on a flat field. The face, every echo's offset, opacity and window are measured off a screen recording.",

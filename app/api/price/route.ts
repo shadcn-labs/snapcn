@@ -16,13 +16,23 @@ export async function GET(req: Request) {
     country && Object.hasOwn(PPP_PRICES, country)
       ? PPP_PRICES[country as keyof typeof PPP_PRICES]
       : null;
+  // The banner's "special offer for India" line; null when we don't know.
+  const name = country
+    ? (new Intl.DisplayNames(["en"], { type: "region" }).of(country) ?? null)
+    : null;
   return Response.json(
-    regional
-      ? {
-          annual: money(regional.everything_annual, regional.currency),
-          lifetime: money(regional.lifetime, regional.currency),
-        }
-      : { annual: CATALOGUE_PRICE.annual, lifetime: CATALOGUE_PRICE.lifetime },
+    {
+      country: name,
+      ...(regional
+        ? {
+            annual: money(regional.everything_annual, regional.currency),
+            lifetime: money(regional.lifetime, regional.currency),
+          }
+        : {
+            annual: CATALOGUE_PRICE.annual,
+            lifetime: CATALOGUE_PRICE.lifetime,
+          }),
+    },
     { headers: { "Cache-Control": "private, no-store" } },
   );
 }

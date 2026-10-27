@@ -107,6 +107,23 @@ export interface GalleryItem {
 
 export const GALLERY_ITEMS: GalleryItem[] = [
   {
+    name: "Phone Stack",
+    description:
+      "Phone screens playing clips rise out of a blur one after another, each pushing the stack back so the older ones peek out on top",
+    category: "screens",
+    href: "/docs/screens/phone-stack",
+    added: "2026-10-24",
+  },
+  {
+    name: "Reel Wall",
+    description:
+      "A curved wall of vertical clips turns past in the dark — it eases in from rest, then keeps turning",
+    category: "scenes",
+    href: "/docs/scenes/reel-wall",
+    added: "2026-10-24",
+    tile: "wide",
+  },
+  {
     name: "Orb Swarm",
     description:
       "A sentence told one beat at a time while glass orbs burst out of it, split into eight and sixteen, wind into a vortex, pay out as a chain and loop around the last words",
@@ -313,14 +330,6 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     tile: "tall",
   },
   {
-    name: "Phone Stack",
-    description:
-      "Phone screens playing clips rise out of a blur one after another, each pushing the stack back so the older ones peek out on top",
-    category: "screens",
-    href: "/docs/screens/phone-stack",
-    added: "2026-10-24",
-  },
-  {
     name: "Laptop Frame",
     description:
       "MacBook that opens, runs a notch notification, then dives into the screen until an image or video fills the frame",
@@ -459,15 +468,6 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     category: "scenes",
     href: "/docs/scenes/reel-collage",
     added: "2026-09-23",
-    tile: "wide",
-  },
-  {
-    name: "Reel Wall",
-    description:
-      "A curved wall of vertical clips turns past in the dark — it eases in from rest, then keeps turning",
-    category: "scenes",
-    href: "/docs/scenes/reel-wall",
-    added: "2026-10-24",
     tile: "wide",
   },
   {
@@ -682,6 +682,7 @@ const PRO_CATEGORY: Record<string, CategoryId> = {
   "glass-prompt": "ai-input",
   "search-retype": "ai-input",
   "ember-reveal": "text",
+  "spark-question": "text",
   "prompt-roll": "ai-input",
   "dot-dissolve": "transitions",
 };
@@ -766,10 +767,22 @@ function withPro(free: GalleryItem[], paid: GalleryItem[]): GalleryItem[] {
   return out;
 }
 
+/**
+ * The paid cards that open the grid, in this order; the rest keep theirs. "All"
+ * is where every visitor lands, so its first rows are the shop window — the
+ * richest, most colourful demos, not whichever shipped first. (The free lead
+ * is simply the top of `GALLERY_ITEMS`.)
+ */
+const PRO_LEAD = ["hype-reel", "depth-swap", "prompt-roll", "glow-pullback"];
+const rank = (item: GalleryItem) => {
+  const i = PRO_LEAD.indexOf(slugFromHref(item.href));
+  return i < 0 ? PRO_LEAD.length : i;
+};
+
 /** Everything the gallery shows, free and paid, in curated order. */
 export const CATALOGUE_ITEMS: GalleryItem[] = withPro(
   GALLERY_ITEMS,
-  PRO_GALLERY_ITEMS,
+  [...PRO_GALLERY_ITEMS].sort((a, b) => rank(a) - rank(b)),
 );
 
 /**
