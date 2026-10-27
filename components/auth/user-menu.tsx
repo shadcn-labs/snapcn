@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { lazy, Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTrackEvent } from "@/lib/analytics";
-import type { PlanName } from "@/lib/plans";
+import type { PlanTier } from "@/lib/plans";
 import { cn } from "@/lib/utils";
 
 /**
@@ -26,8 +26,10 @@ export function UserMenu({ className }: { className?: string }) {
   const { data: session } = useSession();
   const user = session?.user;
   // `free` when the session predates the plan field — an old cookie must read
-  // as the cheaper tier, never the more expensive one.
-  const plan: PlanName = user?.plan ?? "free";
+  // as the cheaper tier, never the more expensive one. `tier` names it the way
+  // it was bought (Lifetime, Commercial); `plan` is the fallback for a session
+  // from before `tier` existed.
+  const tier: PlanTier = user?.tier ?? user?.plan ?? "free";
 
   // While the session is unknown, show the *button*, not a placeholder.
   //
@@ -40,7 +42,7 @@ export function UserMenu({ className }: { className?: string }) {
   // makes this verifiable without a browser.
   return user ? (
     <Suspense fallback={<AvatarSlot className={className} />}>
-      <AccountMenu user={user} plan={plan} className={className} />
+      <AccountMenu user={user} tier={tier} className={className} />
     </Suspense>
   ) : (
     <SignIn className={className} />

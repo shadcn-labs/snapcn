@@ -266,6 +266,63 @@ export type CheckoutProduct = keyof typeof CHECKOUT_PRODUCTS;
  */
 export type Licence = "personal" | "commercial";
 
+/**
+ * What someone holds, named the way they bought it — the one answer every
+ * surface gives: the account menu, `/account`, the pricing cards, the email a
+ * guest buyer gets.
+ *
+ * `PlanName` is what a purchase *unlocks*, and Pro, Lifetime and Commercial all
+ * unlock the same thing, so all three are stored as `pro`. That was right for
+ * gating and wrong for everything a buyer reads: a $249 Lifetime buyer saw
+ * "Pro" in the menu and the annual card marked as theirs, and wrote in asking
+ * whether they had been sold the wrong plan. Anything that *names* a plan goes
+ * through `tierOfPurchase`; anything that *gates* keeps reading `PlanName`.
+ */
+export type PlanTier = "free" | "starter" | "pro" | "lifetime" | "commercial";
+
+/** Each tier includes everything before it: Commercial is "everything in Lifetime". */
+export const TIER_ORDER: readonly PlanTier[] = [
+  "free",
+  "starter",
+  "pro",
+  "lifetime",
+  "commercial",
+];
+
+export const TIER_NAME: Record<PlanTier, string> = {
+  free: "Free",
+  starter: "Starter",
+  pro: "Pro",
+  lifetime: "Lifetime",
+  commercial: "Commercial",
+};
+
+/** Whether holding `held` already gives you everything `tier` does. */
+export function tierIncludes(held: PlanTier, tier: PlanTier): boolean {
+  return TIER_ORDER.indexOf(held) >= TIER_ORDER.indexOf(tier);
+}
+
+/**
+ * The tier a billing row was bought as. Commercial by its licence; otherwise a
+ * subscription behind it is the annual Pro, and none is the one-time Lifetime.
+ */
+export function tierOfPurchase(row: {
+  plan: PlanName;
+  licence: string;
+  subscriptionId: string | null;
+}): PlanTier {
+  if (row.plan !== "pro") return row.plan;
+  if (row.licence === "commercial") return "commercial";
+  return row.subscriptionId ? "pro" : "lifetime";
+}
+
+/** The tier a checkout product sells, or null for anything that grants none. */
+export function tierForProduct(value: unknown): PlanTier | null {
+  if (value === "everything_annual") return "pro";
+  if (value === "lifetime" || value === "commercial") return value;
+  return null;
+}
+
 /** People on one Commercial licence, the owner included. */
 export const COMMERCIAL_SEATS = 5;
 

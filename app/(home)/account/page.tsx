@@ -5,7 +5,12 @@ import { auth } from "@/auth";
 import { CommandLine } from "@/components/command-line";
 import { buttonVariants } from "@/components/ui/button";
 import { SERVER } from "@/lib/mcp-clients";
-import { COMMERCIAL_SEATS, PRO_SAMPLE } from "@/lib/plans";
+import {
+  COMMERCIAL_SEATS,
+  PRO_SAMPLE,
+  TIER_NAME,
+  tierOfPurchase,
+} from "@/lib/plans";
 import { listApiKeys } from "@/lib/server/api-key";
 import { billingFor, planFor } from "@/lib/server/entitlements";
 import { canInvite, listTeam, teamPlanFor } from "@/lib/server/team";
@@ -240,7 +245,7 @@ export default async function AccountPage({
   );
 }
 
-/** The plan, as its owner would describe it. */
+/** The plan, as its owner would describe it — named by `tierOfPurchase`. */
 function planLine(
   billing: Awaited<ReturnType<typeof billingFor>>,
   pro: boolean,
@@ -252,14 +257,9 @@ function planLine(
     billing.plan !== "free" &&
     (billing.status === "active" || billing.status === "cancelled");
   if (teamOwner && !ownLive)
-    return `Pro · on ${teamOwner}'s Commercial licence`;
+    return `Commercial · seat on ${teamOwner}'s licence`;
   if (!billing || billing.plan === "free") return "Free plan";
-  const name =
-    billing.plan === "pro"
-      ? billing.licence === "commercial"
-        ? "Pro · Commercial"
-        : "Pro"
-      : "Starter";
+  const name = TIER_NAME[tierOfPurchase(billing)];
   const end = billing.currentPeriodEnd
     ? DATE.format(billing.currentPeriodEnd)
     : null;
@@ -267,7 +267,6 @@ function planLine(
     return pro && end ? `${name} · ends ${end}` : `${name} · ${billing.status}`;
   }
   // A one-time purchase has no subscription behind it and no end.
-  if (!billing.subscriptionId)
-    return billing.licence === "commercial" ? "Commercial" : "Lifetime";
+  if (!billing.subscriptionId) return name;
   return end ? `${name} · renews ${end}` : name;
 }

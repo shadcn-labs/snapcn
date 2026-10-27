@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { captureServer } from "@/lib/analytics-server";
-import { licenceForProduct, oneTimePlanFor, planForProduct } from "@/lib/plans";
+import {
+  licenceForProduct,
+  oneTimePlanFor,
+  planForProduct,
+  TIER_NAME,
+  tierForProduct,
+} from "@/lib/plans";
 import { isDbConfigured } from "@/lib/server/db";
 import { type DodoEvent, verifyWebhookSignature } from "@/lib/server/dodo";
 import {
@@ -157,7 +163,10 @@ export async function POST(request: Request) {
   // where the plan is. `sendEmail` never throws.
   const tellGuest = async () => {
     if (!str(metadata.user_id) && guestEmail) {
-      await sendEmail(proReadyEmail(guestEmail));
+      const tier = tierForProduct(metadata.product);
+      await sendEmail(
+        proReadyEmail(guestEmail, tier ? TIER_NAME[tier] : "Pro"),
+      );
     }
   };
 

@@ -96,6 +96,7 @@ describe("planFor", () => {
     };
     return expect(planFor("u1")).resolves.toEqual({
       plan: "free",
+      tier: "free",
       limits: PLANS.free,
     });
   });
@@ -108,9 +109,30 @@ describe("planFor", () => {
       plan: "pro",
       status: "cancelled",
       currentPeriodEnd: new Date(Date.now() + 30 * DAY),
+      subscriptionId: "sub_1",
+      licence: "personal",
     };
     return expect(planFor("u1")).resolves.toEqual({
       plan: "pro",
+      tier: "pro",
+      limits: PLANS.pro,
+    });
+  });
+
+  it("names a one-time purchase Lifetime while gating it as pro", () => {
+    // Lifetime is stored as `pro` (same catalogue) with no subscription behind
+    // it. The menu and pricing page read `tier`; a buyer wrote in when they
+    // read "Pro" for the $249 Lifetime they had paid for.
+    db.state.subscription = {
+      plan: "pro",
+      status: "active",
+      currentPeriodEnd: null,
+      subscriptionId: null,
+      licence: "personal",
+    };
+    return expect(planFor("u1")).resolves.toEqual({
+      plan: "pro",
+      tier: "lifetime",
       limits: PLANS.pro,
     });
   });
@@ -124,6 +146,7 @@ describe("planFor", () => {
     };
     return expect(planFor("u1")).resolves.toEqual({
       plan: "free",
+      tier: "free",
       limits: PLANS.free,
     });
   });
@@ -138,6 +161,7 @@ describe("planFor", () => {
     };
     return expect(planFor("u1")).resolves.toEqual({
       plan: "free",
+      tier: "free",
       limits: PLANS.free,
     });
   });
@@ -150,6 +174,7 @@ describe("planFor", () => {
     };
     return expect(planFor("u1")).resolves.toEqual({
       plan: "starter",
+      tier: "starter",
       limits: PLANS.starter,
     });
   });
@@ -164,6 +189,7 @@ describe("planFor", () => {
     };
     return expect(planFor("u1")).resolves.toEqual({
       plan: "free",
+      tier: "free",
       limits: PLANS.free,
     });
   });
@@ -171,6 +197,7 @@ describe("planFor", () => {
   it("gives an anonymous caller one render and never touches the database", async () => {
     await expect(planFor(null)).resolves.toEqual({
       plan: "anonymous",
+      tier: "free",
       limits: ANONYMOUS,
     });
     // The specific number is a product decision and will move. What must not

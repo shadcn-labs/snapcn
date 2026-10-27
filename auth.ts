@@ -174,7 +174,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // authenticated request, so this is one more indexed lookup on a
         // one-row-per-user table rather than a new class of cost — and
         // `planFor` fails soft, so a billing outage cannot log anybody out.
-        session.user.plan = (await planFor(user.id)).plan as PlanName;
+        const { plan, tier } = await planFor(user.id);
+        session.user.plan = plan as PlanName;
+        // What the menu *calls* it: a Lifetime buyer is stored as `pro` too.
+        session.user.tier = tier;
       }
       // Two fields, not `session`: with database sessions that object is the
       // adapter row, and returning it put `sessionToken` in the JSON of

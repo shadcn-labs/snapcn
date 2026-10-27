@@ -15,7 +15,7 @@ import { PageJsonLd } from "@/lib/page-json-ld";
 import { PRO_SAMPLE } from "@/lib/plans";
 import { proDemoPoster, proDemoSrc } from "@/lib/pro-demos";
 import { RenderedDemo } from "@/lib/rendered-demos";
-import { billingFor, planFor } from "@/lib/server/entitlements";
+import { planFor } from "@/lib/server/entitlements";
 import { docsBreadcrumb } from "@/lib/structured-data";
 import { cn } from "@/lib/utils";
 import { PricingPlans } from "./pricing-plans";
@@ -64,21 +64,14 @@ export default async function PricingPage({
   const { country } = await searchParams;
   const session = await auth().catch(() => null);
   const userId = session?.user?.id ?? null;
-  const [{ plan }, billing] = await Promise.all([
+  // Named by the plan as bought (`PlanTier`), so a Lifetime buyer's card is the
+  // one marked theirs, and the cheaper ones read as included rather than for
+  // sale. Same answer the account menu and /account give.
+  const [{ plan, tier }, { tiers, footnote }] = await Promise.all([
     planFor(userId),
-    userId ? billingFor(userId) : null,
+    pricing({ testCountry: country }),
   ]);
-  // Lifetime and Commercial are both stored as plan "pro"; the card to mark is
-  // told apart by the licence and by having no subscription behind it.
-  const currentPlan =
-    plan === "pro" && billing?.plan === "pro"
-      ? billing.licence === "commercial"
-        ? "commercial"
-        : billing.subscriptionId
-          ? "pro"
-          : "lifetime"
-      : plan;
-  const { tiers, footnote } = await pricing({ testCountry: country });
+  const currentPlan = plan === "anonymous" ? "anonymous" : tier;
   const showcase = SHOWCASE.flatMap((slug) => {
     const src = proDemoSrc(slug);
     const item = PRO_GALLERY_ITEMS.find((i) => i.href.endsWith(`/${slug}`));

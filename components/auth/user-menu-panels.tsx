@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { identifyUser, resetUser, useTrackEvent } from "@/lib/analytics";
 import { type AuthProviderId, EMAIL_PROVIDER_ID } from "@/lib/auth-providers";
-import type { PlanName } from "@/lib/plans";
+import type { PlanTier } from "@/lib/plans";
 import { cn } from "@/lib/utils";
 import type { ProjectSummary } from "@/lib/video-editor/project";
 
@@ -48,10 +48,12 @@ import type { ProjectSummary } from "@/lib/video-editor/project";
  * ceilings nobody will meet, and putting one here would advertise a limit
  * instead of a capability — the opposite of what this row is for.
  */
-const PLAN_LABEL: Record<PlanName, string> = {
+const PLAN_LABEL: Record<PlanTier, string> = {
   free: "Free — 720p, watermarked",
   starter: "Starter — 1080p, no watermark",
   pro: "Pro — components, MCP, no watermark",
+  lifetime: "Lifetime — everything, forever",
+  commercial: "Commercial — everything, for client work",
 };
 
 export function SignInDialog({
@@ -136,10 +138,10 @@ const RECENT_VIDEOS = 5;
 
 export function AccountMenu({
   user,
-  plan,
+  tier,
   className,
 }: {
-  plan: PlanName;
+  tier: PlanTier;
   user: {
     id?: string;
     name?: string | null;
@@ -240,9 +242,9 @@ export function AccountMenu({
         <div className="flex items-center gap-2 px-3 pb-2.5">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2 py-0.5 text-[0.6875rem] font-medium text-muted-foreground">
             <Film className="size-3" />
-            {PLAN_LABEL[plan]}
+            {PLAN_LABEL[tier]}
           </span>
-          {plan === "free" && (
+          {tier === "free" && (
             // To the one pricing page, not straight into a $129 checkout: the
             // reader picks annual, lifetime or commercial there.
             <Link

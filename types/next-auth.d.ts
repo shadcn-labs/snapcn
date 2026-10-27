@@ -1,5 +1,5 @@
 import type { DefaultSession } from "next-auth";
-import type { PlanName } from "@/lib/plans";
+import type { PlanName, PlanTier } from "@/lib/plans";
 
 declare module "next-auth" {
   /**
@@ -10,6 +10,8 @@ declare module "next-auth" {
     user: {
       id: string;
       plan: PlanName;
+      /** The plan as bought — Lifetime and Commercial are `plan: "pro"`. */
+      tier?: PlanTier;
     } & DefaultSession["user"];
   }
 }
