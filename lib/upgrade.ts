@@ -1,5 +1,5 @@
-import { offerEarned } from "@/lib/offer";
-import { type CheckoutProduct, OFFER } from "@/lib/plans";
+import { bannerOfferEnds, offerEarned } from "@/lib/offer";
+import { BANNER_OFFER, type CheckoutProduct, OFFER } from "@/lib/plans";
 
 /**
  * Re-exported, not re-declared: the list of products lives in
@@ -26,11 +26,15 @@ export type UpgradeProduct = CheckoutProduct;
 export async function startCheckout(
   product: UpgradeProduct,
   /**
-   * A code to pre-apply on Dodo's page. Defaults to `OFFER.code` once this
-   * browser has earned it, so every buy button honours what the banner shows;
-   * with neither, the server applies the banner's code inside its window.
+   * A code to pre-apply on Dodo's page. Defaults to the banner's 10% while its
+   * countdown runs — what the banner shows — and to `OFFER.code` after, once
+   * this browser has earned it.
    */
-  discount: string | undefined = offerEarned() ? OFFER.code : undefined,
+  discount: string | undefined = bannerOfferEnds() > Date.now()
+    ? BANNER_OFFER.code
+    : offerEarned()
+      ? OFFER.code
+      : undefined,
 ): Promise<void> {
   const res = await fetch("/api/checkout", {
     method: "POST",
