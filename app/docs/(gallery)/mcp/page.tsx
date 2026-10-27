@@ -62,6 +62,26 @@ const jsonLd = [
   docsBreadcrumb(TITLE, PATH),
 ];
 
+function Step({
+  n,
+  title,
+  children,
+}: {
+  n: number;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <li className="relative">
+      <span className="absolute top-0 -left-8 flex size-7 -translate-x-1/2 items-center justify-center rounded-full border border-border bg-background font-mono text-muted-foreground text-xs sm:-left-10">
+        {n}
+      </span>
+      <h2 className="font-medium text-foreground text-lg leading-7">{title}</h2>
+      <div className="mt-2">{children}</div>
+    </li>
+  );
+}
+
 export default function McpPage() {
   return (
     <GalleryFrame>
@@ -78,74 +98,101 @@ export default function McpPage() {
         <p className="mt-4 max-w-lg text-pretty text-body-lg text-current/70">
           Your agent searches the registry, reads a component&apos;s real props
           and plans the whole video from a one-line brief — then installs the
-          components with the shadcn CLI. Included with{" "}
+          components with the shadcn CLI.
+        </p>
+
+        {/* A rail of numbered steps rather than three equal cards: the key is a
+            sentence, the install is the panel, and the prompts are the payoff. */}
+        <ol className="mt-14 space-y-14 border-border border-l pl-8 sm:pl-10">
+          <Step n={1} title="Get your key">
+            <p className="max-w-lg text-pretty text-current/70">
+              Every{" "}
+              <Link
+                href="/docs/pricing?ref=mcp"
+                className="text-foreground underline underline-offset-4"
+              >
+                Pro
+              </Link>{" "}
+              plan includes one. Copy it from{" "}
+              <Link
+                href="/account"
+                className="text-foreground underline underline-offset-4"
+              >
+                your account
+              </Link>{" "}
+              — it replaces{" "}
+              <code className="font-mono text-foreground text-sm">
+                YOUR_KEY
+              </code>{" "}
+              below.
+            </p>
+          </Step>
+          <Step n={2} title="Add the server to your agent">
+            <div className="max-w-3xl rounded-2xl border border-border bg-card p-5">
+              <McpClients />
+            </div>
+          </Step>
+          <Step n={3} title="Ask for a video">
+            <p className="max-w-lg text-pretty text-current/70">
+              Paste any prompt below. The agent picks the tool itself.
+            </p>
+            <div className="mt-6">
+              <McpJobs />
+            </div>
+          </Step>
+        </ol>
+
+        <h2 className="mt-24 font-sans text-[clamp(1.5rem,2.8vw,2rem)] font-normal leading-[1.1] tracking-[-0.03em] text-foreground">
+          Good to know
+        </h2>
+        <dl className="mt-6 grid gap-x-10 gap-y-8 border-border border-t pt-8 sm:grid-cols-3">
+          <div>
+            <dt className="font-medium text-foreground">Runs locally</dt>
+            <dd className="mt-1.5 text-muted-foreground text-sm">
+              Node 18 or newer. Previews and recording analysis use the Remotion
+              CLI already in your project. The live registry is read first, with
+              a copy bundled in the package as fallback.
+            </dd>
+          </div>
+          <div>
+            <dt className="font-medium text-foreground">Your key</dt>
+            <dd className="mt-1.5 text-muted-foreground text-sm">
+              Checked with snapcn.dev on the first call and every 15 minutes
+              after. Delete it on your account and the server stops within that.
+            </dd>
+          </div>
+          <div>
+            <dt className="font-medium text-foreground">Pro components</dt>
+            <dd className="mt-1.5 text-muted-foreground text-sm">
+              {/* Two places need the key: the server's arguments (above), which
+                  unlock the tools, and the project's components.json, which the
+                  shadcn CLI reads to install Pro source. /account shows both. */}
+              Show up in search, marked Pro. Installing one also needs your key
+              in{" "}
+              <code className="font-mono text-foreground text-xs">
+                components.json
+              </code>{" "}
+              —{" "}
+              <Link
+                href="/account"
+                className="text-foreground underline underline-offset-4"
+              >
+                see your account
+              </Link>
+              .
+            </dd>
+          </div>
+        </dl>
+        <p className="mt-12 text-muted-foreground text-sm">
+          Rather teach the agent than run a server?{" "}
           <Link
-            href="/docs/pricing?ref=mcp"
+            href="/docs/getting-started/agent-skill"
             className="text-foreground underline underline-offset-4"
           >
-            snapcn Pro
-          </Link>
-          : replace{" "}
-          <code className="font-mono text-foreground text-sm">YOUR_KEY</code>{" "}
-          with a key from{" "}
-          <Link
-            href="/account"
-            className="text-foreground underline underline-offset-4"
-          >
-            your account
+            Install the agent skill
           </Link>
           .
         </p>
-
-        <div className="mt-10">
-          <McpClients />
-        </div>
-
-        <h2 className="mt-20 font-sans text-[clamp(1.5rem,2.8vw,2rem)] font-normal leading-[1.1] tracking-[-0.03em] text-foreground">
-          What do you want to do?
-        </h2>
-        <p className="mt-3 max-w-lg text-pretty text-current/70">
-          Each card is one of the server&apos;s six tools. Copy the prompt into
-          your agent and it picks the tool itself.
-        </p>
-        <div className="mt-8">
-          <McpJobs />
-        </div>
-
-        <div className="mt-12 rounded-2xl border border-border bg-card p-6 text-muted-foreground text-sm">
-          <p>
-            Needs Node 18 or newer. The server checks your key with snapcn.dev
-            on the first call and every 15 minutes after — delete a key on your
-            account and it stops within that — then reads the live registry and
-            falls back to a copy bundled in the package. Previews and recording
-            analysis run on the Remotion CLI already in your project.
-          </p>
-          <p className="mt-3">
-            {/* Two places need the key: the server's arguments (above), which
-                unlock the tools, and the project's components.json, which the
-                shadcn CLI reads to install Pro source. /account shows both. */}
-            Pro components show up in search with their props, marked Pro.
-            Installing one takes your key in{" "}
-            <code className="font-mono text-foreground text-xs">
-              components.json
-            </code>{" "}
-            —{" "}
-            <Link
-              href="/account"
-              className="text-foreground underline underline-offset-4"
-            >
-              see your account
-            </Link>
-            . Rather teach the agent than run a server?{" "}
-            <Link
-              href="/docs/getting-started/agent-skill"
-              className="text-foreground underline underline-offset-4"
-            >
-              Install the agent skill
-            </Link>
-            .
-          </p>
-        </div>
       </div>
     </GalleryFrame>
   );

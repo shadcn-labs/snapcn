@@ -137,6 +137,8 @@ const SEARCH_LEADS: Record<string, string> = {
     "Typewriter headline animation: gradient words type in while a trend line draws below.",
   "ember-reveal":
     "Glow text reveal animation: a brush sweeps across and blooms into a glow that writes the line.",
+  "spark-question":
+    "Kinetic typography question: a headline asked phrase by phrase, each landing huge as sparkles dart past.",
   "hype-reel":
     "Viral post animation: a video card's views race up as comments and reactions spring in.",
   "depth-swap":

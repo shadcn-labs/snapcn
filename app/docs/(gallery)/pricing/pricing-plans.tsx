@@ -1,12 +1,13 @@
 "use client";
 
-import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { ArrowRight, Check, Loader2, TicketPercent } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useTrackEvent } from "@/lib/analytics";
 import {
+  bannerOfferEnds,
   codeInUrl,
   countPricingVisit,
   earnOffer,
@@ -14,9 +15,119 @@ import {
   offerEarned,
   REPEAT_VISITS,
 } from "@/lib/offer";
-import { OFFER } from "@/lib/plans";
+import { BANNER_OFFER, OFFER } from "@/lib/plans";
 import { startCheckout, type UpgradeProduct } from "@/lib/upgrade";
 import { cn } from "@/lib/utils";
+
+/** A price string split around its number: "Rp 849,000" → "Rp ", 849000, "". */
+function parsePrice(price: string) {
+  const m = price.match(/^(\D*)([\d,]+(?:\.\d+)?)(\D*)$/);
+  if (!m) return null;
+  return {
+    prefix: m[1],
+    value: Number(m[2].replace(/,/g, "")),
+    decimals: m[2].split(".")[1]?.length ?? 0,
+    suffix: m[3],
+  };
+}
+
+/** `price` less `percent`, written the way `price` was ("₹9,499" → "₹8,549"). */
+function lessPercent(price: string, percent: number, t = 1): string {
+  const p = parsePrice(price);
+  if (!p) return price;
+  const v = p.value * (1 - (percent / 100) * t);
+  return (
+    p.prefix +
+    v.toLocaleString("en", {
+      minimumFractionDigits: p.decimals,
+      maximumFractionDigits: p.decimals,
+    }) +
+    p.suffix
+  );
+}
+
+/**
+ * Every amount in `text` that is `price` or the "… with tax" total, less the
+ * offer — so the button and caption quote what checkout will charge. The tax
+ * total scales exactly: tax is a percentage of the discounted subtotal.
+ */
+function withOffer(text: string, price: string, percent: number): string {
+  return text
+    .replace(price, lessPercent(price, percent))
+    .replace(/(\S*\d[\d,]*(?:\.\d+)?)(?= with tax)/, (m) =>
+      lessPercent(m, percent),
+    );
+}
+
+const OFFER_KEYFRAMES = `
+@keyframes offer-stamp { 0% { opacity: 0; transform: scale(1.35) rotate(-4deg); } 60% { opacity: 1; transform: scale(0.97) rotate(0.5deg); } 100% { transform: scale(1) rotate(0); } }
+@keyframes offer-shine { from { transform: translateX(-120%) skewX(-20deg); } to { transform: translateX(420%) skewX(-20deg); } }
+@keyframes offer-strike { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes offer-pop { 0% { opacity: 0; transform: scale(0.6); } 70% { opacity: 1; transform: scale(1.08); } 100% { transform: scale(1); } }`;
+
+/**
+ * A card's price with the offer landing on it: the list price is struck
+ * through, the big number counts down to what checkout will charge, then the
+ * saving pops in. Rounded the way the price was written (no cents on "₹9,499");
+ * Dodo's own page shows the exact figure. Reduced motion lands on the result.
+ */
+function OfferPrice({
+  price,
+  percent,
+  firstYear,
+  className,
+}: {
+  price: string;
+  percent: number;
+  firstYear: boolean;
+  className: string;
+}) {
+  const parts = parsePrice(price);
+  const [shown, setShown] = useState(price);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (!parsePrice(price)) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setShown(lessPercent(price, percent));
+      setDone(true);
+      return;
+    }
+    // Starts once the strike has drawn; ease-out cubic over 700ms.
+    const start = performance.now() + 550;
+    let raf = 0;
+    const step = (now: number) => {
+      const t = Math.min(1, Math.max(0, (now - start) / 700));
+      setShown(lessPercent(price, percent, 1 - (1 - t) ** 3));
+      if (t < 1) raf = requestAnimationFrame(step);
+      else setDone(true);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [price, percent]);
+
+  if (!parts) return <span className={className}>{price}</span>;
+
+  return (
+    <span className="flex flex-col">
+      <span className="flex items-center gap-2 text-sm">
+        <span className="relative text-muted-foreground">
+          {price}
+          <span
+            aria-hidden
+            className="absolute inset-x-[-2px] top-1/2 h-[1.5px] origin-left animate-[offer-strike_350ms_ease-out_200ms_both] bg-current"
+          />
+        </span>
+        {done && (
+          <span className="animate-[offer-pop_350ms_ease-out_both] rounded-md bg-emerald-500/10 px-1.5 py-0.5 font-medium text-emerald-600 text-xs dark:text-emerald-400">
+            −{percent}%{firstYear ? " first year" : ""}
+          </span>
+        )}
+      </span>
+      <span className={cn(className, "tabular-nums")}>{shown}</span>
+    </span>
+  );
+}
 
 /**
  * The pricing cards — the Staged Pricing layout from Ruixen UI
@@ -79,14 +190,22 @@ export function PricingPlans({
 }) {
   const trackEvent = useTrackEvent();
   const [pending, setPending] = useState<UpgradeProduct | null>(null);
-  const [offer, setOffer] = useState(false);
+  // The banner's code for anyone not paying; the intent offer once earned.
+  const [offer, setOffer] = useState<typeof OFFER | typeof BANNER_OFFER | null>(
+    null,
+  );
   const layout = LAYOUT[tiers.length] ?? LAYOUT[4];
 
   // The intent offer (`lib/offer.ts`), for anyone not yet paying: arriving from
   // the CLI paywall's link, a third separate visit here, or already earned at
   // another wall. After mount only — the page is the same HTML for everyone.
   useEffect(() => {
-    if (currentPlan !== "free" && currentPlan !== "anonymous") return;
+    // The banner's offer is for anyone buying while its window runs — an
+    // upgrade too; the server applies it the same way (`/api/checkout`).
+    if (currentPlan !== "free" && currentPlan !== "anonymous") {
+      setOffer(bannerOfferEnds() > Date.now() ? BANNER_OFFER : null);
+      return;
+    }
     const visits = countPricingVisit();
     let earned: OfferTrigger | null = null;
     if (codeInUrl(window.location.search)) earned = "cli";
@@ -95,7 +214,13 @@ export function PricingPlans({
       earnOffer(earned);
       trackEvent("offer_shown", { trigger: earned });
     }
-    setOffer(earned !== null || offerEarned());
+    setOffer(
+      earned !== null || offerEarned()
+        ? OFFER
+        : bannerOfferEnds() > Date.now()
+          ? BANNER_OFFER
+          : null,
+    );
   }, [currentPlan, trackEvent]);
 
   async function buy(product: UpgradeProduct) {
@@ -104,10 +229,10 @@ export function PricingPlans({
     trackEvent("upgrade_started", {
       from,
       plan: product,
-      ...(offer ? { discount: OFFER.code } : {}),
+      ...(offer ? { discount: offer.code } : {}),
     });
     try {
-      await startCheckout(product, offer ? OFFER.code : undefined);
+      await startCheckout(product, offer?.code);
     } catch (err) {
       setPending(null);
       toast.error(
@@ -119,12 +244,34 @@ export function PricingPlans({
   return (
     <div>
       {offer && (
-        // The code, named outright, so it can be typed on Dodo's page too.
-        // No timer: the code does not expire, so nothing here says it will.
-        <p className="mx-auto mb-8 w-fit text-pretty rounded-lg border border-primary/20 bg-primary/10 px-3 py-1.5 text-center text-primary text-sm">
-          Code <span className="font-medium font-mono">{OFFER.code}</span> —{" "}
-          {OFFER.percent}% off your first payment, applied at checkout.
-        </p>
+        // Stamped on like a ticket, with one sweep of light: the moment the
+        // banner's promise lands. The intent code is named outright, so it can
+        // be typed on Dodo's page too.
+        <div className="mb-8 flex justify-center">
+          <style>{OFFER_KEYFRAMES}</style>
+          <p className="relative flex w-fit animate-[offer-stamp_550ms_cubic-bezier(0.2,0.8,0.2,1)_both] items-center gap-2 overflow-hidden text-pretty rounded-full border border-primary/25 bg-primary/10 py-1.5 pr-4 pl-1.5 text-primary text-sm motion-reduce:animate-none">
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+              <TicketPercent className="size-3.5" aria-hidden="true" />
+            </span>
+            <span>
+              {offer.code === OFFER.code ? (
+                <>
+                  Code{" "}
+                  <span className="font-medium font-mono">{offer.code}</span>{" "}
+                  applied
+                </>
+              ) : (
+                <span className="font-medium">Regional offer applied</span>
+              )}{" "}
+              — {offer.percent}% off your first payment, automatically at
+              checkout.
+            </span>
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 left-0 w-1/4 animate-[offer-shine_900ms_ease-in-out_600ms_both] bg-gradient-to-r from-transparent via-white/60 to-transparent motion-reduce:hidden"
+            />
+          </p>
+        </div>
       )}
       <div className={cn("relative grid grid-cols-1 gap-6", layout.grid)}>
         <FrameLines columns={tiers.length} visible={layout.frame} />
@@ -138,6 +285,17 @@ export function PricingPlans({
            */
           const ctaClass =
             "group/cta h-12 w-full gap-2 rounded-button text-base font-medium transition-[background-color,transform] duration-150 ease-out active:scale-[0.97] lg:h-11";
+          /** The offer's percent where it lands on this card, else 0. */
+          const discounted =
+            offer && tier.product && !current ? offer.percent : 0;
+          const priceClass = cn(
+            "whitespace-nowrap font-semibold text-foreground tracking-tight",
+            tier.price.length <= 5
+              ? "text-5xl"
+              : tier.price.length <= 7
+                ? "text-4xl"
+                : "text-3xl",
+          );
           const arrow = (
             <ArrowRight
               aria-hidden
@@ -161,18 +319,16 @@ export function PricingPlans({
                   <div className="flex items-start gap-2">
                     {/* Stepped down for long regional prices — "₫1,249,000"
                         at 48px is wider than the card. */}
-                    <span
-                      className={cn(
-                        "whitespace-nowrap font-semibold text-foreground tracking-tight",
-                        tier.price.length <= 5
-                          ? "text-5xl"
-                          : tier.price.length <= 7
-                            ? "text-4xl"
-                            : "text-3xl",
-                      )}
-                    >
-                      {tier.price}
-                    </span>
+                    {discounted ? (
+                      <OfferPrice
+                        price={tier.price}
+                        percent={discounted}
+                        firstYear={tier.product === "everything_annual"}
+                        className={priceClass}
+                      />
+                    ) : (
+                      <span className={priceClass}>{tier.price}</span>
+                    )}
                     {tier.badge && (
                       <span className="mt-[6px] inline-flex shrink-0 items-center whitespace-nowrap rounded-lg border border-primary/20 bg-primary/10 px-[7px] py-[3px] font-medium text-primary text-xs">
                         {tier.badge}
@@ -180,7 +336,9 @@ export function PricingPlans({
                     )}
                   </div>
                   <p className="mt-0.5 text-muted-foreground text-xs">
-                    {tier.caption}
+                    {discounted
+                      ? withOffer(tier.caption, tier.price, discounted)
+                      : tier.caption}
                   </p>
                 </div>
 
@@ -234,7 +392,13 @@ export function PricingPlans({
                         NotFoundError and the page died mid-checkout. Measured:
                         a buyer on Edge, 30ms after "upgrade_started", never
                         reached Dodo. */}
-                    <span>{current ? "Your plan" : tier.cta}</span>
+                    <span>
+                      {current
+                        ? "Your plan"
+                        : discounted
+                          ? withOffer(tier.cta, tier.price, discounted)
+                          : tier.cta}
+                    </span>
                     {current || pending === tier.product ? null : arrow}
                   </Button>
                 ) : (

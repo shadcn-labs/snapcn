@@ -417,3 +417,29 @@ export const OFFER = {
   code: "SNAPCN25",
   percent: 25,
 } as const;
+
+/**
+ * The site-wide banner's offer: 10% off, for `hours` from a browser's first
+ * sight of it. Created in both Dodo modes on 2026-10-27 with the same terms as
+ * `OFFER` (three snapcn products, first payment, once per customer). The banner
+ * frames it with the visitor's country; the code is the same everywhere.
+ * Someone who has earned `OFFER` gets that instead — the bigger one.
+ *
+ * The countdown is real: `cookie` holds the end time, the banner disappears at
+ * it and `/api/checkout` stops applying the code after it. That is why the
+ * banner never prints the code — once the window closes, the offer is gone.
+ */
+export const BANNER_OFFER = {
+  code: "SNAPCN10",
+  percent: 10,
+  hours: 24,
+  cookie: "snapcn_offer_until",
+} as const;
+
+/** The banner offer's end time (epoch ms) from a cookie header, 0 if unset. */
+export function bannerOfferEndsIn(cookies: string | null | undefined): number {
+  const m = cookies?.match(
+    new RegExp(`(?:^|;\\s*)${BANNER_OFFER.cookie}=(\\d+)`),
+  );
+  return m ? Number(m[1]) : 0;
+}
