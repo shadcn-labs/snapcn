@@ -1,4 +1,5 @@
-import type { CheckoutProduct } from "@/lib/plans";
+import { offerEarned } from "@/lib/offer";
+import { type CheckoutProduct, OFFER } from "@/lib/plans";
 
 /**
  * Re-exported, not re-declared: the list of products lives in
@@ -24,8 +25,12 @@ export type UpgradeProduct = CheckoutProduct;
  */
 export async function startCheckout(
   product: UpgradeProduct,
-  /** `OFFER.code`, pre-applied on Dodo's page. Anything else is ignored server-side. */
-  discount?: string,
+  /**
+   * A code to pre-apply on Dodo's page. Defaults to `OFFER.code` once this
+   * browser has earned it, so every buy button honours what the banner shows;
+   * with neither, the server applies the banner's code inside its window.
+   */
+  discount: string | undefined = offerEarned() ? OFFER.code : undefined,
 ): Promise<void> {
   const res = await fetch("/api/checkout", {
     method: "POST",

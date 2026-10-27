@@ -2,10 +2,11 @@
 
 import { ArrowRight, X } from "lucide-react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useTrackEvent } from "@/lib/analytics";
-import { bannerOfferEnds } from "@/lib/offer";
-import { BANNER_OFFER } from "@/lib/plans";
+import { bannerOfferEnds, offerEarned } from "@/lib/offer";
+import { BANNER_OFFER, OFFER } from "@/lib/plans";
 import { cn } from "@/lib/utils";
 
 const HREF = "/docs/pricing?ref=sale_banner#plans";
@@ -75,12 +76,24 @@ function Pair({ value }: { value: number }) {
  * blue reads as trust and an offer should read as good news — a dark bar read
  * as a warning. Lighter than the early-bird's, with no dark vignette. Decided on the
  * client only: most pages are prerendered. Dismissible for the visit.
+ *
+ * A browser that has earned `OFFER` (lib/offer.ts) is shown that instead — the
+ * bigger code the pricing page and checkout will apply — so the bar and the
+ * page never disagree. No timer then: that code does not expire.
+ *
+ * Not shown to a paying customer (Pro, Lifetime, Commercial — `PlanTier`): an
+ * offer on the plan they already own reads as a billing mistake, and the
+ * pricing page shows them no offer either.
  */
 export function SaleBanner() {
   const trackEvent = useTrackEvent();
+  const { data: session, status } = useSession();
+  const tier = session?.user?.tier ?? session?.user?.plan ?? "free";
   const [time, setTime] = useState<ReturnType<typeof left> | null>(null);
   const [dismissed, setDismissed] = useState(false);
   const [country, setCountry] = useState<string | null>(null);
+  // Null until read, so the bar never flashes 10% before switching to 25%.
+  const [earned, setEarned] = useState<boolean | null>(null);
 
   useEffect(() => {
     fetch(
@@ -92,6 +105,9 @@ export function SaleBanner() {
   }, []);
 
   useEffect(() => {
+    const won = offerEarned();
+    setEarned(won);
+    if (won) return;
     const end = bannerOfferEnds();
     setTime(left(end, Date.now()));
     const id = setInterval(() => {
@@ -102,19 +118,25 @@ export function SaleBanner() {
     return () => clearInterval(id);
   }, []);
 
-  if (!time || time.total <= 0 || dismissed) return null;
+  if (dismissed || earned === null || status === "loading") return null;
+  if (tier !== "free" && tier !== "starter") return null;
+  const offer = earned ? OFFER : BANNER_OFFER;
+  // The timer only ever counts the banner's own window.
+  if (!earned && (!time || time.total <= 0)) return null;
 
   const colon = cn(
     "self-center text-sm font-light transition-opacity duration-500",
-    time.seconds % 2 === 0 ? "opacity-60" : "opacity-30",
+    (time?.seconds ?? 0) % 2 === 0 ? "opacity-60" : "opacity-30",
   );
   const label =
     "text-center text-[8px] font-medium uppercase tracking-[0.15em] text-white/60";
-  const units: [number, string][] = [
-    [time.hours, "hrs"],
-    [time.minutes, "min"],
-    [time.seconds, "sec"],
-  ];
+  const units: [number, string][] = time
+    ? [
+        [time.hours, "hrs"],
+        [time.minutes, "min"],
+        [time.seconds, "sec"],
+      ]
+    : [];
 
   return (
     <div
@@ -146,34 +168,46 @@ export function SaleBanner() {
         className="pointer-events-none absolute inset-y-0 left-0 w-1/4 animate-[banner-shine_4s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/25 to-transparent motion-reduce:hidden"
       />
       <div className="relative flex items-center gap-x-6">
-        <span className="hidden font-medium text-sm md:inline">
-          {country
-            ? `${country} has a special offer`
-            : "You have a special offer"}
-          <span className="hidden text-white/75 lg:inline">
-            {" "}
-            — {BANNER_OFFER.percent}% off Pro, auto-applied at checkout. Ends in
+        {earned ? (
+          <span className="font-medium text-sm">
+            You&apos;ve unlocked a special offer
+            <span className="hidden text-white/75 md:inline">
+              {" "}
+              — {offer.percent}% off Pro, auto-applied at checkout.
+            </span>
           </span>
-        </span>
+        ) : (
+          <>
+            <span className="hidden font-medium text-sm md:inline">
+              {country
+                ? `${country} has a special offer`
+                : "You have a special offer"}
+              <span className="hidden text-white/75 lg:inline">
+                {" "}
+                — {offer.percent}% off Pro, auto-applied at checkout. Ends in
+              </span>
+            </span>
 
-        {/* Labels in their own grid row, so they never shift the digits off
-            the bar's centre line. */}
-        <div
-          className="inline-grid grid-flow-col grid-rows-[auto_auto] items-center gap-x-1.5"
-          role="timer"
-          aria-label={`${time.hours} hours ${time.minutes} minutes left`}
-        >
-          {units.map(([value, name], i) => (
-            <Unit
-              key={name}
-              value={value}
-              name={name}
-              last={i === units.length - 1}
-              colon={colon}
-              label={label}
-            />
-          ))}
-        </div>
+            {/* Labels in their own grid row, so they never shift the digits off
+                the bar's centre line. */}
+            <div
+              className="inline-grid grid-flow-col grid-rows-[auto_auto] items-center gap-x-1.5"
+              role="timer"
+              aria-label={`${time?.hours} hours ${time?.minutes} minutes left`}
+            >
+              {units.map(([value, name], i) => (
+                <Unit
+                  key={name}
+                  value={value}
+                  name={name}
+                  last={i === units.length - 1}
+                  colon={colon}
+                  label={label}
+                />
+              ))}
+            </div>
+          </>
+        )}
 
         <Link
           href={HREF}
@@ -182,7 +216,7 @@ export function SaleBanner() {
           }
           className="group inline-flex h-8 shrink-0 items-center gap-1 rounded-button bg-white px-3.5 font-medium text-primary text-sm shadow-[0_1px_2px_rgba(0,0,0,0.12)] transition-shadow hover:shadow-[0_0_18px_rgba(255,255,255,0.55)]"
         >
-          Claim {BANNER_OFFER.percent}%
+          Claim {offer.percent}%
           <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
         </Link>
       </div>

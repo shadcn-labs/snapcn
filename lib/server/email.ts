@@ -710,9 +710,13 @@ For help, reply to this email or write to ${SUPPORT}.
  * plan sits on the address they typed at checkout; if they closed the tab
  * before signing in, this is the only thing that tells them how to reach it.
  */
-export function proReadyEmail(to: string): Email {
+export function proReadyEmail(
+  to: string,
+  /** What they bought, by `tierForProduct` — "Lifetime" rather than "Pro". */
+  name = "Pro",
+): Email {
   const url = `${SITE}/signin?paid=1&callbackUrl=${encodeURIComponent("/account?checkout=done")}`;
-  const text = `Your snapcn Pro is ready.
+  const text = `Your snapcn ${name} is ready.
 
 Sign in with this address (${to}) to get your API key and the install steps:
 
@@ -724,14 +728,14 @@ For help, reply to this email or write to ${SUPPORT}.
 
   return {
     to,
-    subject: "Your snapcn Pro is ready",
+    subject: `Your snapcn ${name} is ready`,
     reply_to: SUPPORT,
     text,
     html: accountShell({
       preheader: "Sign in with this address to get your API key.",
       greeting: "Hi,",
-      heading: "Your Pro is ready",
-      lead: "Thanks for buying snapcn Pro. Sign in with the address you paid with to get your API key and the install steps.",
+      heading: `Your ${name} is ready`,
+      lead: `Thanks for buying snapcn ${name}. Sign in with the address you paid with to get your API key and the install steps.`,
       rows: [
         ["Account", esc(to)],
         ["Purchase date", utcDate()],

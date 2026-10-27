@@ -8,6 +8,8 @@ import {
   PLANS,
   type PlanLimits,
   type PlanName,
+  type PlanTier,
+  tierOfPurchase,
 } from "@/lib/plans";
 import { ensureApiKey } from "@/lib/server/api-key";
 import { getDb, isDbConfigured } from "@/lib/server/db";
@@ -61,6 +63,8 @@ export class QuotaExceededError extends Error {
 
 export interface ResolvedPlan {
   plan: PlanName | "anonymous";
+  /** What to call it — see `PlanTier`. Never use it to gate; `plan` gates. */
+  tier: PlanTier;
   limits: PlanLimits;
 }
 
@@ -92,15 +96,18 @@ interface PlanRow {
   plan: PlanName;
   status: string;
   currentPeriodEnd: Date | null;
+  subscriptionId: string | null;
+  licence: string;
 }
 
 export async function planFor(userId: string | null): Promise<ResolvedPlan> {
   // "No user" and "user on no plan" are different questions with different
   // answers: an anonymous caller has no durable identity to count against, so
   // it gets its own bucket rather than being folded into free.
-  if (!userId) return { plan: "anonymous", limits: ANONYMOUS };
+  if (!userId) return { plan: "anonymous", tier: "free", limits: ANONYMOUS };
 
-  if (!isDbConfigured) return { plan: "free", limits: PLANS.free };
+  if (!isDbConfigured)
+    return { plan: "free", tier: "free", limits: PLANS.free };
 
   // Fails soft, deliberately.
   //
@@ -120,23 +127,22 @@ export async function planFor(userId: string | null): Promise<ResolvedPlan> {
         plan: billingSubscriptions.plan,
         status: billingSubscriptions.status,
         currentPeriodEnd: billingSubscriptions.currentPeriodEnd,
+        subscriptionId: billingSubscriptions.dodoSubscriptionId,
+        licence: billingSubscriptions.licence,
       })
       .from(billingSubscriptions)
       .where(eq(billingSubscriptions.userId, userId))
       .limit(1);
   } catch (err) {
     console.warn("[entitlements] plan lookup failed, serving free", err);
-    return { plan: "free", limits: PLANS.free };
+    return { plan: "free", tier: "free", limits: PLANS.free };
   }
 
   // No row is the state every user starts in — only the webhook writes here, so
   // the entire paid tier can be absent (no Dodo keys, no webhook, no rows) and
   // this still answers correctly. A seat on someone's Commercial licence is the
   // one other way to hold a plan, asked only once the user's own row says no.
-  if (!row) {
-    const { plan } = await teamPlanFor(userId);
-    return { plan, limits: PLANS[plan] };
-  }
+  if (!row) return teamResolved(userId);
 
   // `cancelled` keeps the paid period, every other non-active status drops at
   // once, and a passed period end entitles nothing — see `entitledPlan`, which
@@ -146,8 +152,18 @@ export async function planFor(userId: string | null): Promise<ResolvedPlan> {
   // add a plan to the enum without adding it to PLANS and this line stops
   // compiling, which is the only reason the two can be trusted to agree.
   const own = entitledPlan(row);
-  const plan = own === "free" ? (await teamPlanFor(userId)).plan : own;
-  return { plan, limits: PLANS[plan] };
+  if (own === "free") return teamResolved(userId);
+  return { plan: own, tier: tierOfPurchase(row), limits: PLANS[own] };
+}
+
+/** A seat on someone's Commercial licence, or free — named as such. */
+async function teamResolved(userId: string): Promise<ResolvedPlan> {
+  const { plan } = await teamPlanFor(userId);
+  return {
+    plan,
+    tier: plan === "free" ? "free" : "commercial",
+    limits: PLANS[plan],
+  };
 }
 
 /* ── pruneUsage ─────────────────────────────────────────────────────────── */
@@ -460,8 +476,28 @@ export async function userIdForEmail(
  * Fails soft to zero. A counter is copy, and a database hiccup must not take
  * the pricing page down with it; showing the full fifty as available is the
  * harmless direction, where showing none is a sold-out sign nobody meant.
+ *
+ * Remembered for a minute per process: the database is in us-west-1 and the
+ * server in Nuremberg, so every query is a transatlantic round trip, and the
+ * pricing page paid one on every load for a number that moves a few times a
+ * week. A failed count is not remembered.
  */
-export async function seatsTaken(): Promise<number> {
+let seats: { at: number; n: Promise<number> } | null = null;
+const SEATS_TTL_MS = 60_000;
+
+export function seatsTaken(): Promise<number> {
+  if (seats && Date.now() - seats.at < SEATS_TTL_MS)
+    return seats.n.then((n) => Math.max(0, n));
+  const entry = { at: Date.now(), n: countSeats() };
+  seats = entry;
+  entry.n.then((n) => {
+    if (n < 0 && seats === entry) seats = null;
+  });
+  return entry.n.then((n) => Math.max(0, n));
+}
+
+/** The count itself; -1 on failure so the memo above can drop it. */
+async function countSeats(): Promise<number> {
   if (!isDbConfigured) return 0;
   try {
     const [row] = await getDb()
@@ -476,7 +512,7 @@ export async function seatsTaken(): Promise<number> {
     return row?.n ?? 0;
   } catch (err) {
     console.warn("[entitlements] seat count failed, showing none taken", err);
-    return 0;
+    return -1;
   }
 }
 

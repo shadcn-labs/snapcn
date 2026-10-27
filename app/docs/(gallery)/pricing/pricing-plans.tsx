@@ -15,7 +15,13 @@ import {
   offerEarned,
   REPEAT_VISITS,
 } from "@/lib/offer";
-import { BANNER_OFFER, OFFER } from "@/lib/plans";
+import {
+  BANNER_OFFER,
+  OFFER,
+  type PlanTier,
+  TIER_NAME,
+  tierIncludes,
+} from "@/lib/plans";
 import { startCheckout, type UpgradeProduct } from "@/lib/upgrade";
 import { cn } from "@/lib/utils";
 
@@ -182,7 +188,8 @@ export function PricingPlans({
   footnote,
 }: {
   tiers: Tier[];
-  currentPlan: string;
+  /** The visitor's plan as bought (`PlanTier`), or anonymous when signed out. */
+  currentPlan: PlanTier | "anonymous";
   /** Which page the `upgrade_started` came from — `/pro` sells too. */
   from?: "pricing" | "pro_page";
   /** One line under the whole row — the regional prices. */
@@ -195,24 +202,33 @@ export function PricingPlans({
     null,
   );
   const layout = LAYOUT[tiers.length] ?? LAYOUT[4];
+  const held = currentPlan === "anonymous" ? null : currentPlan;
+  /** Holds a paid plan: their card is the one highlighted, and no promos. */
+  const paying = held !== null && held !== "free" && held !== "starter";
 
-  // The intent offer (`lib/offer.ts`), for anyone not yet paying: arriving from
-  // the CLI paywall's link, a third separate visit here, or already earned at
-  // another wall. After mount only — the page is the same HTML for everyone.
+  // The intent offer (`lib/offer.ts`) is earned only by someone not yet paying:
+  // arriving from the CLI paywall's link, a third separate visit here, or at
+  // another wall. What applies is then the one rule the banner and
+  // `startCheckout` share — the earned code, else the banner's inside its
+  // window — so the bar, this page and checkout never quote different offers.
+  // After mount only — the page is the same HTML for everyone. A paying customer
+  // gets no offer at all: a "10% off Pro" pill above the plan they already own
+  // reads as a mistake, and the banner hides for them too.
   useEffect(() => {
-    // The banner's offer is for anyone buying while its window runs — an
-    // upgrade too; the server applies it the same way (`/api/checkout`).
-    if (currentPlan !== "free" && currentPlan !== "anonymous") {
-      setOffer(bannerOfferEnds() > Date.now() ? BANNER_OFFER : null);
+    if (paying) {
+      setOffer(null);
       return;
     }
-    const visits = countPricingVisit();
     let earned: OfferTrigger | null = null;
-    if (codeInUrl(window.location.search)) earned = "cli";
-    else if (!offerEarned() && visits >= REPEAT_VISITS) earned = "repeat_visit";
-    if (earned && !offerEarned()) {
-      earnOffer(earned);
-      trackEvent("offer_shown", { trigger: earned });
+    if (currentPlan === "free" || currentPlan === "anonymous") {
+      const visits = countPricingVisit();
+      if (codeInUrl(window.location.search)) earned = "cli";
+      else if (!offerEarned() && visits >= REPEAT_VISITS)
+        earned = "repeat_visit";
+      if (earned && !offerEarned()) {
+        earnOffer(earned);
+        trackEvent("offer_shown", { trigger: earned });
+      }
     }
     setOffer(
       earned !== null || offerEarned()
@@ -221,7 +237,7 @@ export function PricingPlans({
           ? BANNER_OFFER
           : null,
     );
-  }, [currentPlan, trackEvent]);
+  }, [currentPlan, paying, trackEvent]);
 
   async function buy(product: UpgradeProduct) {
     if (pending) return;
@@ -276,7 +292,19 @@ export function PricingPlans({
       <div className={cn("relative grid grid-cols-1 gap-6", layout.grid)}>
         <FrameLines columns={tiers.length} visible={layout.frame} />
         {tiers.map((tier) => {
-          const current = tier.name.toLowerCase() === currentPlan;
+          const cardTier = tier.name.toLowerCase() as PlanTier;
+          const current = held === cardTier;
+          // Below what they hold, the card is theirs already, not for sale:
+          // Commercial includes Lifetime, Lifetime includes Pro, Pro includes
+          // Free. A Lifetime buyer was being offered the annual Pro.
+          const included =
+            held !== null && !current && tierIncludes(held, cardTier);
+          const owned = current || included;
+          const ownedLabel = current
+            ? "Your plan"
+            : `Included in ${held ? TIER_NAME[held] : ""}`;
+          // Their own card draws the eye once they pay; until then, the featured one.
+          const highlight = paying ? current : tier.featured;
           /**
            * Taller than a toolbar button and solid on every paid card: the
            * outline buttons read as "cancel" beside the one blue button. The
@@ -287,7 +315,7 @@ export function PricingPlans({
             "group/cta h-12 w-full gap-2 rounded-button text-base font-medium transition-[background-color,transform] duration-150 ease-out active:scale-[0.97] lg:h-11";
           /** The offer's percent where it lands on this card, else 0. */
           const discounted =
-            offer && tier.product && !current ? offer.percent : 0;
+            offer && tier.product && !owned ? offer.percent : 0;
           const priceClass = cn(
             "whitespace-nowrap font-semibold text-foreground tracking-tight",
             tier.price.length <= 5
@@ -307,13 +335,21 @@ export function PricingPlans({
               key={tier.name}
               className={cn(
                 "relative flex flex-col justify-between rounded-3xl border bg-card px-[23px] pt-[21px] pb-[23px] shadow-[var(--shadow-card)]",
-                tier.featured
+                highlight
                   ? "border-primary/40 ring-4 ring-primary/10"
                   : "border-border",
               )}
             >
               <div className="flex flex-col">
-                <h2 className="text-muted-foreground text-xl">{tier.name}</h2>
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-muted-foreground text-xl">{tier.name}</h2>
+                  {current && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary text-xs">
+                      <Check className="size-3" strokeWidth={2.5} aria-hidden />
+                      Your plan
+                    </span>
+                  )}
+                </div>
 
                 <div className="mt-4 lg:mt-8">
                   <div className="flex items-start gap-2">
@@ -329,7 +365,7 @@ export function PricingPlans({
                     ) : (
                       <span className={priceClass}>{tier.price}</span>
                     )}
-                    {tier.badge && (
+                    {tier.badge && !owned && (
                       <span className="mt-[6px] inline-flex shrink-0 items-center whitespace-nowrap rounded-lg border border-primary/20 bg-primary/10 px-[7px] py-[3px] font-medium text-primary text-xs">
                         {tier.badge}
                       </span>
@@ -361,7 +397,12 @@ export function PricingPlans({
               </div>
 
               <div className="mt-5 flex flex-col items-stretch lg:mt-8">
-                {tier.product ? (
+                {owned ? (
+                  // Theirs already: says so, and offers nothing to click.
+                  <Button className={ctaClass} variant="outline" disabled>
+                    <span>{ownedLabel}</span>
+                  </Button>
+                ) : tier.product ? (
                   <Button
                     className={cn(
                       ctaClass,
@@ -369,17 +410,10 @@ export function PricingPlans({
                       // inverted — as solid as the featured one, without
                       // competing with it for the eye.
                       !tier.featured &&
-                        !current &&
                         "bg-foreground text-background hover:bg-foreground/85",
                     )}
-                    variant={
-                      current
-                        ? "outline"
-                        : tier.featured
-                          ? "default"
-                          : undefined
-                    }
-                    disabled={current || pending !== null}
+                    variant={tier.featured ? "default" : undefined}
+                    disabled={pending !== null}
                     onClick={() => buy(tier.product as UpgradeProduct)}
                   >
                     {pending === tier.product ? (
@@ -393,13 +427,11 @@ export function PricingPlans({
                         a buyer on Edge, 30ms after "upgrade_started", never
                         reached Dodo. */}
                     <span>
-                      {current
-                        ? "Your plan"
-                        : discounted
-                          ? withOffer(tier.cta, tier.price, discounted)
-                          : tier.cta}
+                      {discounted
+                        ? withOffer(tier.cta, tier.price, discounted)
+                        : tier.cta}
                     </span>
-                    {current || pending === tier.product ? null : arrow}
+                    {pending === tier.product ? null : arrow}
                   </Button>
                 ) : (
                   <Link
@@ -409,14 +441,14 @@ export function PricingPlans({
                       ctaClass,
                     )}
                   >
-                    {current ? "Your plan" : tier.cta}
-                    {current ? null : arrow}
+                    {tier.cta}
+                    {arrow}
                   </Link>
                 )}
                 {/* Always rendered, so a card without a note keeps its button
                     level with the cards that have one. */}
                 <p className="mt-2 min-h-4 text-center text-muted-foreground text-xs">
-                  {tier.note}
+                  {owned ? null : tier.note}
                 </p>
               </div>
             </div>
