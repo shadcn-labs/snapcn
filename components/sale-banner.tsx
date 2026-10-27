@@ -2,11 +2,12 @@
 
 import { ArrowRight, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useTrackEvent } from "@/lib/analytics";
-import { bannerOfferEnds, offerEarned } from "@/lib/offer";
-import { BANNER_OFFER, OFFER } from "@/lib/plans";
+import { bannerOfferEnds } from "@/lib/offer";
+import { BANNER_OFFER } from "@/lib/plans";
 import { cn } from "@/lib/utils";
 
 const HREF = "/docs/pricing?ref=sale_banner#plans";
@@ -66,6 +67,9 @@ function Pair({ value }: { value: number }) {
   );
 }
 
+/** Account pages, where an offer reads as "you still have to pay". */
+const QUIET = ["/signin", "/account"];
+
 /**
  * The site-wide offer bar: `BANNER_OFFER.percent` off, framed with the
  * visitor's country from `/api/price`, counting down this browser's window —
@@ -77,23 +81,24 @@ function Pair({ value }: { value: number }) {
  * as a warning. Lighter than the early-bird's, with no dark vignette. Decided on the
  * client only: most pages are prerendered. Dismissible for the visit.
  *
- * A browser that has earned `OFFER` (lib/offer.ts) is shown that instead — the
- * bigger code the pricing page and checkout will apply — so the bar and the
- * page never disagree. No timer then: that code does not expire.
+ * Always the 10% and its countdown — never the 25% intent code: while this
+ * window runs, the pricing page and checkout apply the same 10% (`lib/offer.ts`).
  *
  * Not shown to a paying customer (Pro, Lifetime, Commercial — `PlanTier`): an
  * offer on the plan they already own reads as a billing mistake, and the
- * pricing page shows them no offer either.
+ * pricing page shows them no offer either. Nor on sign-in and `/account`: a
+ * teammate following a Commercial invite lands on both, signed out or not yet
+ * matched to the licence, and read a sales bar as "you still have to pay".
  */
+
 export function SaleBanner() {
   const trackEvent = useTrackEvent();
   const { data: session, status } = useSession();
+  const pathname = usePathname();
   const tier = session?.user?.tier ?? session?.user?.plan ?? "free";
   const [time, setTime] = useState<ReturnType<typeof left> | null>(null);
   const [dismissed, setDismissed] = useState(false);
   const [country, setCountry] = useState<string | null>(null);
-  // Null until read, so the bar never flashes 10% before switching to 25%.
-  const [earned, setEarned] = useState<boolean | null>(null);
 
   useEffect(() => {
     fetch(
@@ -105,9 +110,6 @@ export function SaleBanner() {
   }, []);
 
   useEffect(() => {
-    const won = offerEarned();
-    setEarned(won);
-    if (won) return;
     const end = bannerOfferEnds();
     setTime(left(end, Date.now()));
     const id = setInterval(() => {
@@ -118,25 +120,23 @@ export function SaleBanner() {
     return () => clearInterval(id);
   }, []);
 
-  if (dismissed || earned === null || status === "loading") return null;
+  if (dismissed || status === "loading" || !time || time.total <= 0)
+    return null;
   if (tier !== "free" && tier !== "starter") return null;
-  const offer = earned ? OFFER : BANNER_OFFER;
-  // The timer only ever counts the banner's own window.
-  if (!earned && (!time || time.total <= 0)) return null;
+  if (QUIET.some((p) => pathname?.startsWith(p))) return null;
+  const offer = BANNER_OFFER;
 
   const colon = cn(
     "self-center text-sm font-light transition-opacity duration-500",
-    (time?.seconds ?? 0) % 2 === 0 ? "opacity-60" : "opacity-30",
+    time.seconds % 2 === 0 ? "opacity-60" : "opacity-30",
   );
   const label =
     "text-center text-[8px] font-medium uppercase tracking-[0.15em] text-white/60";
-  const units: [number, string][] = time
-    ? [
-        [time.hours, "hrs"],
-        [time.minutes, "min"],
-        [time.seconds, "sec"],
-      ]
-    : [];
+  const units: [number, string][] = [
+    [time.hours, "hrs"],
+    [time.minutes, "min"],
+    [time.seconds, "sec"],
+  ];
 
   return (
     <div
@@ -168,46 +168,34 @@ export function SaleBanner() {
         className="pointer-events-none absolute inset-y-0 left-0 w-1/4 animate-[banner-shine_4s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/25 to-transparent motion-reduce:hidden"
       />
       <div className="relative flex items-center gap-x-6">
-        {earned ? (
-          <span className="font-medium text-sm">
-            You&apos;ve unlocked a special offer
-            <span className="hidden text-white/75 md:inline">
-              {" "}
-              — {offer.percent}% off Pro, auto-applied at checkout.
-            </span>
+        <span className="hidden font-medium text-sm md:inline">
+          {country
+            ? `${country} has a special offer`
+            : "You have a special offer"}
+          <span className="hidden text-white/75 lg:inline">
+            {" "}
+            — {offer.percent}% off Pro, auto-applied at checkout. Ends in
           </span>
-        ) : (
-          <>
-            <span className="hidden font-medium text-sm md:inline">
-              {country
-                ? `${country} has a special offer`
-                : "You have a special offer"}
-              <span className="hidden text-white/75 lg:inline">
-                {" "}
-                — {offer.percent}% off Pro, auto-applied at checkout. Ends in
-              </span>
-            </span>
+        </span>
 
-            {/* Labels in their own grid row, so they never shift the digits off
+        {/* Labels in their own grid row, so they never shift the digits off
                 the bar's centre line. */}
-            <div
-              className="inline-grid grid-flow-col grid-rows-[auto_auto] items-center gap-x-1.5"
-              role="timer"
-              aria-label={`${time?.hours} hours ${time?.minutes} minutes left`}
-            >
-              {units.map(([value, name], i) => (
-                <Unit
-                  key={name}
-                  value={value}
-                  name={name}
-                  last={i === units.length - 1}
-                  colon={colon}
-                  label={label}
-                />
-              ))}
-            </div>
-          </>
-        )}
+        <div
+          className="inline-grid grid-flow-col grid-rows-[auto_auto] items-center gap-x-1.5"
+          role="timer"
+          aria-label={`${time.hours} hours ${time.minutes} minutes left`}
+        >
+          {units.map(([value, name], i) => (
+            <Unit
+              key={name}
+              value={value}
+              name={name}
+              last={i === units.length - 1}
+              colon={colon}
+              label={label}
+            />
+          ))}
+        </div>
 
         <Link
           href={HREF}

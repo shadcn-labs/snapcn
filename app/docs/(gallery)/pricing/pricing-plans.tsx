@@ -230,11 +230,13 @@ export function PricingPlans({
         trackEvent("offer_shown", { trigger: earned });
       }
     }
+    // The banner's 10% wins while its countdown runs, so the bar and this page
+    // always quote the same offer; the earned code only after the window.
     setOffer(
-      earned !== null || offerEarned()
-        ? OFFER
-        : bannerOfferEnds() > Date.now()
-          ? BANNER_OFFER
+      bannerOfferEnds() > Date.now()
+        ? BANNER_OFFER
+        : earned !== null || offerEarned()
+          ? OFFER
           : null,
     );
   }, [currentPlan, paying, trackEvent]);

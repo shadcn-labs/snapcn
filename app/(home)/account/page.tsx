@@ -11,7 +11,7 @@ import {
   TIER_NAME,
   tierOfPurchase,
 } from "@/lib/plans";
-import { listApiKeys } from "@/lib/server/api-key";
+import { ensureApiKey, listApiKeys } from "@/lib/server/api-key";
 import { billingFor, planFor } from "@/lib/server/entitlements";
 import { canInvite, listTeam, teamPlanFor } from "@/lib/server/team";
 import { cn } from "@/lib/utils";
@@ -51,7 +51,7 @@ export default async function AccountPage({
     );
   }
 
-  const [{ limits }, billing, keys, owner, seat] = await Promise.all([
+  const [{ limits }, billing, listed, owner, seat] = await Promise.all([
     planFor(user.id),
     billingFor(user.id),
     listApiKeys(user.id).catch(() => []),
@@ -59,6 +59,15 @@ export default async function AccountPage({
     teamPlanFor(user.id),
   ]);
   const pro = limits.components;
+  // A buyer's first key is made when the payment lands; a teammate has no
+  // payment, and the invite email promises a key on sign-in. So their first
+  // visit here with a seat and no key makes one (`ensureApiKey` only ever
+  // inserts when they hold none).
+  let keys = listed;
+  if (pro && seat.ownerEmail && keys.length === 0) {
+    await ensureApiKey(user.id).catch(() => {});
+    keys = await listApiKeys(user.id).catch(() => []);
+  }
   const key = keys[0]?.key;
   const team = owner ? await listTeam(user.id).catch(() => []) : [];
 
