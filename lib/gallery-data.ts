@@ -683,6 +683,7 @@ const PRO_CATEGORY: Record<string, CategoryId> = {
   "search-retype": "ai-input",
   "ember-reveal": "text",
   "spark-question": "text",
+  "blueprint-collage": "scenes",
   "prompt-roll": "ai-input",
   "dot-dissolve": "transitions",
 };

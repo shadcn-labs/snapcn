@@ -72,8 +72,7 @@ export default async function TemplatesPage() {
   const session = await auth().catch(() => null);
   const { plan } = await planFor(session?.user?.id ?? null);
   const released = Date.now() >= Date.parse(TEMPLATES_RELEASE_AT);
-  // Paid: the film and the real install, release date or not. Everyone else
-  // gets the locked card, and `released` only changes its copy.
+  // Everyone sees the film and the install; paid just drops the upsell.
   const unlocked = plan !== "anonymous" && PLANS[plan].components;
 
   return (
@@ -100,34 +99,14 @@ export default async function TemplatesPage() {
 
         {/* The templates, one after another */}
         <div className="mt-20 flex flex-col gap-28">
-          {/* Only what the card shows: the install name, film and still
-              hashes stay on the server, since a client component's props
-              ship in the page. */}
+          {/* Film and install command for everyone: the registry, not this
+              page, is what refuses an unpaid install. */}
           {ORDERED.map((reel) => (
             <TemplateCard
               key={reel.slug}
-              released={released}
-              reel={{
-                slug: reel.slug,
-                title: reel.title,
-                description: reel.description,
-                beats: reel.beats.length,
-                seconds: Math.round(
-                  reel.beats.reduce((n, b) => n + b.frames, 0) / reel.fps,
-                ),
-              }}
-              // Only ever built for a paying reader — for anyone else these
-              // props would put the film and the install name in the page.
-              unlocked={
-                unlocked
-                  ? {
-                      reel,
-                      install: PRO_NAMES.includes(reel.install)
-                        ? reel.install
-                        : null,
-                    }
-                  : undefined
-              }
+              reel={reel}
+              install={PRO_NAMES.includes(reel.install) ? reel.install : null}
+              unlocked={unlocked}
             />
           ))}
         </div>
