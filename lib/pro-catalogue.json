@@ -326,6 +326,12 @@
     "added": "2026-10-27"
   },
   {
+    "name": "blueprint-collage",
+    "title": "Blueprint Collage",
+    "description": "A headline cycles through three phrases while five pictures and a disc hop around it in 15fps stop motion, the camera eases back, and the pictures clear away one by one to leave the last phrase fading from the accent to ink. Every picture's pose is fitted frame by frame off a screen recording.",
+    "added": "2026-10-28"
+  },
+  {
     "name": "echo-stack",
     "title": "Echo Stack",
     "description": "One word with copies of itself stacked above and below in horizontal windows, fading as they go. The echoes open out from behind the word while the stack eases back, in one move on a flat field. The face, every echo's offset, opacity and window are measured off a screen recording.",

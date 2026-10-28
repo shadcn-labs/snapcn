@@ -149,6 +149,7 @@ const COMPONENT_QUERY: Record<string, string> = {
   "search-retype": "Remotion search bar typing animation",
   "ember-reveal": "Remotion brush stroke glow text reveal animation",
   "spark-question": "Remotion kinetic typography question headline animation",
+  "blueprint-collage": "Remotion UI card collage headline animation",
   "prompt-roll": "Remotion rotating word prompt animation",
   "app-reveal": "Remotion app reveal animation",
   "brief-send": "Remotion product brief animation",
