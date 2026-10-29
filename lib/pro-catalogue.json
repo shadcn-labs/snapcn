@@ -332,6 +332,12 @@
     "added": "2026-10-28"
   },
   {
+    "name": "mark-grid",
+    "title": "Mark Grid",
+    "description": "The last scene wipes away and a line types itself in around your mark, lifts off word by word, and a staggered wall of tiles opens round the mark as the camera eases in. A dozen app icons fade into the wall and three name pills rise in beside them. The face, camera, wipe and every fade are measured off a screen recording.",
+    "added": "2026-10-29"
+  },
+  {
     "name": "echo-stack",
     "title": "Echo Stack",
     "description": "One word with copies of itself stacked above and below in horizontal windows, fading as they go. The echoes open out from behind the word while the stack eases back, in one move on a flat field. The face, every echo's offset, opacity and window are measured off a screen recording.",

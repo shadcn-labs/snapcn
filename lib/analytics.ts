@@ -253,6 +253,21 @@ export type AnalyticsEvents = {
   };
 
   /**
+   * The AI studio (`/studio`). Does prompting get people to a video, and what
+   * does it cost us per video? One event per turn: `ops` is how much the AI
+   * changed, `status` a failure we would otherwise never hear about (401 is a
+   * signed-out prompt — the sign-in wall's size). Its exports are counted by
+   * `editor_export_*`; the studio uses the editor's export.
+   */
+  ai_studio_opened: Record<string, never>;
+  ai_studio_prompted: {
+    model: string;
+    ops: number;
+    status: number;
+    scene_count: number;
+  };
+
+  /**
    * An address *asked* to join the launch list — the form submit, not the
    * subscription. Since the list went double opt-in, joining happens in a
    * second place this event cannot see: the confirm link, opened from a

@@ -67,8 +67,11 @@ function Pair({ value }: { value: number }) {
   );
 }
 
-/** Account pages, where an offer reads as "you still have to pay". */
-const QUIET = ["/signin", "/account"];
+/**
+ * Account pages, where an offer reads as "you still have to pay" — and the
+ * studio, a full-screen app where a bar costs canvas and sits on its toolbar.
+ */
+const QUIET = ["/signin", "/account", "/studio"];
 
 /**
  * The site-wide offer bar: `BANNER_OFFER.percent` off, framed with the
