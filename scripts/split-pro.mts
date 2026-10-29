@@ -139,6 +139,8 @@ const SEARCH_LEADS: Record<string, string> = {
     "Glow text reveal animation: a brush sweeps across and blooms into a glow that writes the line.",
   "blueprint-collage":
     "Photo collage animation: pictures hop around a cycling headline, then clear to the last word.",
+  "mark-grid":
+    "App icon grid animation: a headline types around your logo, then a wall of app icons opens round it.",
   "spark-question":
     "Kinetic typography question: a headline asked phrase by phrase, each landing huge as sparkles dart past.",
   "hype-reel":

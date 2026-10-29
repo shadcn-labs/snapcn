@@ -29,7 +29,8 @@ export type RateLimitBucket =
   | "project"
   | "checkout"
   | "subscribe"
-  | "apiKey";
+  | "apiKey"
+  | "studio";
 
 /** Env prefix per bucket. `render` keeps `RENDER_*` so existing config still applies. */
 const ENV_PREFIX: Record<RateLimitBucket, string> = {
@@ -40,6 +41,7 @@ const ENV_PREFIX: Record<RateLimitBucket, string> = {
   checkout: "CHECKOUT",
   subscribe: "SUBSCRIBE",
   apiKey: "API_KEY",
+  studio: "STUDIO",
 };
 
 /**
@@ -64,6 +66,9 @@ const DEFAULT_LIMIT: Record<RateLimitBucket, number> = {
   // Creating and deleting keys on the account page. A person does this a few
   // times, once; a loop minting and deleting keys is the only thing this stops.
   apiKey: 10,
+  // One prompt is an LLM call that can run several tool steps — the priciest
+  // request the site serves. Six a minute is a person iterating fast.
+  studio: 6,
 };
 
 function envInt(name: string, fallback: number, min = 1): number {

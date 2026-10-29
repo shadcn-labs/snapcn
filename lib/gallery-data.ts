@@ -684,6 +684,7 @@ const PRO_CATEGORY: Record<string, CategoryId> = {
   "ember-reveal": "text",
   "spark-question": "text",
   "blueprint-collage": "scenes",
+  "mark-grid": "scenes",
   "prompt-roll": "ai-input",
   "dot-dissolve": "transitions",
 };
