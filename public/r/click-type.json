@@ -21,6 +21,6 @@
       "target": "components/snap-cn/click-type.tsx"
     }
   ],
-  "docs": "Docs and props: https://snapcn.dev/docs/cursor/click-type?ref=cli — placeholder writes itself in the wide shot; prompt is what types after the click, in the close-up. Pass mode=\"dark\" if you are rendering onto a dark frame — these default to shadcn's light palette. — 51 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
+  "docs": "Docs and props: https://snapcn.dev/docs/cursor/click-type?ref=cli — placeholder writes itself in the wide shot; prompt is what types after the click, in the close-up. Pass mode=\"dark\" if you are rendering onto a dark frame — these default to shadcn's light palette. — 73 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
   "type": "registry:component"
 }

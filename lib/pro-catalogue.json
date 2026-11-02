@@ -332,10 +332,34 @@
     "added": "2026-10-28"
   },
   {
+    "name": "flood-outro",
+    "title": "Flood Outro",
+    "description": "An end card: your mark and wordmark write in left to right over a warm wave, the wave sinks away, then a blue-to-orange gradient floods down the frame and the lockup turns white letter by letter. The wave contour, the reveals and the flood colours are measured frame by frame off a screen recording.",
+    "added": "2026-11-02"
+  },
+  {
+    "name": "word-insert",
+    "title": "Word Insert",
+    "description": "A line that grows from its last word, in 12fps stop motion: each new word is slipped in ahead of it, landing bold and dark and settling to the line's ink while the words to its left glide aside, the words to its right step over and the underline stretches to fit, every word shaking on its own each pose. Timing, glide and shake are measured frame by frame off a screen recording.",
+    "added": "2026-11-02"
+  },
+  {
     "name": "mark-grid",
     "title": "Mark Grid",
     "description": "The last scene wipes away and a line types itself in around your mark, lifts off word by word, and a staggered wall of tiles opens round the mark as the camera eases in. A dozen app icons fade into the wall and three name pills rise in beside them. The face, camera, wipe and every fade are measured off a screen recording.",
     "added": "2026-10-29"
+  },
+  {
+    "name": "pixel-peak",
+    "title": "Pixel Peak",
+    "description": "Transition for @remotion/transitions: the next shot climbs up through the last one as a stepped peak of blocks. A 20 × 10 grid opens at the bottom middle, widens and climbs, its edge flickering with single frames of blue before each block cuts to the next shot; the top corners go last. Every block's flash frame, cut frame and colour is replayed from a screen recording (all 37 frames within 1.42/255). Only the transition: your two shots are the scenes either side of it in a TransitionSeries.",
+    "added": "2026-11-02"
+  },
+  {
+    "name": "lens-wall",
+    "title": "Lens Wall",
+    "description": "A wall of 18 pictures fades in tile by tile on a slow zoom-out, then a lens bends it: the edges stretch, the middle pulls back, flashes and cuts to the bare wall. Defaults to snapcn Pro scenes with the snapcn lockup in the middle. Replayed from a screen recording fitted on every frame: each picture's rect, each fade, the camera, the lens and the flash (all 56 recorded frames within 5.9/255, mean 3.4).",
+    "added": "2026-11-02"
   },
   {
     "name": "echo-stack",
