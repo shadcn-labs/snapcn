@@ -139,6 +139,14 @@ const SEARCH_LEADS: Record<string, string> = {
     "Glow text reveal animation: a brush sweeps across and blooms into a glow that writes the line.",
   "blueprint-collage":
     "Photo collage animation: pictures hop around a cycling headline, then clear to the last word.",
+  "flood-outro":
+    "Logo outro animation: your wordmark writes in, then a gradient floods the frame.",
+  "word-insert":
+    "Kinetic text animation: a line grows from its last word as each new word lands bold and cools.",
+  "lens-wall":
+    "Photo wall animation: a grid of pictures zooms out, then a lens bends it and flashes.",
+  "pixel-peak":
+    "Pixel transition: the next shot climbs through the last as a stepped peak of blocks.",
   "mark-grid":
     "App icon grid animation: a headline types around your logo, then a wall of app icons opens round it.",
   "spark-question":
