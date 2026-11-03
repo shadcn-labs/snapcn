@@ -414,5 +414,11 @@
     "title": "Prompt Poster",
     "description": "A dark composer with an image attached finishes typing its request, a pointer glides in turning as it travels, presses send, and the page scrolls: the composer rides up and off while the generated poster rises in and settles. Push-in, pointer path, press and scroll are measured frame by frame off a screen recording.",
     "added": "2026-11-03"
+  },
+  {
+    "name": "pain-point",
+    "title": "Pain Point",
+    "description": "The opening beat of a launch video: the viewer's pain, typed as a question, while the camera pulls back through the tools they are stuck in. A violet glow blooms out of black, the first line types itself with its newest characters running from white to violet, the camera dollies back and nine UI cards cut in at their own depths, a second line takes over, and the camera rushes back in. Replayed from a 4.5s screen recording measured frame by frame: a single dollying camera solved from nine tracked cards (0.26% scale error), the glow as fitted super-gaussian blobs, the type fitted for size, weight and tracking, and every reveal frame read off the capture.",
+    "added": "2026-11-03"
   }
 ]

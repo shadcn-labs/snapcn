@@ -18,6 +18,6 @@
       "target": "components/snap-cn/capture-reveal.tsx"
     }
   ],
-  "docs": "Docs and props: https://snapcn.dev/docs/screens/capture-reveal?ref=cli — src is the screenshot in the window (laid in at full width, top first); headline breaks lines on |; capturing and copied are the two toast messages. Pass mode=\"dark\" if you are rendering onto a dark frame — these default to shadcn's light palette. — 76 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
+  "docs": "Docs and props: https://snapcn.dev/docs/screens/capture-reveal?ref=cli — src is the screenshot in the window (laid in at full width, top first); headline breaks lines on |; capturing and copied are the two toast messages. Pass mode=\"dark\" if you are rendering onto a dark frame — these default to shadcn's light palette. — 77 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
   "type": "registry:component"
 }

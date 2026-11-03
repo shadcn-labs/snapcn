@@ -699,6 +699,7 @@ const PRO_CATEGORY: Record<string, CategoryId> = {
   "glow-map": "scenes",
   "glow-type": "scenes",
   "prompt-poster": "scenes",
+  "pain-point": "scenes",
   "mark-grid": "scenes",
   "prompt-roll": "ai-input",
   "dot-dissolve": "transitions",
