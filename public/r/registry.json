@@ -797,6 +797,28 @@
       "type": "registry:component"
     },
     {
+      "name": "cut-lockup",
+      "title": "Cut Lockup",
+      "description": "Logo reveal in hard cuts. The logo lands huge on grid paper, steps down in three cuts, pushes in, cuts to night where its construction lines and anchor points draw themselves, then a paper panel wipes up onto the resting lockup. Cuts, scales, push and wipe are measured frame by frame off a reference recording.",
+      "dependencies": [
+        "remotion"
+      ],
+      "files": [
+        {
+          "path": "registry/snap-cn/cut-lockup/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/cut-lockup/index.tsx"
+        },
+        {
+          "path": "registry/snap-cn/cut-lockup/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/cut-lockup/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/scenes/cut-lockup?ref=cli — 108 frames at 30fps; paints its own background. Pass your logo as SVG paths (logo={{ width, height, shapes }}).",
+      "type": "registry:component"
+    },
+    {
       "name": "search-typing",
       "title": "Search Typing",
       "description": "Search bar typing animation for AI search and command palette demos. A search field wider than the shot: two thirds in frame, then it comes forward, types across its left half, pages to its right half, and goes back. Every proportion is measured, and the scale pivots on the text baseline so the type never climbs the pixel grid.",
@@ -2916,6 +2938,73 @@
         }
       ],
       "docs": "Docs and props: https://snapcn.dev/docs/text/word-insert?ref=cli — 90 frames at 30fps. paints its own white background. text, order, fontSize, color, accent, rule, background, grain, beat, start, stepRate, shake and speed.",
+      "type": "registry:component",
+      "meta": {
+        "access": "pro"
+      }
+    },
+    {
+      "name": "prompt-poster",
+      "title": "Prompt Poster",
+      "description": "AI prompt animation: a prompt is sent and the generated poster scrolls into view. A dark composer with an image attached finishes typing its request, a pointer glides in turning as it travels, presses send, and the page scrolls: the composer rides up and off while the generated poster rises in and settles. Push-in, pointer path, press and scroll are measured frame by frame off a screen recording.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "files": [
+        {
+          "path": "prompt-poster/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/prompt-poster/index.tsx"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/scenes/prompt-poster?ref=cli — 86 frames at 30fps. paints its own white page. prompt, image, label, title, footer, page, composer, ink, typedFrom, typedBy and speed.",
+      "type": "registry:component",
+      "meta": {
+        "access": "pro"
+      }
+    },
+    {
+      "name": "glow-map",
+      "title": "Glow Map",
+      "description": "World map animation: a dotted map wipes in and points light up with pulsing rings. A light sweeps off the frame and a dotted world map wipes in west to east as it glides into place; points light up across it one after another and rings pulse out of them. No text. Pan, wipe, light and the order of every point are measured frame by frame off a screen recording; land is Natural Earth on a hex dot grid.",
+      "dependencies": [
+        "remotion"
+      ],
+      "files": [
+        {
+          "path": "glow-map/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/glow-map/index.tsx"
+        },
+        {
+          "path": "glow-map/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/glow-map/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/scenes/glow-map?ref=cli — 150 frames at 30fps; paints its own dark background. background, floor, dot, dotOpacity, dotRadius, southFade, glow, flash, points, ringEvery, feather and speed.",
+      "type": "registry:component",
+      "meta": {
+        "access": "pro"
+      }
+    },
+    {
+      "name": "glow-type",
+      "title": "Glow Type",
+      "description": "Glow text animation: type lights up word by word as the camera glides along the line. Dark type lights up word by word as the camera eases back, then slides off left; the camera dives into the second line, glides along it letter-size while each letter lights as it passes, and pulls back out. Crisp type, a soft glow under lit letters, every motion one eased curve.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "files": [
+        {
+          "path": "glow-type/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/glow-type/index.tsx"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/scenes/glow-type?ref=cli — 150 frames at 30fps; paints its own background. lineA, lineB, color, dim, background, glow and speed.",
       "type": "registry:component",
       "meta": {
         "access": "pro"

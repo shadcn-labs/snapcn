@@ -18,6 +18,6 @@
       "target": "components/snap-cn/check-cycle.tsx"
     }
   ],
-  "docs": "Docs and props: https://snapcn.dev/docs/text/check-cycle?ref=cli — headline is the part of the sentence that never changes; words is what finishes it, comma separated, rolled through in order beside a ticked checkbox, then the line steps back to 80% and rests. Pass mode=\"dark\" if you are rendering onto a dark frame — these default to shadcn's light palette. — 73 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
+  "docs": "Docs and props: https://snapcn.dev/docs/text/check-cycle?ref=cli — headline is the part of the sentence that never changes; words is what finishes it, comma separated, rolled through in order beside a ticked checkbox, then the line steps back to 80% and rests. Pass mode=\"dark\" if you are rendering onto a dark frame — these default to shadcn's light palette. — 76 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
   "type": "registry:component"
 }

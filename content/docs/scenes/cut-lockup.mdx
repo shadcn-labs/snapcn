@@ -1,0 +1,70 @@
+---
+title: Cut Lockup
+description: A logo reveal in hard cuts — huge on grid paper, three cuts down, a push to night where its construction lines draw themselves, then paper wipes up onto the lockup
+---
+
+<ComponentPreview name="cut-lockup" />
+
+## Installation
+
+<InstallBlock name="cut-lockup" />
+
+## Component code
+
+The exact file `shadcn add` copies into your project.
+
+<ComponentSource name="cut-lockup" />
+
+## Usage
+
+Cut Lockup paints its own background and runs 108 frames at 30fps. Every cut,
+scale, push and the wipe are measured frame by frame off a reference recording;
+each one is a prop with that measured value as its default.
+
+```tsx
+import { CutLockup } from "@/components/snap-cn/cut-lockup";
+
+export const Intro = () => <CutLockup />;
+```
+
+Your logo goes in as SVG paths — paste the `d` of each `<path>` from your logo's
+SVG (outline text first in Figma: _Outline stroke_ / _Flatten_). Each subpath is
+drawn as its own construction line, with a dot on every anchor point.
+
+```tsx
+<CutLockup
+  logo={{
+    width: 120,
+    height: 32,
+    shapes: ["M0 0h20v32H0z", "M30 16a16 16 0 1 0 32 0a16 16 0 1 0-32 0z"],
+  }}
+  ink="#111111"
+  night="#0a0a0a"
+/>
+```
+
+## Props
+
+<PropsTable
+  rows={[
+    { name: "logo", type: "{ width: number; height: number; shapes: string[] }", default: "snapcn mark + wordmark", description: "Your logo as SVG paths in a width × height box" },
+    { name: "size", type: "number", default: "0.2335", description: "Resting logo width as a fraction of the frame width" },
+    { name: "ink", type: "string", default: "\"#1f1f1f\"", description: "Logo colour on paper" },
+    { name: "paper", type: "[string, string, string]", default: "[\"#f6f6f6\", \"#f8f8f8\", \"#fcfcfc\"]", description: "Paper, left edge → middle → right edge" },
+    { name: "grid", type: "{ color: string; pitch: number; width: number }", default: "{ color: \"rgba(0,0,0,0.014)\", pitch: 22, width: 1 }", description: "Grid-paper lines on the left of the paper (ref px)" },
+    { name: "roughness", type: "number", default: "0.35", description: "Printed-edge roughness; 0 for clean vector edges" },
+    { name: "steps", type: "CutStep[]", default: "4 measured cuts", description: "The hard cuts: { from, scale, x?, y?, drift? } — scale × resting width, offsets in logo widths" },
+    { name: "push", type: "[frame, scale][]", default: "frames 36–42", description: "Push-in before the cut to night" },
+    { name: "night", type: "string", default: "\"#242424\"", description: "Night background" },
+    { name: "line", type: "string", default: "\"rgba(255,255,255,0.11)\"", description: "Construction line colour" },
+    { name: "dot", type: "string", default: "\"rgba(255,255,255,0.22)\"", description: "Anchor dot colour" },
+    { name: "nightAt", type: "number", default: "43", description: "Frame of the cut to night" },
+    { name: "nightScale", type: "number", default: "1.154", description: "Logo scale at night" },
+    { name: "drawFrames", type: "number", default: "7", description: "Frames each shape takes to draw" },
+    { name: "drawSpread", type: "number", default: "22", description: "Frames between the first and last shape starting, left to right" },
+    { name: "wipe", type: "[frame, top][]", default: "frames 91–102", description: "Paper wipe: top edge as a fraction of the height" },
+    { name: "endPaper", type: "string", default: "\"#f8f8f8\"", description: "Paper after the wipe" },
+    { name: "endScale", type: "number", default: "1.1894", description: "Resting logo scale after the wipe" },
+    { name: "speed", type: "number", default: "1", description: "Time multiplier" },
+  ]}
+/>

@@ -124,6 +124,14 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     tile: "wide",
   },
   {
+    name: "Cut Lockup",
+    description:
+      "A logo reveal in hard cuts — huge on grid paper, three cuts down, a push to night where its construction lines draw themselves, then paper wipes up onto the lockup",
+    category: "scenes",
+    href: "/docs/scenes/cut-lockup",
+    added: "2026-11-03",
+  },
+  {
     name: "Orb Swarm",
     description:
       "A sentence told one beat at a time while glass orbs burst out of it, split into eight and sixteen, wind into a vortex, pay out as a chain and loop around the last words",
@@ -688,6 +696,9 @@ const PRO_CATEGORY: Record<string, CategoryId> = {
   "word-insert": "text",
   "lens-wall": "scenes",
   "pixel-peak": "transitions",
+  "glow-map": "scenes",
+  "glow-type": "scenes",
+  "prompt-poster": "scenes",
   "mark-grid": "scenes",
   "prompt-roll": "ai-input",
   "dot-dissolve": "transitions",

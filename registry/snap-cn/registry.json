@@ -634,6 +634,26 @@
       ]
     },
     {
+      "name": "cut-lockup",
+      "type": "registry:component",
+      "docs": "Docs and props: https://snapcn.dev/docs/scenes/cut-lockup?ref=cli \u2014 108 frames at 30fps; paints its own background. Pass your logo as SVG paths (logo={{ width, height, shapes }}).",
+      "title": "Cut Lockup",
+      "description": "Logo reveal in hard cuts. The logo lands huge on grid paper, steps down in three cuts, pushes in, cuts to night where its construction lines and anchor points draw themselves, then a paper panel wipes up onto the resting lockup. Cuts, scales, push and wipe are measured frame by frame off a reference recording.",
+      "dependencies": ["remotion"],
+      "files": [
+        {
+          "path": "cut-lockup/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/cut-lockup/index.tsx"
+        },
+        {
+          "path": "cut-lockup/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/cut-lockup/data.ts"
+        }
+      ]
+    },
+    {
       "name": "search-typing",
       "type": "registry:component",
       "docs": "Docs and props: https://snapcn.dev/docs/ai-input/search-typing?ref=cli \u2014 pass mode=\"dark\" if you are rendering onto a dark frame \u2014 these default to shadcn's light palette and a bare Remotion render is black.",

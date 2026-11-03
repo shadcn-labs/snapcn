@@ -67,7 +67,7 @@ notes). Don't read every file.
 | **AI Chat Input** | `snapcn` | `prompt-send`, `search-typing`, `prompt-zoom`, `answer-stream`, `answer-highlight`, `agent-steps` |
 | **Screens & Devices** | `snapcn` | `phone-frame`, `laptop-frame`, `terminal-simulator`, `screen-recording`, `cursor-track` |
 | **Logos** | `snapcn` | `logo-assemble`, `logo-flicker`, `logo-collapse`, `logo-drift`, `block-wordmark`, `wordmark-cut` |
-| **Scenes** | `snapcn` | `announce-title`, `hero-launch`, `orbit-gallery`, `moodboard-reveal`, `status-cycle`, `count-grid`, `roster-grant`, `orb-swarm`, `reel-collage`, `card-rail` |
+| **Scenes** | `snapcn` | `announce-title`, `hero-launch`, `orbit-gallery`, `moodboard-reveal`, `status-cycle`, `count-grid`, `roster-grant`, `orb-swarm`, `reel-collage`, `card-rail`, `cut-lockup` |
 | **Social Proof** | `snapcn` | `follower-rush`, `channel-thread` |
 | **Effects** | `snapcn` | `pulsing-border` |
 | **UI Primitives** | `snap-cn-ui` | `input`, `caret` (+ `snap-cn-ui`, the shared core lib) |
