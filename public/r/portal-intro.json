@@ -17,6 +17,6 @@
       "target": "components/snap-cn/portal-intro.tsx"
     }
   ],
-  "docs": "Docs and props: https://snapcn.dev/docs/scenes/portal-intro?ref=cli — pass mode=\"dark\" if you are rendering onto a dark frame; the picture, title and mark are props. — 73 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
+  "docs": "Docs and props: https://snapcn.dev/docs/scenes/portal-intro?ref=cli — pass mode=\"dark\" if you are rendering onto a dark frame; the picture, title and mark are props. — 76 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
   "type": "registry:component"
 }

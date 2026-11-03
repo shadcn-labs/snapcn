@@ -13,6 +13,7 @@ import { clickTypeConfig } from "@/registry/snap-cn/click-type/config";
 import { countGridConfig } from "@/registry/snap-cn/count-grid/config";
 import { cursorTrackConfig } from "@/registry/snap-cn/cursor-track/config";
 import { dotBloomConfig } from "@/registry/snap-cn/dot-bloom/config";
+import { cutLockupConfig } from "@/registry/snap-cn/cut-lockup/config";
 import { followerRushConfig } from "@/registry/snap-cn/follower-rush/config";
 import { fontShuffleConfig } from "@/registry/snap-cn/font-shuffle/config";
 import { heroLaunchConfig } from "@/registry/snap-cn/hero-launch/config";
@@ -101,6 +102,7 @@ export const CONFIGS: Record<string, ComponentConfig> = {
   "word-gather": wordGatherConfig,
   "portal-intro": portalIntroConfig,
   "dot-bloom": dotBloomConfig,
+  "cut-lockup": cutLockupConfig,
   "orb-swarm": orbSwarmConfig,
   "word-wheel": wordWheelConfig,
   "capture-reveal": captureRevealConfig,

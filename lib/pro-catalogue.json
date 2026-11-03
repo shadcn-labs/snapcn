@@ -396,5 +396,23 @@
     "title": "Dot Dissolve",
     "description": "LED dot-matrix transition: dots pop in across the frame in clumps until the matrix covers it, hold, then break up in clumps and let go, the last stragglers out bottom left. Each dot takes its tone off a drifting noise field mapped onto a calm dusk palette (slate, dusty blue, mist), so the matrix drifts like soft light through LEDs. It paints only its dots, so it lays over any cut: cut between your shots under it at DOT_DISSOLVE_CUT.",
     "added": "2026-10-21"
+  },
+  {
+    "name": "glow-map",
+    "title": "Glow Map",
+    "description": "A light sweeps off the frame and a dotted world map wipes in west to east as it glides into place; points light up across it one after another and rings pulse out of them. No text. Pan, wipe, light and the order of every point are measured frame by frame off a screen recording; land is Natural Earth on a hex dot grid.",
+    "added": "2026-11-03"
+  },
+  {
+    "name": "glow-type",
+    "title": "Glow Type",
+    "description": "Dark type lights up word by word as the camera eases back, then slides off left; the camera dives into the second line, glides along it letter-size while each letter lights as it passes, and pulls back out. Crisp type, a soft glow under lit letters, every motion one eased curve.",
+    "added": "2026-11-03"
+  },
+  {
+    "name": "prompt-poster",
+    "title": "Prompt Poster",
+    "description": "A dark composer with an image attached finishes typing its request, a pointer glides in turning as it travels, presses send, and the page scrolls: the composer rides up and off while the generated poster rises in and settles. Push-in, pointer path, press and scroll are measured frame by frame off a screen recording.",
+    "added": "2026-11-03"
   }
 ]

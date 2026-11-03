@@ -106,6 +106,7 @@ or fetch `https://snapcn.dev/docs/<category>/<name>.md`.
 | `word-gather` | A short sentence that arrives out of order and settles — a tagline. | Lines over ~8 words; the scatter gets busy. | 49f | clean |
 | `word-wheel` | A fixed lead-in with a slot that spins through audiences or use-cases ("snapcn for …"). Pass `words` comma-separated. | One word only — use `text-reveal`. | 66f | playful |
 | `orb-swarm` | A sentence told beat by beat with glass orbs that swarm and ring the last words. `script` is six cards split with `\|`. | Tight budgets — it needs its full 160 frames. | 160f | playful |
+| `cut-lockup` | A logo intro/outro in hard cuts: huge on paper, stepping down, construction lines at night, paper wipe onto the lockup. `logo` takes SVG paths. | A text-only title — use `text-reveal`. | 108f | premium |
 | `count-grid` | The "it scales" stat: cards multiply and a counter jumps (`from`, `to`, `noun`). | A number with no proof behind it. | 47f | data |
 | `roster-grant` | A cursor clicks a CTA and a team's avatars switch on — access granted, seats filled. | Solo products; it reads as teams. | 120f | clean |
 | `card-rail` | Feature or template cards flicked across a tilted 3D plane. | A single hero image — use `moodboard-reveal`. | 108f | premium |

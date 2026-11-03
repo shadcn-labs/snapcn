@@ -147,6 +147,12 @@ const SEARCH_LEADS: Record<string, string> = {
     "Photo wall animation: a grid of pictures zooms out, then a lens bends it and flashes.",
   "pixel-peak":
     "Pixel transition: the next shot climbs through the last as a stepped peak of blocks.",
+  "glow-map":
+    "World map animation: a dotted map wipes in and points light up with pulsing rings.",
+  "glow-type":
+    "Glow text animation: type lights up word by word as the camera glides along the line.",
+  "prompt-poster":
+    "AI prompt animation: a prompt is sent and the generated poster scrolls into view.",
   "mark-grid":
     "App icon grid animation: a headline types around your logo, then a wall of app icons opens round it.",
   "spark-question":

@@ -15,6 +15,7 @@ import { ClickType } from "@/registry/snap-cn/click-type";
 import { CountGrid } from "@/registry/snap-cn/count-grid";
 import { CursorTrack } from "@/registry/snap-cn/cursor-track";
 import { DotBloom } from "@/registry/snap-cn/dot-bloom";
+import { CutLockup } from "@/registry/snap-cn/cut-lockup";
 import { FollowerRush } from "@/registry/snap-cn/follower-rush";
 import { FontShuffle } from "@/registry/snap-cn/font-shuffle";
 import { HeroLaunch } from "@/registry/snap-cn/hero-launch";
@@ -152,6 +153,7 @@ const registry: Record<string, RegistryEntry> = {
   "word-gather": { Component: WordGather, config: CONFIGS["word-gather"] },
   "portal-intro": { Component: PortalIntro, config: CONFIGS["portal-intro"] },
   "dot-bloom": { Component: DotBloom, config: CONFIGS["dot-bloom"] },
+  "cut-lockup": { Component: CutLockup, config: CONFIGS["cut-lockup"] },
   "orb-swarm": { Component: OrbSwarm, config: CONFIGS["orb-swarm"] },
   "word-wheel": { Component: WordWheel, config: CONFIGS["word-wheel"] },
   "capture-reveal": {

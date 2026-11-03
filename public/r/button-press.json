@@ -19,6 +19,6 @@
       "target": "components/snap-cn/button-press.tsx"
     }
   ],
-  "docs": "Docs and props: https://snapcn.dev/docs/cursor/button-press?ref=cli — label, pending and done are the three states; width is fixed so the button never reflows. Pass mode=\"dark\" if you are rendering onto a dark frame — these default to shadcn's light palette. — 73 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
+  "docs": "Docs and props: https://snapcn.dev/docs/cursor/button-press?ref=cli — label, pending and done are the three states; width is fixed so the button never reflows. Pass mode=\"dark\" if you are rendering onto a dark frame — these default to shadcn's light palette. — 76 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
   "type": "registry:component"
 }
