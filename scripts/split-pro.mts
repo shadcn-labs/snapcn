@@ -153,6 +153,8 @@ const SEARCH_LEADS: Record<string, string> = {
     "Glow text animation: type lights up word by word as the camera glides along the line.",
   "prompt-poster":
     "AI prompt animation: a prompt is sent and the generated poster scrolls into view.",
+  "pain-point":
+    "Launch video intro: a typed question as the camera pulls back through floating UI cards.",
   "mark-grid":
     "App icon grid animation: a headline types around your logo, then a wall of app icons opens round it.",
   "spark-question":

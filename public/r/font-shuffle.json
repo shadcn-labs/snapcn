@@ -17,6 +17,6 @@
       "target": "components/snap-cn/font-shuffle.tsx"
     }
   ],
-  "docs": "Docs and props: https://snapcn.dev/docs/text/font-shuffle?ref=cli — lead stays serif, subject tries on eleven typefaces; accent is the colour the line flashes before it settles. Pass mode=\"dark\" if you are rendering onto a dark frame — these default to shadcn's light palette. — 76 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
+  "docs": "Docs and props: https://snapcn.dev/docs/text/font-shuffle?ref=cli — lead stays serif, subject tries on eleven typefaces; accent is the colour the line flashes before it settles. Pass mode=\"dark\" if you are rendering onto a dark frame — these default to shadcn's light palette. — 77 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
   "type": "registry:component"
 }

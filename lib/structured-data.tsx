@@ -157,6 +157,7 @@ const COMPONENT_QUERY: Record<string, string> = {
   "glow-map": "Remotion dotted world map animation with glowing points",
   "glow-type": "Remotion glowing kinetic typography animation",
   "prompt-poster": "Remotion AI prompt to generated poster animation",
+  "pain-point": "Remotion launch video intro with typed question and UI cards",
   "mark-grid": "Remotion logo app icon grid outro animation",
   "prompt-roll": "Remotion rotating word prompt animation",
   "app-reveal": "Remotion app reveal animation",
