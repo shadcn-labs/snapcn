@@ -100,6 +100,10 @@ export default function LivePreview({
       // heavy concurrent mount) can leave it. The useLazyPlayer visibility
       // effect still pauses off-screen cards.
       autoPlay
+      // Muted, or Remotion waits for the AudioContext to resume before advancing
+      // a frame, and Chrome won't resume it without a gesture: the card sits on
+      // its first frame until something on the page is clicked.
+      initiallyMuted
       acknowledgeRemotionLicense
     />
   );

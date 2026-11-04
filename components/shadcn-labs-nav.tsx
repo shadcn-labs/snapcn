@@ -184,16 +184,20 @@ export function ShadcnLabsNav({ className }: { className?: string }) {
 
   return (
     <span className={cn("flex items-center gap-2", className)}>
-      <a
-        href={SHADCN_LABS_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        title="Shadcn Labs"
-        className="text-foreground transition-opacity hover:opacity-70"
-      >
-        <LabsLogo />
-        <span className="sr-only">Go to Shadcn Labs</span>
-      </a>
+      <span className="relative flex items-center text-foreground">
+        <Link href="/" aria-label="snapcn home" tabIndex={-1}>
+          <LabsLogo />
+        </Link>
+        <a
+          href={SHADCN_LABS_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Shadcn Labs"
+          className="absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2"
+        >
+          <span className="sr-only">Go to Shadcn Labs</span>
+        </a>
+      </span>
       <span className="select-none text-muted-foreground/60" aria-hidden="true">
         /
       </span>

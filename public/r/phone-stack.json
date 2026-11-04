@@ -14,6 +14,6 @@
       "target": "components/snap-cn/phone-stack.tsx"
     }
   ],
-  "docs": "Docs and props: https://snapcn.dev/docs/screens/phone-stack?ref=cli — pass one clip per screen as videos; the page and glow are props. — 77 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
+  "docs": "Docs and props: https://snapcn.dev/docs/screens/phone-stack?ref=cli — pass one clip per screen as videos; the page and glow are props. — 82 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
   "type": "registry:component"
 }

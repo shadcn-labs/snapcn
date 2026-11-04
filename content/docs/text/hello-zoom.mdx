@@ -1,0 +1,26 @@
+---
+title: Hello Zoom
+description: Words flicker in place, one line types on, then the camera dives through its own letters into the next card
+---
+
+<ComponentPreview name="hello-zoom" />
+
+## Installation
+
+<InstallBlock name="hello-zoom" />
+
+## Component code
+
+The exact file `shadcn add` copies into your project.
+
+<ComponentSource name="hello-zoom" />
+
+## Usage
+
+Hello Zoom paints its own card and runs 75 frames at 30fps. Timing is measured frame by frame off a reference; every word, colour and font is a prop.
+
+```tsx
+import { HelloZoom } from "@/components/snap-cn/hello-zoom";
+
+export const Beat = () => <HelloZoom />;
+```

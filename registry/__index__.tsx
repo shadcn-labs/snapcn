@@ -15,6 +15,10 @@ import { ClickType } from "@/registry/snap-cn/click-type";
 import { CountGrid } from "@/registry/snap-cn/count-grid";
 import { CursorTrack } from "@/registry/snap-cn/cursor-track";
 import { DotBloom } from "@/registry/snap-cn/dot-bloom";
+import { HelloZoom } from "@/registry/snap-cn/hello-zoom";
+import { SpecSweep } from "@/registry/snap-cn/spec-sweep";
+import { DropLine } from "@/registry/snap-cn/drop-line";
+import { TitleSweep } from "@/registry/snap-cn/title-sweep";
 import { CutLockup } from "@/registry/snap-cn/cut-lockup";
 import { FollowerRush } from "@/registry/snap-cn/follower-rush";
 import { FontShuffle } from "@/registry/snap-cn/font-shuffle";
@@ -154,6 +158,10 @@ const registry: Record<string, RegistryEntry> = {
   "portal-intro": { Component: PortalIntro, config: CONFIGS["portal-intro"] },
   "dot-bloom": { Component: DotBloom, config: CONFIGS["dot-bloom"] },
   "cut-lockup": { Component: CutLockup, config: CONFIGS["cut-lockup"] },
+  "hello-zoom": { Component: HelloZoom as React.ComponentType<Record<string, unknown>>, config: CONFIGS["hello-zoom"] },
+  "spec-sweep": { Component: SpecSweep as React.ComponentType<Record<string, unknown>>, config: CONFIGS["spec-sweep"] },
+  "drop-line": { Component: DropLine as React.ComponentType<Record<string, unknown>>, config: CONFIGS["drop-line"] },
+  "title-sweep": { Component: TitleSweep as React.ComponentType<Record<string, unknown>>, config: CONFIGS["title-sweep"] },
   "orb-swarm": { Component: OrbSwarm, config: CONFIGS["orb-swarm"] },
   "word-wheel": { Component: WordWheel, config: CONFIGS["word-wheel"] },
   "capture-reveal": {

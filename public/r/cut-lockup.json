@@ -20,6 +20,6 @@
       "target": "components/snap-cn/cut-lockup/data.ts"
     }
   ],
-  "docs": "Docs and props: https://snapcn.dev/docs/scenes/cut-lockup?ref=cli — 108 frames at 30fps; paints its own background. Pass your logo as SVG paths (logo={{ width, height, shapes }}). — 77 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
+  "docs": "Docs and props: https://snapcn.dev/docs/scenes/cut-lockup?ref=cli — 108 frames at 30fps; paints its own background. Pass your logo as SVG paths (logo={{ width, height, shapes }}). — 82 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
   "type": "registry:component"
 }

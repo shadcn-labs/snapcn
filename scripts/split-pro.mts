@@ -153,6 +153,16 @@ const SEARCH_LEADS: Record<string, string> = {
     "Glow text animation: type lights up word by word as the camera glides along the line.",
   "prompt-poster":
     "AI prompt animation: a prompt is sent and the generated poster scrolls into view.",
+  "count-portal":
+    "Countdown animation: a dare in hard cuts, then 3 2 1 as holes you fall through.",
+  "slam-type":
+    "Kinetic title animation: three hard-cut wide words lit by one travelling metal gradient.",
+  "glow-frame":
+    "Screen edge glow animation: a gradient line settles as light runs round the frame.",
+  "metal-chip":
+    "Metal chip reveal: a silver chip with your mark un-tilts as light rolls over it.",
+  "spec-wall":
+    "Scrolling text animation: spec lines type on, then invert and fly past too fast to read.",
   "pain-point":
     "Launch video intro: a typed question as the camera pulls back through floating UI cards.",
   "mark-grid":

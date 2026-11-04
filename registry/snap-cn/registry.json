@@ -634,6 +634,105 @@
       ]
     },
     {
+      "name": "hello-zoom",
+      "type": "registry:component",
+      "title": "Hello Zoom",
+      "description": "Words flicker in place, one line types on, then the camera dives through its own letters into the next card",
+      "docs": "Docs and props: https://snapcn.dev/docs/text/hello-zoom?ref=cli — 75 frames at 30fps.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "hello-zoom/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/hello-zoom/index.tsx"
+        }
+      ]
+    },
+    {
+      "name": "spec-sweep",
+      "type": "registry:component",
+      "title": "Spec Sweep",
+      "description": "A one-line spec slides in word by word while a highlight runs along it and an icon charges up",
+      "docs": "Docs and props: https://snapcn.dev/docs/text/spec-sweep?ref=cli — 75 frames at 30fps.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "spec-sweep/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/spec-sweep/index.tsx"
+        },
+        {
+          "path": "spec-sweep/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/spec-sweep/data.ts"
+        }
+      ]
+    },
+    {
+      "name": "drop-line",
+      "type": "registry:component",
+      "title": "Drop Line",
+      "description": "Words cut past one card at a time, then the last word sinks out from under the dot of its own i",
+      "docs": "Docs and props: https://snapcn.dev/docs/text/drop-line?ref=cli — 38 frames at 30fps.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "drop-line/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/drop-line/index.tsx"
+        },
+        {
+          "path": "drop-line/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/drop-line/data.ts"
+        }
+      ]
+    },
+    {
+      "name": "title-sweep",
+      "type": "registry:component",
+      "title": "Title Sweep",
+      "description": "An end title lit by a gradient that travels through the letters, cuts in the dark, and a second title takes over",
+      "docs": "Docs and props: https://snapcn.dev/docs/text/title-sweep?ref=cli — 76 frames at 30fps.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "title-sweep/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/title-sweep/index.tsx"
+        },
+        {
+          "path": "title-sweep/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/title-sweep/data.ts"
+        }
+      ]
+    },
+    {
       "name": "cut-lockup",
       "type": "registry:component",
       "docs": "Docs and props: https://snapcn.dev/docs/scenes/cut-lockup?ref=cli \u2014 108 frames at 30fps; paints its own background. Pass your logo as SVG paths (logo={{ width, height, shapes }}).",

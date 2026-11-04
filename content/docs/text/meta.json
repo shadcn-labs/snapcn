@@ -16,6 +16,10 @@
     "font-shuffle",
     "word-gather",
     "word-wheel",
-    "check-cycle"
+    "check-cycle",
+    "hello-zoom",
+    "spec-sweep",
+    "drop-line",
+    "title-sweep"
   ]
 }

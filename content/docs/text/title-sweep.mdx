@@ -1,0 +1,26 @@
+---
+title: Title Sweep
+description: An end title lit by a gradient that travels through the letters, cuts in the dark, and a second title takes over
+---
+
+<ComponentPreview name="title-sweep" />
+
+## Installation
+
+<InstallBlock name="title-sweep" />
+
+## Component code
+
+The exact file `shadcn add` copies into your project.
+
+<ComponentSource name="title-sweep" />
+
+## Usage
+
+Title Sweep paints its own card and runs 76 frames at 30fps. Timing is measured frame by frame off a reference; every word, colour and font is a prop.
+
+```tsx
+import { TitleSweep } from "@/components/snap-cn/title-sweep";
+
+export const Beat = () => <TitleSweep />;
+```

@@ -1,0 +1,26 @@
+---
+title: Spec Sweep
+description: A one-line spec slides in word by word while a highlight runs along it and an icon charges up
+---
+
+<ComponentPreview name="spec-sweep" />
+
+## Installation
+
+<InstallBlock name="spec-sweep" />
+
+## Component code
+
+The exact file `shadcn add` copies into your project.
+
+<ComponentSource name="spec-sweep" />
+
+## Usage
+
+Spec Sweep paints its own card and runs 75 frames at 30fps. Timing is measured frame by frame off a reference; every word, colour and font is a prop.
+
+```tsx
+import { SpecSweep } from "@/components/snap-cn/spec-sweep";
+
+export const Beat = () => <SpecSweep />;
+```
