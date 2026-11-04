@@ -797,6 +797,105 @@
       "type": "registry:component"
     },
     {
+      "name": "hello-zoom",
+      "title": "Hello Zoom",
+      "description": "Words flicker in place, one line types on, then the camera dives through its own letters into the next card",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/snap-cn/hello-zoom/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/hello-zoom/index.tsx"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/text/hello-zoom?ref=cli — 75 frames at 30fps.",
+      "type": "registry:component"
+    },
+    {
+      "name": "spec-sweep",
+      "title": "Spec Sweep",
+      "description": "A one-line spec slides in word by word while a highlight runs along it and an icon charges up",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/snap-cn/spec-sweep/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/spec-sweep/index.tsx"
+        },
+        {
+          "path": "registry/snap-cn/spec-sweep/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/spec-sweep/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/text/spec-sweep?ref=cli — 75 frames at 30fps.",
+      "type": "registry:component"
+    },
+    {
+      "name": "drop-line",
+      "title": "Drop Line",
+      "description": "Words cut past one card at a time, then the last word sinks out from under the dot of its own i",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/snap-cn/drop-line/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/drop-line/index.tsx"
+        },
+        {
+          "path": "registry/snap-cn/drop-line/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/drop-line/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/text/drop-line?ref=cli — 38 frames at 30fps.",
+      "type": "registry:component"
+    },
+    {
+      "name": "title-sweep",
+      "title": "Title Sweep",
+      "description": "An end title lit by a gradient that travels through the letters, cuts in the dark, and a second title takes over",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/snap-cn/title-sweep/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/title-sweep/index.tsx"
+        },
+        {
+          "path": "registry/snap-cn/title-sweep/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/title-sweep/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/text/title-sweep?ref=cli — 76 frames at 30fps.",
+      "type": "registry:component"
+    },
+    {
       "name": "cut-lockup",
       "title": "Cut Lockup",
       "description": "Logo reveal in hard cuts. The logo lands huge on grid paper, steps down in three cuts, pushes in, cuts to night where its construction lines and anchor points draw themselves, then a paper panel wipes up onto the resting lockup. Cuts, scales, push and wipe are measured frame by frame off a reference recording.",
@@ -2631,6 +2730,140 @@
         }
       ],
       "docs": "Docs and props: https://snapcn.dev/docs/ai-input/glass-prompt?ref=cli — 151 frames at 30fps. prompt (a long one shrinks to fit the glass), backdrop (empty draws hills), images or image1…image9 for the ring, fontFamily and textScale; frost, rim and lensZoom for the glass; focus and motionBlur for the camera; showPointer, pointer and pointerFill; ringScale, ringBlur and tileRadius; print and printDark/Mid/Light for the blue negative; background and speed. Also installs into Remotion Studio from the gallery, with every prop in the Inspector.",
+      "type": "registry:component",
+      "meta": {
+        "access": "pro"
+      }
+    },
+    {
+      "name": "count-portal",
+      "title": "Count Portal",
+      "description": "Countdown animation: a dare in hard cuts, then 3 2 1 as holes you fall through. A lead word assembles out of order, words cut past and the last one slams and inverts. Then each digit of a countdown arrives as a hole in a new card, larger than the stage, and you fall through it into the previous card.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "count-portal/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/count-portal/index.tsx"
+        },
+        {
+          "path": "count-portal/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/count-portal/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/text/count-portal?ref=cli — 116 frames at 30fps.",
+      "type": "registry:component",
+      "meta": {
+        "access": "pro"
+      }
+    },
+    {
+      "name": "slam-type",
+      "title": "Slam Type",
+      "description": "Kinetic title animation: three hard-cut wide words lit by one travelling metal gradient. Three hard cuts of one ultra-wide black word, each larger than the last, with one hot-metal gradient travelling through all three while the type pushes in.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "files": [
+        {
+          "path": "slam-type/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/slam-type/index.tsx"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/text/slam-type?ref=cli — 52 frames at 30fps.",
+      "type": "registry:component",
+      "meta": {
+        "access": "pro"
+      }
+    },
+    {
+      "name": "glow-frame",
+      "title": "Glow Frame",
+      "description": "Screen edge glow animation: a gradient line settles as light runs round the frame. A line of type scales up while a thin light enters at the edge of the screen, runs round all four sides and fades to a hairline, its colours drifting round the frame.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "glow-frame/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/glow-frame/index.tsx"
+        },
+        {
+          "path": "glow-frame/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/glow-frame/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/scenes/glow-frame?ref=cli — 37 frames at 30fps.",
+      "type": "registry:component",
+      "meta": {
+        "access": "pro"
+      }
+    },
+    {
+      "name": "metal-chip",
+      "title": "Metal Chip",
+      "description": "Metal chip reveal: a silver chip with your mark un-tilts as light rolls over it. A brushed-metal chip with your mark embossed on its face pushes in and un-tilts in perspective while a soft light rolls over the surface.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "files": [
+        {
+          "path": "metal-chip/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/metal-chip/index.tsx"
+        },
+        {
+          "path": "metal-chip/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/metal-chip/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/scenes/metal-chip?ref=cli — 36 frames at 30fps.",
+      "type": "registry:component",
+      "meta": {
+        "access": "pro"
+      }
+    },
+    {
+      "name": "spec-wall",
+      "title": "Spec Wall",
+      "description": "Scrolling text animation: spec lines type on, then invert and fly past too fast to read. A heading arrives word by word, spec lines type on underneath and the block scrolls, faster and faster, until the card inverts and the rest flies past too quickly to read.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "spec-wall/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/spec-wall/index.tsx"
+        },
+        {
+          "path": "spec-wall/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/spec-wall/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/text/spec-wall?ref=cli — 108 frames at 30fps.",
       "type": "registry:component",
       "meta": {
         "access": "pro"

@@ -124,6 +124,38 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     tile: "wide",
   },
   {
+    name: "Hello Zoom",
+    description:
+      "Words flicker in place, one line types on, then the camera dives through its own letters into the next card",
+    category: "text",
+    href: "/docs/text/hello-zoom",
+    added: "2026-11-04",
+  },
+  {
+    name: "Spec Sweep",
+    description:
+      "A one-line spec slides in word by word while a highlight runs along it and an icon charges up",
+    category: "text",
+    href: "/docs/text/spec-sweep",
+    added: "2026-11-04",
+  },
+  {
+    name: "Drop Line",
+    description:
+      "Words cut past one card at a time, then the last word sinks out from under the dot of its own i",
+    category: "text",
+    href: "/docs/text/drop-line",
+    added: "2026-11-04",
+  },
+  {
+    name: "Title Sweep",
+    description:
+      "An end title lit by a gradient that travels through the letters, cuts in the dark, and a second title takes over",
+    category: "text",
+    href: "/docs/text/title-sweep",
+    added: "2026-11-04",
+  },
+  {
     name: "Cut Lockup",
     description:
       "A logo reveal in hard cuts — huge on grid paper, three cuts down, a push to night where its construction lines draw themselves, then paper wipes up onto the lockup",
@@ -703,6 +735,11 @@ const PRO_CATEGORY: Record<string, CategoryId> = {
   "mark-grid": "scenes",
   "prompt-roll": "ai-input",
   "dot-dissolve": "transitions",
+  "count-portal": "text",
+  "slam-type": "text",
+  "glow-frame": "scenes",
+  "metal-chip": "scenes",
+  "spec-wall": "text",
 };
 
 /**

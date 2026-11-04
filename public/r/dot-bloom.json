@@ -14,6 +14,6 @@
       "target": "components/snap-cn/dot-bloom.tsx"
     }
   ],
-  "docs": "Docs and props: https://snapcn.dev/docs/transitions/dot-bloom?ref=cli — lay it over both shots and cut under it at DOT_BLOOM_CUT, where the cream covers the frame. — 77 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
+  "docs": "Docs and props: https://snapcn.dev/docs/transitions/dot-bloom?ref=cli — lay it over both shots and cut under it at DOT_BLOOM_CUT, where the cream covers the frame. — 82 Pro components too — charts, launch scenes, device shots: https://snapcn.dev/docs/pricing?ref=cli-docs",
   "type": "registry:component"
 }

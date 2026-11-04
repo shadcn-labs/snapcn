@@ -343,4 +343,52 @@ export const WALL_POSTS: readonly WallPost[] = [
       "甚至還提供 AI Agent Skill，可以搭配 AI Coding 工具協助挑選元件、安排動畫時間軸。\n\n以後要製作 SaaS 產品介紹、AI 工具 Demo、功能宣傳短片，又多了一個超強選擇！…",
     verified: true,
   },
+  {
+    handle: "Creator_Toolbox",
+    name: "Creators Toolbox",
+    lang: "en",
+    date: "2026-11-02",
+    url: "https://x.com/Creator_Toolbox/status/2117390617433240047",
+    quote:
+      "snapcn turns launch videos into something you git push\n\nIt's a library of ready-made Remotion video components you install into your project and own outright, so the video lives right next to your code",
+    verified: true,
+  },
+  {
+    handle: "lokidotdev",
+    name: "Loki",
+    lang: "en",
+    date: "2026-10-28",
+    url: "https://x.com/lokidotdev/status/2115566365222572538",
+    quote:
+      "You're losing launch-day attention if your video looks like everyone else's.\n\nSnapcn has ready-made templates that make product launches feel premium in minutes.\n\nYour next launch shouldn't be boring.",
+    verified: true,
+  },
+  {
+    handle: "zzurcz",
+    name: "Rhuan",
+    lang: "pt",
+    date: "2026-11-02",
+    url: "https://x.com/zzurcz/status/2117286035700760900",
+    quote: "usei o snapcn pra componets de motion…",
+    verified: true,
+  },
+  {
+    handle: "HeyDetya",
+    name: "Hey Detya",
+    lang: "en",
+    date: "2026-10-30",
+    url: "https://x.com/HeyDetya/status/2116224431454589165",
+    quote:
+      "Motion as an npm install is such a good idea. Designers will love this 🔥",
+    verified: true,
+  },
+  {
+    handle: "JerelVelarde",
+    name: "Jerel Velarde",
+    lang: "en",
+    date: "2026-10-30",
+    url: "https://x.com/JerelVelarde/status/2116028996257472998",
+    quote: "watch out",
+    verified: true,
+  },
 ] as const;

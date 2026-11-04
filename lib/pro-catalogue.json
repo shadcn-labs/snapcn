@@ -420,5 +420,35 @@
     "title": "Pain Point",
     "description": "The opening beat of a launch video: the viewer's pain, typed as a question, while the camera pulls back through the tools they are stuck in. A violet glow blooms out of black, the first line types itself with its newest characters running from white to violet, the camera dollies back and nine UI cards cut in at their own depths, a second line takes over, and the camera rushes back in. Replayed from a 4.5s screen recording measured frame by frame: a single dollying camera solved from nine tracked cards (0.26% scale error), the glow as fitted super-gaussian blobs, the type fitted for size, weight and tracking, and every reveal frame read off the capture.",
     "added": "2026-11-03"
+  },
+  {
+    "name": "count-portal",
+    "title": "Count Portal",
+    "description": "A lead word assembles out of order, words cut past and the last one slams and inverts. Then each digit of a countdown arrives as a hole in a new card, larger than the stage, and you fall through it into the previous card.",
+    "added": "2026-11-04"
+  },
+  {
+    "name": "slam-type",
+    "title": "Slam Type",
+    "description": "Three hard cuts of one ultra-wide black word, each larger than the last, with one hot-metal gradient travelling through all three while the type pushes in.",
+    "added": "2026-11-04"
+  },
+  {
+    "name": "glow-frame",
+    "title": "Glow Frame",
+    "description": "A line of type scales up while a thin light enters at the edge of the screen, runs round all four sides and fades to a hairline, its colours drifting round the frame.",
+    "added": "2026-11-04"
+  },
+  {
+    "name": "metal-chip",
+    "title": "Metal Chip",
+    "description": "A brushed-metal chip with your mark embossed on its face pushes in and un-tilts in perspective while a soft light rolls over the surface.",
+    "added": "2026-11-04"
+  },
+  {
+    "name": "spec-wall",
+    "title": "Spec Wall",
+    "description": "A heading arrives word by word, spec lines type on underneath and the block scrolls, faster and faster, until the card inverts and the rest flies past too quickly to read.",
+    "added": "2026-11-04"
   }
 ]

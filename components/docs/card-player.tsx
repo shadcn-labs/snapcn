@@ -44,6 +44,10 @@ export default function CardPlayer({
       // limit), so a slow-loading card never freezes on its first frame the
       // way the rAF play() poll can when it gives up under a heavy mount.
       autoPlay
+      // Muted, or Remotion waits for the AudioContext to resume before advancing
+      // a frame, and Chrome won't resume it without a gesture: the card sits on
+      // its first frame until something on the page is clicked.
+      initiallyMuted
       acknowledgeRemotionLicense
     />
   );

@@ -1,0 +1,26 @@
+---
+title: Drop Line
+description: Words cut past one card at a time, then the last word sinks out from under the dot of its own i
+---
+
+<ComponentPreview name="drop-line" />
+
+## Installation
+
+<InstallBlock name="drop-line" />
+
+## Component code
+
+The exact file `shadcn add` copies into your project.
+
+<ComponentSource name="drop-line" />
+
+## Usage
+
+Drop Line paints its own card and runs 38 frames at 30fps. Timing is measured frame by frame off a reference; every word, colour and font is a prop.
+
+```tsx
+import { DropLine } from "@/components/snap-cn/drop-line";
+
+export const Beat = () => <DropLine />;
+```
