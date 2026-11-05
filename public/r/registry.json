@@ -918,6 +918,84 @@
       "type": "registry:component"
     },
     {
+      "name": "bloom-lockup",
+      "title": "Bloom Lockup",
+      "description": "Logo reveal in four seconds. A wall of finished work blooms outward from your logo, cuts in tight on it, then bends away through a lens and a flash while the logo rises to take its wordmark and tagline. Measured frame by frame off a reference recording.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/snap-cn/bloom-lockup/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/bloom-lockup/index.tsx"
+        },
+        {
+          "path": "registry/snap-cn/bloom-lockup/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/bloom-lockup/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/scenes/bloom-lockup?ref=cli — 120 frames at 30fps; paints its own background. Pass your logo as SVG paths (logo={{ width, height, shapes }}) and your screens as images.",
+      "type": "registry:component"
+    },
+    {
+      "name": "gather-lockup",
+      "title": "Gather Lockup",
+      "description": "Logo reveal in two and a half seconds. A wall of your work sits under a line of type. The line falls apart word by word, the wall cuts in to a row of four, and each slot swaps its picture and hands over to your mark and wordmark. Measured frame by frame off a reference recording.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/snap-cn/gather-lockup/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/gather-lockup/index.tsx"
+        },
+        {
+          "path": "registry/snap-cn/gather-lockup/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/gather-lockup/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/scenes/gather-lockup?ref=cli — 60 frames at 24fps; paints its own background. Pass 15 images, and your logo as SVG paths (logo={{ width, height, shapes }}).",
+      "type": "registry:component"
+    },
+    {
+      "name": "sky-lockup",
+      "title": "Sky Lockup",
+      "description": "Logo outro in under two seconds. A one-line promise takes itself apart word by word, the white page washes off to a soft sky, and the mark in the middle of the sentence slides over, turns white and picks up your wordmark. Measured frame by frame off a reference recording.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/snap-cn/sky-lockup/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/sky-lockup/index.tsx"
+        },
+        {
+          "path": "registry/snap-cn/sky-lockup/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/sky-lockup/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/scenes/sky-lockup?ref=cli — 57 frames at 30fps; paints its own background. Pass your logo as SVG paths (logo={{ width, height, shapes }}).",
+      "type": "registry:component"
+    },
+    {
       "name": "search-typing",
       "title": "Search Typing",
       "description": "Search bar typing animation for AI search and command palette demos. A search field wider than the shot: two thirds in frame, then it comes forward, types across its left half, pages to its right half, and goes back. Every proportion is measured, and the scale pivots on the text baseline so the type never climbs the pixel grid.",

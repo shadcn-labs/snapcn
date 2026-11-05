@@ -2,7 +2,7 @@
 
 Router for the per-component reference files in this directory. **Scan this table to pick candidates, then open only the `components/<name>.md` files you actually need** — do not read every file.
 
-The registry ships **47 free items** (plus 50 Pro components that need a key — see the snapcn skill's Pro section). If a name is not in this file, it is not installable — check *Older names* at the bottom before assuming it exists.
+The registry ships **64 free items** (plus 81 Pro components that need a key — see the snapcn skill's Pro section). If a name is not in this file, it is not installable — check *Older names* at the bottom before assuming it exists.
 
 Install any entry: `shadcn add @snapcn/<name>` (lands at `components/snap-cn/<name>.tsx`; deps auto-install).
 
@@ -107,6 +107,9 @@ or fetch `https://snapcn.dev/docs/<category>/<name>.md`.
 | `word-wheel` | A fixed lead-in with a slot that spins through audiences or use-cases ("snapcn for …"). Pass `words` comma-separated. | One word only — use `text-reveal`. | 66f | playful |
 | `orb-swarm` | A sentence told beat by beat with glass orbs that swarm and ring the last words. `script` is six cards split with `\|`. | Tight budgets — it needs its full 160 frames. | 160f | playful |
 | `cut-lockup` | A logo intro/outro in hard cuts: huge on paper, stepping down, construction lines at night, paper wipe onto the lockup. `logo` takes SVG paths. | A text-only title — use `text-reveal`. | 108f | premium |
+| `bloom-lockup` | A logo reveal out of your work: a wall of screens blooms from the mark, cuts in tight, bends away through a lens, and the logo takes its wordmark. `logo` takes SVG paths. | No screens to show — use `cut-lockup`. | 120f | premium |
+| `gather-lockup` | A logo reveal from a photo wall: a line of type falls apart, the wall cuts to a row of four, and the slots hand over to your mark and wordmark. Pass 15 images. | Fewer than 15 images — use `bloom-lockup`. | 60f at 24fps | premium |
+| `sky-lockup` | A quick logo outro: a one-line promise takes itself apart, the page washes to a soft sky, and the mark in the sentence becomes your logo. `logo` takes SVG paths. | Long sentences; it wants a short promise. | 57f | premium |
 | `count-grid` | The "it scales" stat: cards multiply and a counter jumps (`from`, `to`, `noun`). | A number with no proof behind it. | 47f | data |
 | `roster-grant` | A cursor clicks a CTA and a team's avatars switch on — access granted, seats filled. | Solo products; it reads as teams. | 120f | clean |
 | `card-rail` | Feature or template cards flicked across a tilted 3D plane. | A single hero image — use `moodboard-reveal`. | 108f | premium |

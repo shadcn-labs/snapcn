@@ -1,0 +1,42 @@
+---
+title: Sky Lockup
+description: A one-line promise takes itself apart word by word, the page washes off to a soft sky, and the mark in the middle of the sentence slides over and becomes your logo
+---
+
+<ComponentPreview name="sky-lockup" />
+
+## Installation
+
+<InstallBlock name="sky-lockup" />
+
+## Component code
+
+The exact file `shadcn add` copies into your project.
+
+<ComponentSource name="sky-lockup" />
+
+## Usage
+
+Sky Lockup paints its own background and runs 57 frames at 30fps, under two
+seconds, so it closes a video without slowing it down. Every curve is measured
+frame by frame off a reference recording. The words, the wordmark, your mark and
+the sky are all props.
+
+```tsx
+import { SkyLockup } from "@/components/snap-cn/sky-lockup";
+
+export const Outro = () => (
+  <SkyLockup before="your product" after="as one video" wordmark="acme" />
+);
+```
+
+Your logo goes in as SVG paths, the same shape Cut Lockup takes. Any image works as
+the sky, and `mode="dark"` swaps the white page for your dark card.
+
+```tsx
+<SkyLockup
+  logo={{ width: 32, height: 32, shapes: ["M0 0h32v32H0z"] }}
+  sky="https://example.com/your-sky.jpg"
+  mode="dark"
+/>
+```

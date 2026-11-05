@@ -252,6 +252,18 @@ export const RENDERED_DEMOS: readonly string[] = [
   //                   different web font loaded at runtime — the Player shows
   //                   only the first frame until every face has arrived.
   "font-shuffle",
+  //   bloom-lockup    a wall of 28 images scaling out of a logo, then bent
+  //                   through an SVG displacement lens. A Player pays 28
+  //                   decodes and a filter per frame; the file pays neither.
+  //   gather-lockup   fifteen images behind type, with cuts on single frames
+  //                   at 24fps. A cut shown late is a stumble, and a Player
+  //                   flashes each swap before its picture has decoded.
+  //   sky-lockup      opens on a white page, so a live card reads as blank,
+  //                   and its 57 frames are over before a dropped one can be
+  //                   forgiven.
+  "bloom-lockup",
+  "gather-lockup",
+  "sky-lockup",
 ];
 
 /**

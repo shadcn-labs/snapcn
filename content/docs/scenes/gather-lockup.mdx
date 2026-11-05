@@ -1,0 +1,38 @@
+---
+title: Gather Lockup
+description: A wall of your work sits under a line of type. The line falls apart word by word, the wall cuts in to a row of four, and each slot swaps its picture and hands over to your mark and wordmark
+---
+
+<ComponentPreview name="gather-lockup" />
+
+## Installation
+
+<InstallBlock name="gather-lockup" />
+
+## Component code
+
+The exact file `shadcn add` copies into your project.
+
+<ComponentSource name="gather-lockup" />
+
+## Usage
+
+Gather Lockup paints its own background and runs 60 frames at 24fps, every pose
+measured off a reference recording. It cuts between held poses instead of easing, so
+keep it at 24fps. Pass fifteen pictures: seven for the wall, four for the row, four
+for the swaps. Tiles crop to fit, so portrait pictures work best. The title reads best
+at five words on three lines.
+
+```tsx
+import { GatherLockup } from "@/components/snap-cn/gather-lockup";
+
+export const Outro = () => (
+  <GatherLockup
+    lines={[["Ship"], ["your", "demo"], ["in", "code"]]}
+    wordmark="acme"
+    images={pictures}
+    captions={["Launch film", "Product demo"]}
+    logo={{ width: 32, height: 32, shapes: ["M0 0h32v32H0z"] }}
+  />
+);
+```
