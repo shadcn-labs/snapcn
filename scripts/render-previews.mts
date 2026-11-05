@@ -299,6 +299,9 @@ const POSTER_AT: Record<string, number> = {
   // manifest hashes the mp4, not the still beside it. Harmless for a poster that
   // has never shipped; for one that has, bump the demo too or it stays cached.
   "logo-collapse": 0.08,
+  // Half the run is the finished lockup; at 60% the card would be a bare logo.
+  // 10% is the wall of images with the line still whole.
+  "gather-lockup": 0.1,
 };
 
 function writePoster(file: string, tag: string) {

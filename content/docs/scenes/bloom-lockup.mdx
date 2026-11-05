@@ -1,0 +1,35 @@
+---
+title: Bloom Lockup
+description: A wall of finished work blooms outward from your logo, cuts in tight on it, then bends away through a lens and a flash while the logo rises to take its wordmark
+---
+
+<ComponentPreview name="bloom-lockup" />
+
+## Installation
+
+<InstallBlock name="bloom-lockup" />
+
+## Component code
+
+The exact file `shadcn add` copies into your project.
+
+<ComponentSource name="bloom-lockup" />
+
+## Usage
+
+Bloom Lockup paints its own background and runs 120 frames at 30fps. Every curve is
+measured frame by frame off a reference recording. Fill the cards with your own
+screens, and pass your logo as SVG paths, the same shape Cut Lockup takes.
+
+```tsx
+import { BloomLockup } from "@/components/snap-cn/bloom-lockup";
+
+export const Intro = () => (
+  <BloomLockup
+    wordmark="acme"
+    tagline="acme.dev"
+    images={["/screens/home.png", "/screens/chart.png"]}
+    logo={{ width: 32, height: 32, shapes: ["M0 0h32v32H0z"] }}
+  />
+);
+```

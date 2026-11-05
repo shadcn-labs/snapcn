@@ -45,11 +45,13 @@
   "check-cycle": "68d7e29bb4",
   "capture-reveal": "175099d81b",
   "font-shuffle": "1c45a4354a",
-  "agent-compose": "c56456f8d7",
   "reel-wall": "159cb37c71",
   "phone-stack": "96a628a774",
   "portal-intro": "ed7678c560",
   "dot-bloom": "f414ff6cf1",
   "button-press": "9632193565",
-  "click-type": "9e056d7753"
+  "click-type": "9e056d7753",
+  "bloom-lockup": "2e7650af82",
+  "gather-lockup": "69946c5d1a",
+  "sky-lockup": "26e5b4a3e8"
 }

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "measuredAt": "2026-10-21T07:17:02.341Z",
+  "measuredAt": "2026-11-05T10:00:19.910Z",
   "components": {
     "agent-steps": {
       "sourceHash": "4af6c8c9c78f",
@@ -91,6 +91,24 @@
         "maxChars": 6
       },
       "detailCoverage": 0.0339
+    },
+    "bloom-lockup": {
+      "sourceHash": "c58a5c041b0f",
+      "width": 1280,
+      "height": 720,
+      "fps": 30,
+      "durationInFrames": 120,
+      "settle": {
+        "base": 111,
+        "baseWords": 1,
+        "perWord": 0
+      },
+      "copy": {
+        "prop": "wordmark",
+        "pxPerChar": 213.5,
+        "maxChars": 6
+      },
+      "detailCoverage": 0.1504
     },
     "capture-reveal": {
       "sourceHash": "228e97eca115",
@@ -220,6 +238,24 @@
         "maxChars": 10
       },
       "detailCoverage": 0.0839
+    },
+    "gather-lockup": {
+      "sourceHash": "db9208d4ef3f",
+      "width": 1280,
+      "height": 720,
+      "fps": 24,
+      "durationInFrames": 60,
+      "settle": {
+        "base": 33,
+        "baseWords": 1,
+        "perWord": 0
+      },
+      "copy": {
+        "prop": "wordmark",
+        "pxPerChar": 196.83,
+        "maxChars": 6
+      },
+      "detailCoverage": 0.0222
     },
     "hero-launch": {
       "sourceHash": "47d762f423d9",
@@ -471,14 +507,14 @@
       "detailCoverage": 0.0857
     },
     "reel-collage": {
-      "sourceHash": "eec854cb9690",
+      "sourceHash": "9ee29a30a151",
       "width": 1280,
       "height": 720,
       "fps": 30,
       "durationInFrames": 96,
       "settle": {
-        "base": 76,
-        "baseWords": 2,
+        "base": 96,
+        "baseWords": 0,
         "perWord": 0
       },
       "copy": {
@@ -486,7 +522,7 @@
         "pxPerChar": 128.1,
         "maxChars": 10
       },
-      "detailCoverage": 0.1161
+      "detailCoverage": 0.1089
     },
     "roster-grant": {
       "sourceHash": "44eedf1d347e",
@@ -537,6 +573,24 @@
         "maxChars": 13
       },
       "detailCoverage": 0.0883
+    },
+    "sky-lockup": {
+      "sourceHash": "e61a1634dd38",
+      "width": 1280,
+      "height": 720,
+      "fps": 30,
+      "durationInFrames": 57,
+      "settle": {
+        "base": 57,
+        "baseWords": 2,
+        "perWord": 0
+      },
+      "copy": {
+        "prop": "wordmark",
+        "pxPerChar": 213.5,
+        "maxChars": 6
+      },
+      "detailCoverage": 0.0233
     },
     "status-cycle": {
       "sourceHash": "6cdd41eaef40",
@@ -2388,6 +2442,229 @@
         }
       ]
     },
+    "bloom-lockup": {
+      "slug": "bloom-lockup",
+      "settleFrame": 111,
+      "settleFrameAtCapacity": 111,
+      "neverSettles": false,
+      "durationInFrames": 120,
+      "capacity": {
+        "wordmark": {
+          "maxChars": 6,
+          "atFontSize": null,
+          "measuredWith": "snapcn"
+        },
+        "tagline": {
+          "maxChars": 10,
+          "atFontSize": null,
+          "measuredWith": "snapcn.dev"
+        }
+      },
+      "detailCoverage": 0.15042,
+      "subject": null,
+      "measurements": [
+        {
+          "check": "settlesBeforeTransition",
+          "value": 111,
+          "unit": "frames",
+          "threshold": 101,
+          "pass": null,
+          "frame": 111,
+          "series": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.04804,
+            0.15229,
+            0.28522,
+            0.30015,
+            0.33339,
+            0.41385,
+            0.43553,
+            0.4405,
+            0.497,
+            0.51048,
+            0.47971,
+            0.60042,
+            0.43771,
+            0.35756,
+            0.36563,
+            0.36072,
+            0.28769,
+            0.24041,
+            0.23433,
+            0.21563,
+            0.15074,
+            0.09793,
+            0.06484,
+            0.03104,
+            0.0296,
+            0.01681,
+            0.02669,
+            0.05905,
+            0.0456,
+            0.03136,
+            0.05942,
+            0.05851,
+            0.0681,
+            0.07125,
+            0.08444,
+            0.08067,
+            0.08958,
+            0.08149,
+            0.10156,
+            0.09978,
+            0.06898,
+            0.11546,
+            0.10837,
+            0.11573,
+            0.10824,
+            0.14733,
+            0.13461,
+            0.12538,
+            0.90022,
+            0.1984,
+            0.20931,
+            0.19783,
+            0.19691,
+            0.19396,
+            0.20363,
+            0.20896,
+            0.19567,
+            0.20146,
+            0.19357,
+            0.21005,
+            0.24842,
+            0.30613,
+            0.37074,
+            0.43866,
+            0.69625,
+            0.68733,
+            0.67814,
+            0.00802,
+            0.00916,
+            0.00781,
+            0.00815,
+            0.0099,
+            0.00922,
+            0.00892,
+            0.00871,
+            0.00824,
+            0.00832,
+            0.00822,
+            0.00834,
+            0.0087,
+            0.00915,
+            0.00228,
+            0.00223,
+            0.0028,
+            0.00051,
+            0.00169,
+            0.0029,
+            0.0017,
+            0.00101,
+            0.0015,
+            0.00206,
+            0.00171,
+            0.00299,
+            0.0023,
+            0.00212,
+            0.00232,
+            0.00229,
+            0.00206,
+            0.00264,
+            0.00176,
+            0.00065,
+            0.00098,
+            0.00057,
+            0.00053,
+            0.00054,
+            0.00049,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "detail": "still animating on frame 111; the 18-frame transition starts at 102, so the next beat fades in over 10 frames of unfinished animation. Reported, not judged: bill this beat at 111 + 18 frames instead of its 120-frame length."
+        },
+        {
+          "check": "holdIsStill",
+          "value": 3,
+          "unit": "count",
+          "threshold": null,
+          "pass": null,
+          "detail": "0.049% of pixels still move after the settle frame (a caret, a counter, a playing recording) — reported, not judged: byte-identity only applies where nothing moves at all."
+        },
+        {
+          "check": "noFrozenFrames",
+          "value": 36,
+          "unit": "count",
+          "threshold": null,
+          "pass": null,
+          "frame": 111,
+          "detail": "36 consecutive frames move less than 0.5px while animating (ends at frame 111) — they rasterise identically and the motion visibly stops dead. Use a moderate decelerate, not quint/expo."
+        },
+        {
+          "check": "centroidMonotonic",
+          "value": 35,
+          "unit": "count",
+          "threshold": null,
+          "pass": null,
+          "frame": 111,
+          "detail": "the ink's y centroid changes direction 35 times under a monotone transform — the type is snapping to the pixel grid. Pivot the scale on the baseline."
+        },
+        {
+          "check": "shapeInvariant",
+          "value": 1.87537,
+          "unit": "fraction",
+          "threshold": null,
+          "pass": null,
+          "detail": "ink area / width² drifts 187.54% under a scale — hinting is re-snapping the stems and the letterforms are boiling. Set text-rendering: geometricPrecision."
+        },
+        {
+          "check": "detailCoverage",
+          "value": 0.15042,
+          "unit": "fraction",
+          "threshold": null,
+          "pass": null,
+          "detail": "15.0% of the frame carries detail (median over 120 frames). Not judged — no product-shot floor was declared."
+        },
+        {
+          "check": "edgeBleed",
+          "value": 4,
+          "unit": "count",
+          "threshold": null,
+          "pass": null,
+          "detail": "partial [left,right,top,bottom] full-bleed [none]",
+          "frame": 70
+        },
+        {
+          "check": "settlesBeforeTransition@capacity:wordmark",
+          "value": 111,
+          "unit": "frames",
+          "threshold": 101,
+          "pass": null,
+          "frame": 111,
+          "detail": "still animating on frame 111; the 18-frame transition starts at 102, so the next beat fades in over 10 frames of unfinished animation. Reported, not judged: the default copy already settles inside the transition overlap, so the copy length is not what did this."
+        },
+        {
+          "check": "settlesBeforeTransition@capacity:tagline",
+          "value": 111,
+          "unit": "frames",
+          "threshold": 101,
+          "pass": null,
+          "frame": 111,
+          "detail": "still animating on frame 111; the 18-frame transition starts at 102, so the next beat fades in over 10 frames of unfinished animation. Reported, not judged: the default copy already settles inside the transition overlap, so the copy length is not what did this."
+        }
+      ]
+    },
     "capture-reveal": {
       "slug": "capture-reveal",
       "settleFrame": 114,
@@ -4214,6 +4491,155 @@
           "pass": true,
           "frame": 69,
           "detail": "settles on frame 69, 27 frames before the 18-frame transition opens."
+        }
+      ]
+    },
+    "gather-lockup": {
+      "slug": "gather-lockup",
+      "settleFrame": 33,
+      "settleFrameAtCapacity": 33,
+      "neverSettles": false,
+      "durationInFrames": 60,
+      "capacity": {
+        "wordmark": {
+          "maxChars": 6,
+          "atFontSize": null,
+          "measuredWith": "snapcn"
+        }
+      },
+      "detailCoverage": 0.02222,
+      "subject": null,
+      "measurements": [
+        {
+          "check": "settlesBeforeTransition",
+          "value": 33,
+          "unit": "frames",
+          "threshold": 41,
+          "pass": true,
+          "frame": 33,
+          "series": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.01007,
+            0.00065,
+            0.0269,
+            0,
+            0.0012,
+            0.06443,
+            0.01805,
+            0.02799,
+            0.07349,
+            0.10014,
+            0.1728,
+            0.12005,
+            0.07243,
+            0.1554,
+            0.04662,
+            0.01547,
+            0.04014,
+            0.03734,
+            0,
+            0.06475,
+            0.0161,
+            0.01597,
+            0.05034,
+            0,
+            0.00974,
+            0,
+            0.01305,
+            0,
+            0.00349,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "detail": "settles on frame 33, 8 frames before the 18-frame transition opens."
+        },
+        {
+          "check": "holdIsStill",
+          "value": 1,
+          "unit": "count",
+          "threshold": 1,
+          "pass": true,
+          "detail": "27 frames of hold, all byte-identical."
+        },
+        {
+          "check": "noFrozenFrames",
+          "value": 9,
+          "unit": "count",
+          "threshold": null,
+          "pass": null,
+          "frame": 9,
+          "detail": "9 consecutive frames move less than 0.5px while animating (ends at frame 9) — they rasterise identically and the motion visibly stops dead. Use a moderate decelerate, not quint/expo."
+        },
+        {
+          "check": "centroidMonotonic",
+          "value": 12,
+          "unit": "count",
+          "threshold": null,
+          "pass": null,
+          "frame": 31,
+          "detail": "the ink's y centroid changes direction 12 times under a monotone transform — the type is snapping to the pixel grid. Pivot the scale on the baseline."
+        },
+        {
+          "check": "shapeInvariant",
+          "value": 0.87782,
+          "unit": "fraction",
+          "threshold": null,
+          "pass": null,
+          "detail": "ink area / width² drifts 87.78% under a scale — hinting is re-snapping the stems and the letterforms are boiling. Set text-rendering: geometricPrecision."
+        },
+        {
+          "check": "detailCoverage",
+          "value": 0.02222,
+          "unit": "fraction",
+          "threshold": null,
+          "pass": null,
+          "detail": "2.2% of the frame carries detail (median over 60 frames). Not judged — no product-shot floor was declared."
+        },
+        {
+          "check": "edgeBleed",
+          "value": 1,
+          "unit": "count",
+          "threshold": null,
+          "pass": null,
+          "detail": "partial [top] full-bleed [none]",
+          "frame": 17
+        },
+        {
+          "check": "settlesBeforeTransition@capacity:wordmark",
+          "value": 33,
+          "unit": "frames",
+          "threshold": 41,
+          "pass": true,
+          "frame": 33,
+          "detail": "settles on frame 33, 8 frames before the 18-frame transition opens."
         }
       ]
     },
@@ -7816,9 +8242,9 @@
     },
     "reel-collage": {
       "slug": "reel-collage",
-      "settleFrame": 76,
-      "settleFrameAtCapacity": 76,
-      "neverSettles": false,
+      "settleFrame": null,
+      "settleFrameAtCapacity": null,
+      "neverSettles": true,
       "durationInFrames": 96,
       "capacity": {
         "topLine": {
@@ -7842,16 +8268,17 @@
           "measuredWith": "Launch day"
         }
       },
-      "detailCoverage": 0.11611,
+      "detailCoverage": 0.10889,
       "subject": null,
       "measurements": [
         {
           "check": "settlesBeforeTransition",
-          "value": 76,
+          "value": null,
           "unit": "frames",
-          "threshold": 77,
-          "pass": true,
-          "frame": 76,
+          "threshold": null,
+          "pass": null,
+          "detail": "still moving on frame 95 and never goes quiet; the 18-frame transition opens at 78. Reported, not failed — a loop and an unfinished beat are indistinguishable without a periodicity test. Bill it at full length.",
+          "frame": 95,
           "series": [
             0,
             0.03612,
@@ -7904,95 +8331,94 @@
             0.00558,
             0.01079,
             0.03015,
-            0.07082,
-            0.07968,
-            0.09275,
-            0.08759,
-            0.09873,
-            0.10856,
-            0.1267,
-            0.14937,
-            0.17244,
-            0.19618,
-            0.18882,
-            0.19154,
-            0.18763,
-            0.11191,
-            0.10564,
-            0.07863,
-            0.07526,
-            0.07228,
-            0.0714,
-            0.06321,
-            0.05908,
-            0.06173,
-            0.04997,
-            0.05717,
-            0.04815,
-            0.02379,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-          ],
-          "detail": "settles on frame 76, 1 frames before the 18-frame transition opens."
+            0.05933,
+            0.07501,
+            0.0945,
+            0.08787,
+            0.09925,
+            0.10844,
+            0.12954,
+            0.15268,
+            0.1719,
+            0.19817,
+            0.19004,
+            0.19108,
+            0.19385,
+            0.11316,
+            0.10979,
+            0.06922,
+            0.06254,
+            0.05818,
+            0.05629,
+            0.04833,
+            0.04777,
+            0.04861,
+            0.03747,
+            0.04101,
+            0.03455,
+            0.02105,
+            0.01214,
+            0.01255,
+            0.01399,
+            0.01423,
+            0.01337,
+            0.01612,
+            0.01974,
+            0.01845,
+            0.02067,
+            0.02124,
+            0.02252,
+            0.02571,
+            0.02793,
+            0.03192,
+            0.03739,
+            0.0361,
+            0.03697,
+            0.03517,
+            0.03581
+          ]
         },
         {
           "check": "holdIsStill",
-          "value": 1,
+          "value": null,
           "unit": "count",
-          "threshold": 1,
-          "pass": true,
-          "detail": "20 frames of hold, all byte-identical."
+          "threshold": null,
+          "pass": null,
+          "detail": "never settles — no hold to compare."
         },
         {
           "check": "noFrozenFrames",
+          "value": 21,
+          "unit": "count",
+          "threshold": null,
+          "pass": null,
+          "frame": 95,
+          "detail": "21 consecutive frames move less than 0.5px while animating (ends at frame 95) — they rasterise identically and the motion visibly stops dead. Use a moderate decelerate, not quint/expo."
+        },
+        {
+          "check": "centroidMonotonic",
           "value": 17,
           "unit": "count",
           "threshold": null,
           "pass": null,
-          "frame": 48,
-          "detail": "17 consecutive frames move less than 0.5px while animating (ends at frame 48) — they rasterise identically and the motion visibly stops dead. Use a moderate decelerate, not quint/expo."
-        },
-        {
-          "check": "centroidMonotonic",
-          "value": 15,
-          "unit": "count",
-          "threshold": null,
-          "pass": null,
-          "frame": 51,
-          "detail": "the ink's y centroid changes direction 15 times under a monotone transform — the type is snapping to the pixel grid. Pivot the scale on the baseline."
+          "frame": 91,
+          "detail": "the ink's y centroid changes direction 17 times under a monotone transform — the type is snapping to the pixel grid. Pivot the scale on the baseline."
         },
         {
           "check": "shapeInvariant",
-          "value": 0.50889,
+          "value": 0.52985,
           "unit": "fraction",
           "threshold": null,
           "pass": null,
-          "detail": "ink area / width² drifts 50.89% under a scale — hinting is re-snapping the stems and the letterforms are boiling. Set text-rendering: geometricPrecision."
+          "detail": "ink area / width² drifts 52.98% under a scale — hinting is re-snapping the stems and the letterforms are boiling. Set text-rendering: geometricPrecision."
         },
         {
           "check": "detailCoverage",
-          "value": 0.11611,
+          "value": 0.10889,
           "unit": "fraction",
           "threshold": null,
           "pass": null,
-          "detail": "11.6% of the frame carries detail (median over 96 frames). Not judged — no product-shot floor was declared."
+          "detail": "10.9% of the frame carries detail (median over 96 frames). Not judged — no product-shot floor was declared."
         },
         {
           "check": "edgeBleed",
@@ -8005,39 +8431,39 @@
         },
         {
           "check": "settlesBeforeTransition@capacity:topLine",
-          "value": 76,
+          "value": null,
           "unit": "frames",
-          "threshold": 77,
-          "pass": true,
-          "frame": 76,
-          "detail": "settles on frame 76, 1 frames before the 18-frame transition opens."
+          "threshold": null,
+          "pass": null,
+          "detail": "still moving on frame 191 and never goes quiet; the 18-frame transition opens at 78. Reported, not failed — a loop and an unfinished beat are indistinguishable without a periodicity test. Bill it at full length. Measured over 192 frames: at 10 chars the copy does not finish inside the component's own 96.",
+          "frame": 191
         },
         {
           "check": "settlesBeforeTransition@capacity:bottomLine",
-          "value": 76,
+          "value": null,
           "unit": "frames",
-          "threshold": 77,
-          "pass": true,
-          "frame": 76,
-          "detail": "settles on frame 76, 1 frames before the 18-frame transition opens."
+          "threshold": null,
+          "pass": null,
+          "detail": "still moving on frame 191 and never goes quiet; the 18-frame transition opens at 78. Reported, not failed — a loop and an unfinished beat are indistinguishable without a periodicity test. Bill it at full length. Measured over 192 frames: at 13 chars the copy does not finish inside the component's own 96.",
+          "frame": 191
         },
         {
           "check": "settlesBeforeTransition@capacity:swapTop",
-          "value": 76,
+          "value": null,
           "unit": "frames",
-          "threshold": 77,
-          "pass": true,
-          "frame": 76,
-          "detail": "settles on frame 76, 1 frames before the 18-frame transition opens."
+          "threshold": null,
+          "pass": null,
+          "detail": "still moving on frame 191 and never goes quiet; the 18-frame transition opens at 78. Reported, not failed — a loop and an unfinished beat are indistinguishable without a periodicity test. Bill it at full length. Measured over 192 frames: at 13 chars the copy does not finish inside the component's own 96.",
+          "frame": 191
         },
         {
           "check": "settlesBeforeTransition@capacity:swapBottom",
-          "value": 76,
+          "value": null,
           "unit": "frames",
-          "threshold": 77,
-          "pass": true,
-          "frame": 76,
-          "detail": "settles on frame 76, 1 frames before the 18-frame transition opens."
+          "threshold": null,
+          "pass": null,
+          "detail": "still moving on frame 191 and never goes quiet; the 18-frame transition opens at 78. Reported, not failed — a loop and an unfinished beat are indistinguishable without a periodicity test. Bill it at full length. Measured over 192 frames: at 10 chars the copy does not finish inside the component's own 96.",
+          "frame": 191
         }
       ]
     },
@@ -8991,6 +9417,180 @@
           "pass": null,
           "frame": 403,
           "detail": "still animating on frame 403; the 18-frame transition starts at 402, so the next beat fades in over 2 frames of unfinished animation. Reported, not judged: the default copy already settles inside the transition overlap, so the copy length is not what did this."
+        }
+      ]
+    },
+    "sky-lockup": {
+      "slug": "sky-lockup",
+      "settleFrame": null,
+      "settleFrameAtCapacity": 57,
+      "neverSettles": true,
+      "durationInFrames": 57,
+      "capacity": {
+        "before": {
+          "maxChars": 15,
+          "atFontSize": null,
+          "measuredWith": "your animations"
+        },
+        "after": {
+          "maxChars": 14,
+          "atFontSize": null,
+          "measuredWith": "as one install"
+        },
+        "wordmark": {
+          "maxChars": 6,
+          "atFontSize": null,
+          "measuredWith": "snapcn"
+        }
+      },
+      "detailCoverage": 0.02333,
+      "subject": null,
+      "measurements": [
+        {
+          "check": "settlesBeforeTransition",
+          "value": null,
+          "unit": "frames",
+          "threshold": null,
+          "pass": null,
+          "detail": "still moving on frame 56 and never goes quiet; the 18-frame transition opens at 39. Reported, not failed — a loop and an unfinished beat are indistinguishable without a periodicity test. Bill it at full length.",
+          "frame": 56,
+          "series": [
+            0,
+            0.01376,
+            0.01499,
+            0.01403,
+            0.01345,
+            0.00967,
+            0.00903,
+            0.00932,
+            0.01395,
+            0.01156,
+            0.0107,
+            0.01021,
+            0.01118,
+            0.01052,
+            0.00782,
+            0.04855,
+            0.00814,
+            0.00805,
+            0.00677,
+            0.00748,
+            0.00835,
+            0.00803,
+            0.0066,
+            0.00551,
+            0.00447,
+            0.00416,
+            0.00422,
+            0.00366,
+            0.00542,
+            0.01769,
+            0.06619,
+            0.04555,
+            0.07259,
+            0.11269,
+            0.15518,
+            0.1988,
+            0.25221,
+            0.31896,
+            0.4202,
+            0.5616,
+            0.76063,
+            0.65968,
+            0.40009,
+            0.25486,
+            0.16328,
+            0.04437,
+            0.05231,
+            0.01386,
+            0.00333,
+            0.00334,
+            0.00307,
+            0.00208,
+            0.0022,
+            0.00146,
+            0.00218,
+            0.00156,
+            0.00157
+          ]
+        },
+        {
+          "check": "holdIsStill",
+          "value": null,
+          "unit": "count",
+          "threshold": null,
+          "pass": null,
+          "detail": "never settles — no hold to compare."
+        },
+        {
+          "check": "noFrozenFrames",
+          "value": 13,
+          "unit": "count",
+          "threshold": null,
+          "pass": null,
+          "frame": 56,
+          "detail": "13 consecutive frames move less than 0.5px while animating (ends at frame 56) — they rasterise identically and the motion visibly stops dead. Use a moderate decelerate, not quint/expo."
+        },
+        {
+          "check": "centroidMonotonic",
+          "value": 8,
+          "unit": "count",
+          "threshold": null,
+          "pass": null,
+          "frame": 33,
+          "detail": "the ink's y centroid changes direction 8 times under a monotone transform — the type is snapping to the pixel grid. Pivot the scale on the baseline."
+        },
+        {
+          "check": "shapeInvariant",
+          "value": 3.9956,
+          "unit": "fraction",
+          "threshold": null,
+          "pass": null,
+          "detail": "ink area / width² drifts 399.56% under a scale — hinting is re-snapping the stems and the letterforms are boiling. Set text-rendering: geometricPrecision."
+        },
+        {
+          "check": "detailCoverage",
+          "value": 0.02333,
+          "unit": "fraction",
+          "threshold": null,
+          "pass": null,
+          "detail": "2.3% of the frame carries detail (median over 57 frames). Not judged — no product-shot floor was declared."
+        },
+        {
+          "check": "edgeBleed",
+          "value": 2,
+          "unit": "count",
+          "threshold": null,
+          "pass": null,
+          "detail": "partial [top,bottom] full-bleed [left,right]",
+          "frame": 41
+        },
+        {
+          "check": "settlesBeforeTransition@capacity:before",
+          "value": 57,
+          "unit": "frames",
+          "threshold": 38,
+          "pass": null,
+          "frame": 57,
+          "detail": "still animating on frame 57; the 18-frame transition starts at 39, so the next beat fades in over 19 frames of unfinished animation. Measured over 114 frames: at 15 chars the copy does not finish inside the component's own 57. Reported, not judged: the default copy already settles inside the transition overlap, so the copy length is not what did this."
+        },
+        {
+          "check": "settlesBeforeTransition@capacity:after",
+          "value": 57,
+          "unit": "frames",
+          "threshold": 38,
+          "pass": null,
+          "frame": 57,
+          "detail": "still animating on frame 57; the 18-frame transition starts at 39, so the next beat fades in over 19 frames of unfinished animation. Measured over 114 frames: at 14 chars the copy does not finish inside the component's own 57. Reported, not judged: the default copy already settles inside the transition overlap, so the copy length is not what did this."
+        },
+        {
+          "check": "settlesBeforeTransition@capacity:wordmark",
+          "value": 57,
+          "unit": "frames",
+          "threshold": 38,
+          "pass": null,
+          "frame": 57,
+          "detail": "still animating on frame 57; the 18-frame transition starts at 39, so the next beat fades in over 19 frames of unfinished animation. Measured over 114 frames: at 6 chars the copy does not finish inside the component's own 57. Reported, not judged: the default copy already settles inside the transition overlap, so the copy length is not what did this."
         }
       ]
     },

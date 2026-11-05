@@ -19,7 +19,10 @@ import { HelloZoom } from "@/registry/snap-cn/hello-zoom";
 import { SpecSweep } from "@/registry/snap-cn/spec-sweep";
 import { DropLine } from "@/registry/snap-cn/drop-line";
 import { TitleSweep } from "@/registry/snap-cn/title-sweep";
+import { BloomLockup } from "@/registry/snap-cn/bloom-lockup";
 import { CutLockup } from "@/registry/snap-cn/cut-lockup";
+import { GatherLockup } from "@/registry/snap-cn/gather-lockup";
+import { SkyLockup } from "@/registry/snap-cn/sky-lockup";
 import { FollowerRush } from "@/registry/snap-cn/follower-rush";
 import { FontShuffle } from "@/registry/snap-cn/font-shuffle";
 import { HeroLaunch } from "@/registry/snap-cn/hero-launch";
@@ -157,7 +160,10 @@ const registry: Record<string, RegistryEntry> = {
   "word-gather": { Component: WordGather, config: CONFIGS["word-gather"] },
   "portal-intro": { Component: PortalIntro, config: CONFIGS["portal-intro"] },
   "dot-bloom": { Component: DotBloom, config: CONFIGS["dot-bloom"] },
+  "bloom-lockup": { Component: BloomLockup as React.ComponentType<Record<string, unknown>>, config: CONFIGS["bloom-lockup"] },
   "cut-lockup": { Component: CutLockup, config: CONFIGS["cut-lockup"] },
+  "gather-lockup": { Component: GatherLockup as React.ComponentType<Record<string, unknown>>, config: CONFIGS["gather-lockup"] },
+  "sky-lockup": { Component: SkyLockup as React.ComponentType<Record<string, unknown>>, config: CONFIGS["sky-lockup"] },
   "hello-zoom": { Component: HelloZoom as React.ComponentType<Record<string, unknown>>, config: CONFIGS["hello-zoom"] },
   "spec-sweep": { Component: SpecSweep as React.ComponentType<Record<string, unknown>>, config: CONFIGS["spec-sweep"] },
   "drop-line": { Component: DropLine as React.ComponentType<Record<string, unknown>>, config: CONFIGS["drop-line"] },

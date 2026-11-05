@@ -12,14 +12,13 @@ import { checkCycleConfig } from "@/registry/snap-cn/check-cycle/config";
 import { clickTypeConfig } from "@/registry/snap-cn/click-type/config";
 import { countGridConfig } from "@/registry/snap-cn/count-grid/config";
 import { cursorTrackConfig } from "@/registry/snap-cn/cursor-track/config";
-import { dotBloomConfig } from "@/registry/snap-cn/dot-bloom/config";
-import { helloZoomConfig } from "@/registry/snap-cn/hello-zoom/config";
-import { specSweepConfig } from "@/registry/snap-cn/spec-sweep/config";
-import { dropLineConfig } from "@/registry/snap-cn/drop-line/config";
-import { titleSweepConfig } from "@/registry/snap-cn/title-sweep/config";
+import { bloomLockupConfig } from "@/registry/snap-cn/bloom-lockup/config";
 import { cutLockupConfig } from "@/registry/snap-cn/cut-lockup/config";
+import { dotBloomConfig } from "@/registry/snap-cn/dot-bloom/config";
+import { dropLineConfig } from "@/registry/snap-cn/drop-line/config";
 import { followerRushConfig } from "@/registry/snap-cn/follower-rush/config";
 import { fontShuffleConfig } from "@/registry/snap-cn/font-shuffle/config";
+import { helloZoomConfig } from "@/registry/snap-cn/hello-zoom/config";
 import { heroLaunchConfig } from "@/registry/snap-cn/hero-launch/config";
 import { karaokeCaptionsConfig } from "@/registry/snap-cn/karaoke-captions/config";
 import { laptopFrameConfig } from "@/registry/snap-cn/laptop-frame/config";
@@ -41,6 +40,9 @@ import { reelWallConfig } from "@/registry/snap-cn/reel-wall/config";
 import { rosterGrantConfig } from "@/registry/snap-cn/roster-grant/config";
 import { screenRecordingConfig } from "@/registry/snap-cn/screen-recording/config";
 import { searchTypingConfig } from "@/registry/snap-cn/search-typing/config";
+import { gatherLockupConfig } from "@/registry/snap-cn/gather-lockup/config";
+import { skyLockupConfig } from "@/registry/snap-cn/sky-lockup/config";
+import { specSweepConfig } from "@/registry/snap-cn/spec-sweep/config";
 import { statusCycleConfig } from "@/registry/snap-cn/status-cycle/config";
 import { terminalSimulatorConfig } from "@/registry/snap-cn/terminal-simulator/config";
 import { textBuildConfig } from "@/registry/snap-cn/text-build/config";
@@ -50,6 +52,7 @@ import { textRewriteConfig } from "@/registry/snap-cn/text-rewrite/config";
 import { textSelectConfig } from "@/registry/snap-cn/text-select/config";
 import { textSwapConfig } from "@/registry/snap-cn/text-swap/config";
 import { textSwellConfig } from "@/registry/snap-cn/text-swell/config";
+import { titleSweepConfig } from "@/registry/snap-cn/title-sweep/config";
 import { wordCaptionsConfig } from "@/registry/snap-cn/word-captions/config";
 import { wordFlipConfig } from "@/registry/snap-cn/word-flip/config";
 import { wordGatherConfig } from "@/registry/snap-cn/word-gather/config";
@@ -106,7 +109,10 @@ export const CONFIGS: Record<string, ComponentConfig> = {
   "word-gather": wordGatherConfig,
   "portal-intro": portalIntroConfig,
   "dot-bloom": dotBloomConfig,
+  "bloom-lockup": bloomLockupConfig,
   "cut-lockup": cutLockupConfig,
+  "gather-lockup": gatherLockupConfig,
+  "sky-lockup": skyLockupConfig,
   "hello-zoom": helloZoomConfig,
   "spec-sweep": specSweepConfig,
   "drop-line": dropLineConfig,

@@ -156,6 +156,30 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     added: "2026-11-04",
   },
   {
+    name: "Bloom Lockup",
+    description:
+      "A wall of finished work blooms outward from your logo, cuts in tight on it, then bends away through a lens and a flash while the logo rises to take its wordmark",
+    category: "scenes",
+    href: "/docs/scenes/bloom-lockup",
+    added: "2026-11-05",
+  },
+  {
+    name: "Gather Lockup",
+    description:
+      "A wall of your work sits under a line of type. The line falls apart word by word, the wall cuts in to a row of four, and each slot swaps its picture and hands over to your mark and wordmark",
+    category: "scenes",
+    href: "/docs/scenes/gather-lockup",
+    added: "2026-11-05",
+  },
+  {
+    name: "Sky Lockup",
+    description:
+      "A one-line promise takes itself apart word by word, the page washes off to a soft sky, and the mark in the middle of the sentence slides over and becomes your logo",
+    category: "scenes",
+    href: "/docs/scenes/sky-lockup",
+    added: "2026-11-05",
+  },
+  {
     name: "Cut Lockup",
     description:
       "A logo reveal in hard cuts — huge on grid paper, three cuts down, a push to night where its construction lines draw themselves, then paper wipes up onto the lockup",
