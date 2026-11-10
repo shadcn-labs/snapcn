@@ -85,7 +85,14 @@ export type CtaId =
    * The only upsell a signed-in free user sees outside the editor. Does anyone
    * who already has an account go and look at the price from there?
    */
-  | "account_menu_upgrade";
+  | "account_menu_upgrade"
+  /**
+   * The one-time "Liking snapcn?" card (`components/nudge-card.tsx`), shown
+   * after an install copy or 45s. Does a moment of proven interest sell Pro
+   * better than a deadline does, and how many take the free Star instead?
+   */
+  | "nudge_pro"
+  | "nudge_star";
 
 export type AnalyticsEvents = {
   install_command_copied: {
@@ -323,6 +330,9 @@ export function useTrackEvent() {
     ) => {
       const props = args[0] as Record<string, unknown> | undefined;
       withPostHog((ph) => ph.capture(event, props));
+      // The nudge card listens for this: a copied install is proven interest.
+      if (event === "install_command_copied")
+        window.dispatchEvent(new Event("snapcn:installed"));
     },
     [],
   );

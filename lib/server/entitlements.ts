@@ -1,18 +1,27 @@
 import "server-only";
 import { and, count, eq, lt, sql } from "drizzle-orm";
-import { billingSubscriptions, renderUsage, users } from "@/lib/db/schema";
+import {
+  accounts,
+  apiKeys,
+  billingSubscriptions,
+  renderUsage,
+  users,
+} from "@/lib/db/schema";
 import {
   ANONYMOUS,
   entitledPlan,
   type Licence,
+  oneTimePlanFor,
   PLANS,
   type PlanLimits,
   type PlanName,
   type PlanTier,
+  planForProduct,
   tierOfPurchase,
 } from "@/lib/plans";
 import { ensureApiKey } from "@/lib/server/api-key";
 import { getDb, isDbConfigured } from "@/lib/server/db";
+import type { DodoPayment } from "@/lib/server/dodo";
 import { teamPlanFor } from "@/lib/server/team";
 
 /**
@@ -540,4 +549,77 @@ export async function billingFor(userId: string) {
     console.warn("[entitlements] billing read failed", err);
     return null;
   }
+}
+
+/* ── claimGuestPurchase ─────────────────────────────────────────────────── */
+
+/**
+ * How long after paying a guest can still claim the purchase.
+ *
+ * A guest's plan lands on whatever address they typed on Dodo's page. Typo it
+ * (lou4oyu.com, Nov 2026) and the plan sits on an account nobody can sign in
+ * to, while the buyer signs in with their real address and sees Free. The
+ * return URL carries the `payment_id`, so whoever signs in straight after
+ * paying is, in practice, the buyer. A day covers "paid, then signed in later
+ * that evening"; past that, a stale link is not proof of anything.
+ */
+const CLAIM_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+/** A succeeded guest purchase of ours, recent enough to claim. */
+export function isClaimable(p: DodoPayment, now = Date.now()): boolean {
+  const product = p.metadata?.product;
+  return (
+    p.status === "succeeded" &&
+    !p.metadata?.user_id &&
+    Boolean(planForProduct(product) || oneTimePlanFor(product)) &&
+    Boolean(p.customer?.email) &&
+    now - Date.parse(p.created_at) < CLAIM_WINDOW_MS
+  );
+}
+
+/**
+ * Move a guest purchase from the address typed at checkout to the account that
+ * just signed in with its `payment_id` — only when nobody has ever signed in to
+ * the typed address (no verified email, no linked provider), so a plan is never
+ * taken off an account someone actually uses.
+ *
+ * Returns true when the plan moved. Moves nothing if the signed-in account
+ * already has a billing row: the primary key refuses the second row and the
+ * transaction rolls back.
+ * ponytail: a webhook that has not landed yet leaves nothing to move; the
+ * buyer then needs support. Retry here on a delay if that ever shows up.
+ */
+export async function claimGuestPurchase(
+  userId: string,
+  payment: DodoPayment,
+): Promise<boolean> {
+  if (!isClaimable(payment)) return false;
+  const address = (payment.customer?.email ?? "").trim().toLowerCase();
+  const db = getDb();
+  const [holder] = await db
+    .select({ id: users.id, verified: users.emailVerified })
+    .from(users)
+    .where(sql`lower(${users.email}) = ${address}`)
+    .limit(1);
+  if (!holder || holder.id === userId || holder.verified) return false;
+  const [linked] = await db
+    .select({ id: accounts.userId })
+    .from(accounts)
+    .where(eq(accounts.userId, holder.id))
+    .limit(1);
+  if (linked) return false;
+
+  return db.transaction(async (tx) => {
+    const moved = await tx
+      .update(billingSubscriptions)
+      .set({ userId, updatedAt: new Date() })
+      .where(eq(billingSubscriptions.userId, holder.id))
+      .returning({ id: billingSubscriptions.userId });
+    if (!moved.length) return false;
+    await tx
+      .update(apiKeys)
+      .set({ userId })
+      .where(eq(apiKeys.userId, holder.id));
+    return true;
+  });
 }
