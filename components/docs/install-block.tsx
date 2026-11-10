@@ -1,3 +1,4 @@
+import { ELEMENT_PAYLOAD_MIME_TYPE } from "@remotion/studio-protocol";
 import Link from "next/link";
 import { installCommand } from "@/config/site";
 import { convertNpmCommand } from "@/lib/convert-npm-command";
@@ -54,7 +55,16 @@ export function InstallBlock({
         if this is your first snapcn component.
       </p>
       {STUDIO_ELEMENTS.includes(name) && (
-        <StudioInstall name={name} surface="docs" />
+        <>
+          {/* Points `npx remotion elements use <page URL>` at the same payload
+              the button sends, without adding it to the page's HTML. */}
+          <link
+            rel="alternate"
+            type={ELEMENT_PAYLOAD_MIME_TYPE}
+            href={`/elements/${name}.json`}
+          />
+          <StudioInstall name={name} surface="docs" />
+        </>
       )}
     </div>
   );

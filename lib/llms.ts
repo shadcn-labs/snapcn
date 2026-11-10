@@ -13,6 +13,7 @@ import {
 import { CLIENTS, JOBS, SERVER } from "./mcp-clients";
 import { ROADMAP, STAGE_LABEL } from "./roadmap-data";
 import { firstSentence } from "./structured-data";
+import STUDIO_ELEMENTS from "./studio-elements.json";
 
 export const SITE_URL = "https://snapcn.dev";
 
@@ -53,6 +54,17 @@ function frontmatterField(fm: string, key: string): string {
 }
 
 /**
+ * A free component that is also a Remotion Element can be added to one
+ * composition from its page URL: the page links the same payload the
+ * "Add to Remotion Studio" button sends.
+ */
+function installMarkdown(name: string, url: string): string {
+  const shadcn = `\`\`\`bash\nnpx shadcn@latest add @snapcn/${name}\n\`\`\``;
+  if (!(STUDIO_ELEMENTS as string[]).includes(name)) return shadcn;
+  return `${shadcn}\n\nTo add it to one Remotion composition as an editable copy instead (Remotion 4.0.542+):\n\n\`\`\`bash\nnpx remotion elements use ${SITE_URL}${url} --composition <id>\n\`\`\``;
+}
+
+/**
  * Rewrite site-only MDX widgets into plain markdown an LLM can act on:
  * install widgets become runnable commands, interactive previews become a
  * pointer to the docs page, and remaining JSX tags are dropped.
@@ -64,12 +76,8 @@ function toPlainMarkdown(body: string, url: string): string {
       // InstallBlock prints — the CLI resolves the namespace from the shadcn
       // registry directory, so an agent can paste this as-is.
       .replace(
-        /<InstallBlock\s+registry="[\w-]+"\s+name="([\w-]+)"\s*\/>/g,
-        "```bash\nnpx shadcn@latest add @snapcn/$1\n```",
-      )
-      .replace(
-        /<InstallBlock\s+name="([\w-]+)"\s*\/>/g,
-        "```bash\nnpx shadcn@latest add @snapcn/$1\n```",
+        /<InstallBlock\s+(?:registry="[\w-]+"\s+)?name="([\w-]+)"\s*\/>/g,
+        (_, name: string) => installMarkdown(name, url),
       )
       .replace(
         /<(ComponentPreview|UiComponentPreview|BlockPreview)[\s\S]*?\/>/g,
@@ -206,7 +214,7 @@ ${mcpInstall}`,
       category: "tools",
       body: `Every free component's page has an "Add to Remotion Studio" button. It sends the component over the Remotion Studio Protocol to the Studio running on the reader's computer (Remotion 4.0.524+, started with \`npx remotion studio\`, a composition open). Studio shows the source, and on confirmation writes \`src/<name>.element.tsx\`, installs the packages it imports at exact versions, and places it in the open composition as one layer: transparent, sized to the component, text and colours in the Inspector.
 
-For an agent working in a project, the shadcn CLI is still the route — \`npx shadcn@latest add @snapcn/<name>\` — since the button needs a person to click it and confirm in Studio.`,
+An agent can do the same without the button: \`npx remotion elements use <component page URL> --composition <id>\` (Remotion 4.0.542+) reads the payload the page links to and installs it into that composition. To copy a component into \`components/\` instead, use the shadcn CLI: \`npx shadcn@latest add @snapcn/<name>\`.`,
     },
     {
       url: "/docs/changelog",
@@ -460,6 +468,10 @@ export function componentIndex(): string {
 Install any entry: \`npx shadcn@latest add @snapcn/<name>\`. The source is copied
 into the project and the caller owns it — MIT, with no runtime dependency on
 snapcn. \`Deps\` installs transitively; do not add those by hand.
+
+Free components with an "Add to Remotion Studio" button can also be added to
+one Remotion composition as an editable copy:
+\`npx remotion elements use <Docs link> --composition <id>\` (Remotion 4.0.542+).
 
 \`Length\` is how many frames the component's own animation runs at its native
 fps. It is the floor for the \`<Sequence>\` that wraps it, not the whole beat:

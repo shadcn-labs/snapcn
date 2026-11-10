@@ -250,7 +250,9 @@ await renderFrames({
   inputProps,
   imageFormat: "png",
   outputDir: null,
-  onFrameBuffer: (buffer, frame) => mine.set(frame, new Uint8Array(buffer)),
+  onFrameBuffer: (buffer, frame) => {
+    mine.set(frame, new Uint8Array(buffer));
+  },
   scale: 1,
   frameRange: null,
   concurrency: Number(process.env.REMOTION_CONCURRENCY) || 4,
