@@ -61,7 +61,7 @@ function frontmatterField(fm: string, key: string): string {
 function installMarkdown(name: string, url: string): string {
   const shadcn = `\`\`\`bash\nnpx shadcn@latest add @snapcn/${name}\n\`\`\``;
   if (!(STUDIO_ELEMENTS as string[]).includes(name)) return shadcn;
-  return `${shadcn}\n\nTo add it to one Remotion composition as an editable copy instead (Remotion 4.0.542+):\n\n\`\`\`bash\nnpx remotion elements use ${SITE_URL}${url} --composition <id>\n\`\`\``;
+  return `${shadcn}\n\nTo add it to one Remotion composition as an editable copy instead (Remotion 4.0.542+):\n\n\`\`\`bash\nnpx remotion elements use ${SITE_URL}${url} --composition <id> --yes\n\`\`\``;
 }
 
 /**
@@ -214,7 +214,7 @@ ${mcpInstall}`,
       category: "tools",
       body: `Every free component's page has an "Add to Remotion Studio" button. It sends the component over the Remotion Studio Protocol to the Studio running on the reader's computer (Remotion 4.0.524+, started with \`npx remotion studio\`, a composition open). Studio shows the source, and on confirmation writes \`src/<name>.element.tsx\`, installs the packages it imports at exact versions, and places it in the open composition as one layer: transparent, sized to the component, text and colours in the Inspector.
 
-An agent can do the same without the button: \`npx remotion elements use <component page URL> --composition <id>\` (Remotion 4.0.542+) reads the payload the page links to and installs it into that composition. To copy a component into \`components/\` instead, use the shadcn CLI: \`npx shadcn@latest add @snapcn/<name>\`.`,
+An agent can do the same without the button: \`npx remotion elements use <component page URL> --composition <id> --yes\` (Remotion 4.0.542+) reads the payload the page links to and installs it into that composition. To copy a component into \`components/\` instead, use the shadcn CLI: \`npx shadcn@latest add @snapcn/<name>\`.`,
     },
     {
       url: "/docs/changelog",
@@ -471,7 +471,7 @@ snapcn. \`Deps\` installs transitively; do not add those by hand.
 
 Free components with an "Add to Remotion Studio" button can also be added to
 one Remotion composition as an editable copy:
-\`npx remotion elements use <Docs link> --composition <id>\` (Remotion 4.0.542+).
+\`npx remotion elements use <Docs link> --composition <id> --yes\` (Remotion 4.0.542+).
 
 \`Length\` is how many frames the component's own animation runs at its native
 fps. It is the floor for the \`<Sequence>\` that wraps it, not the whole beat:
