@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import {
   BANNER_OFFER,
-  bannerOfferEndsIn,
   CHECKOUT_PRODUCTS,
   type CheckoutProduct,
   isCheckoutProduct,
@@ -93,13 +92,12 @@ export async function POST(request: Request) {
   // Only the codes we hand out. Anyone can type any code on Dodo's own page,
   // so this is not a guard on money — it keeps this route from being a probe
   // for which codes exist.
-  // The banner's code whenever this browser's window is live, sent or not:
-  // the banner promises "auto-applied at checkout" on every page, and several
-  // buttons start a checkout (pricing, the editor, the watermark) — applying it
-  // here keeps that promise for all of them. After the window, never: the
-  // cookie is the visitor's own, but so is typing the code on Dodo's page.
-  const bannerLive =
-    bannerOfferEndsIn(request.headers.get("cookie")) > Date.now();
+  // The banner's code whenever its window is live, sent or not: the banner
+  // promises "auto-applied at checkout" on every page, and several buttons
+  // start a checkout (pricing, the editor, the watermark) — applying it here
+  // keeps that promise for all of them. After `endsAt`, never (Dodo expires it
+  // at the same moment).
+  const bannerLive = Date.now() < Date.parse(BANNER_OFFER.endsAt);
   const discountCode =
     discount === OFFER.code
       ? OFFER.code

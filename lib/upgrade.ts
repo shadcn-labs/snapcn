@@ -26,7 +26,7 @@ export type UpgradeProduct = CheckoutProduct;
 export async function startCheckout(
   product: UpgradeProduct,
   /**
-   * A code to pre-apply on Dodo's page. Defaults to the banner's 10% while its
+   * A code to pre-apply on Dodo's page. Defaults to the banner's code while its
    * countdown runs — what the banner shows — and to `OFFER.code` after, once
    * this browser has earned it.
    */

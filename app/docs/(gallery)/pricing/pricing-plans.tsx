@@ -230,7 +230,7 @@ export function PricingPlans({
         trackEvent("offer_shown", { trigger: earned });
       }
     }
-    // The banner's 10% wins while its countdown runs, so the bar and this page
+    // The banner's offer wins while its countdown runs, so the bar and this page
     // always quote the same offer; the earned code only after the window.
     setOffer(
       bannerOfferEnds() > Date.now()
@@ -279,7 +279,7 @@ export function PricingPlans({
                   applied
                 </>
               ) : (
-                <span className="font-medium">Regional offer applied</span>
+                <span className="font-medium">Launch offer applied</span>
               )}{" "}
               — {offer.percent}% off your first payment, automatically at
               checkout.
