@@ -1,7 +1,15 @@
+import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
+import { users } from "@/lib/db/schema";
 import { planForProduct } from "@/lib/plans";
-import { dodoConfigured, findActiveSubscription } from "@/lib/server/dodo";
-import { activatePlan } from "@/lib/server/entitlements";
+import { getDb } from "@/lib/server/db";
+import {
+  dodoConfigured,
+  findActiveSubscription,
+  getPayment,
+  setCustomerEmail,
+} from "@/lib/server/dodo";
+import { activatePlan, claimGuestPurchase } from "@/lib/server/entitlements";
 import { requireUser } from "@/lib/server/projects";
 
 export const runtime = "nodejs";
@@ -30,6 +38,29 @@ export async function GET(request: NextRequest) {
   const next = safeNext(request.nextUrl.searchParams.get("next"));
 
   if (dodoConfigured()) {
+    // A guest arrives with the `payment_id` the sign-in page carried over. If
+    // they typed a different address at checkout, the plan moves to the
+    // account they actually signed in with — see `claimGuestPurchase`.
+    const paymentId = request.nextUrl.searchParams.get("payment_id");
+    if (paymentId) {
+      try {
+        const payment = await getPayment(paymentId);
+        if (payment && (await claimGuestPurchase(guard.userId, payment))) {
+          const [me] = await getDb()
+            .select({ email: users.email })
+            .from(users)
+            .where(eq(users.id, guard.userId))
+            .limit(1);
+          const customerId = payment.customer?.customer_id;
+          if (me?.email && customerId)
+            await setCustomerEmail(customerId, me.email);
+          console.info(`[billing] ${paymentId} claimed by ${guard.userId}`);
+        }
+      } catch (err) {
+        console.warn("[billing] claim failed", err);
+      }
+    }
+
     try {
       const sub = await findActiveSubscription(guard.userId);
       // `findActiveSubscription` already refuses anything this app did not

@@ -325,6 +325,64 @@ export interface DodoSubscription {
   metadata?: Record<string, string>;
 }
 
+export interface DodoPayment {
+  payment_id: string;
+  status: string;
+  created_at: string;
+  customer?: { customer_id?: string; email?: string };
+  metadata?: Record<string, string>;
+}
+
+/** One payment, or null when Dodo has no such id (or no key is set). */
+export async function getPayment(
+  paymentId: string,
+): Promise<DodoPayment | null> {
+  const apiKey = process.env.DODO_API_KEY;
+  if (!apiKey) return null;
+  const res = await fetch(
+    `${baseUrl()}/payments/${encodeURIComponent(paymentId)}`,
+    { headers: { Authorization: `Bearer ${apiKey}` } },
+  );
+  if (res.status === 404) return null;
+  if (!res.ok)
+    throw new DodoApiError(
+      res.status,
+      null,
+      `Dodo ${res.status} reading payment`,
+    );
+  return (await res.json()) as DodoPayment;
+}
+
+/**
+ * Point a Dodo customer at a new address. A guest's renewal events carry the
+ * customer's email and nothing else (no `user_id`), so after a claim this is
+ * what keeps next year's renewal landing on the account that claimed it.
+ */
+export async function setCustomerEmail(
+  customerId: string,
+  email: string,
+): Promise<void> {
+  const apiKey = process.env.DODO_API_KEY;
+  if (!apiKey) return;
+  const res = await fetch(
+    `${baseUrl()}/customers/${encodeURIComponent(customerId)}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    },
+  );
+  if (!res.ok)
+    throw new DodoApiError(
+      res.status,
+      null,
+      `Dodo ${res.status} updating customer`,
+    );
+}
+
 /**
  * Re-exported, not re-implemented.
  *

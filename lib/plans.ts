@@ -417,8 +417,8 @@ export const CATALOGUE_PROMISE = {
   templates: "10+",
   /** The day the first templates land — the same day the early-bird prices end. */
   templatesOn: EARLY_BIRD.endsOn,
-  /** Five land with the rise, five more after: the copy says so rather than "ten on the day". */
-  templatesSchedule: `5 on ${EARLY_BIRD.endsOn}, 5 more on 10 November`,
+  /** Nov 9: the 25 October date had passed and read as stale on the templates page and pricing card. */
+  templatesSchedule: "all 10 by 10 November",
 } as const;
 
 /**

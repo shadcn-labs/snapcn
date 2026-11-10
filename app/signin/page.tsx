@@ -71,9 +71,20 @@ export default async function SignInPage({
   // in PostHog pageviews and session replay. Redirecting server-side means the
   // browser never renders that URL.
   if (DODO_ECHO.some((k) => k in params)) {
-    const kept = Object.entries(params).filter(
-      ([k, v]) => !DODO_ECHO.includes(k) && typeof v === "string",
-    ) as [string, string][];
+    const kept = Object.fromEntries(
+      Object.entries(params).filter(
+        ([k, v]) => !DODO_ECHO.includes(k) && typeof v === "string",
+      ),
+    ) as Record<string, string>;
+    // The one echo worth keeping: after sign-in, the sync route uses the
+    // `payment_id` to pull a typo'd guest purchase onto this account.
+    const paymentId = (params as Record<string, unknown>).payment_id;
+    if (typeof paymentId === "string") {
+      kept.callbackUrl = `/api/billing/sync?${new URLSearchParams({
+        next: kept.callbackUrl ?? "/",
+        payment_id: paymentId,
+      })}`;
+    }
     redirect(`/signin?${new URLSearchParams(kept)}`);
   }
   const { error, callbackUrl, check, paid } = params;

@@ -4,6 +4,7 @@ import { Caveat, Geist, Geist_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
+import { NudgeCard } from "@/components/nudge-card";
 import { SaleBanner } from "@/components/sale-banner";
 import { cn } from "@/lib/utils";
 import { PostHogProvider } from "./posthog-provider";
@@ -168,6 +169,7 @@ export default function RootLayout({
               >
                 <ThemeShortcut />
                 <SaleBanner />
+                <NudgeCard />
                 <SnapCnThemeBridge>{children}</SnapCnThemeBridge>
               </RootProvider>
             </NuqsAdapter>
