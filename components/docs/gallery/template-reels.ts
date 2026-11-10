@@ -340,4 +340,334 @@ export const REELS: readonly Reel[] = [
       },
     ],
   },
+  {
+    slug: "template-06",
+    install: "template-06",
+    title: "Launch film",
+    description:
+      "Three words, every scene renders at once, one tap ships it, then the offer, the proof and the mark.",
+    fps: 30,
+    v: "17897a95da",
+    v1080: "5f4744f758",
+    stills: ["c16fa8b015", "0c04de34b6", "401380ee2b"],
+    beats: [
+      {
+        label: "Hook \u2014 three words",
+        component: "Word Trio",
+        frames: 114,
+      },
+      {
+        label: "Render \u2014 every scene at once",
+        component: "Agent Fanout",
+        frames: 165,
+      },
+      {
+        label: "Act \u2014 render the film",
+        component: "Chip Tap",
+        frames: 84,
+      },
+      {
+        label: "Tap \u2014 one tap",
+        component: "Tap Burst",
+        frames: 65,
+      },
+      {
+        label: "Offer \u2014 keep every scene",
+        component: "Phone Paywall",
+        frames: 138,
+      },
+      {
+        label: "Proof \u2014 the benchmark",
+        component: "Bench Bars",
+        frames: 120,
+      },
+      {
+        label: "Logo \u2014 start building",
+        component: "Caret Lockup",
+        frames: 111,
+      },
+    ],
+  },
+  {
+    slug: "template-07",
+    install: "template-07",
+    title: "Ask snapcn",
+    description:
+      "A faster way in: ask for the film in a message, snapcn plans and renders it, you change it from your phone, it finds the right scene, and the thread closes on the app.",
+    fps: 30,
+    v: "e44d1c17be",
+    v1080: "403cf60828",
+    stills: ["eb8865ac6e", "415dd90e4c", "7216b9dd0b"],
+    beats: [
+      {
+        label: "Hook \u2014 a faster way",
+        component: "Echo Cycle",
+        frames: 87,
+      },
+      {
+        label: "Ask \u2014 the message",
+        component: "Bubble Send",
+        frames: 99,
+      },
+      {
+        label: "Reply \u2014 the film card",
+        component: "Rich Reply",
+        frames: 101,
+      },
+      {
+        label: "Input \u2014 ask snapcn",
+        component: "Input Build",
+        frames: 53,
+      },
+      {
+        label: "Features \u2014 plan and render",
+        component: "Feature Dive",
+        frames: 77,
+      },
+      {
+        label: "Change \u2014 from your phone",
+        component: "Phone Ask",
+        frames: 123,
+      },
+      {
+        label: "Search \u2014 describe a scene",
+        component: "Halftone Prompt",
+        frames: 78,
+      },
+      {
+        label: "Chip \u2014 it searches",
+        component: "Halftone Chip",
+        frames: 72,
+      },
+      {
+        label: "Match \u2014 it finds it",
+        component: "Halftone Match",
+        frames: 48,
+      },
+      {
+        label: "Answer \u2014 the plan",
+        component: "Glow Reply",
+        frames: 78,
+      },
+      {
+        label: "Done \u2014 it is up",
+        component: "React Bubble",
+        frames: 145,
+      },
+      {
+        label: "Thread \u2014 the conversation",
+        component: "Thread Pull",
+        frames: 81,
+      },
+      {
+        label: "App \u2014 the icon",
+        component: "Composer Icon",
+        frames: 82,
+      },
+    ],
+  },
+  {
+    slug: "template-08",
+    install: "template-08",
+    title: "What's new",
+    description:
+      "What's new, said big; not just fixes; what shipped; the fixes you reported; the app; the list; then the release film renders, gets published and closes on the URL.",
+    fps: 30,
+    v: "692c5913e5",
+    v1080: "5939ee736f",
+    stills: ["7204454b0e", "7a6a3991ec", "8c38858e7c"],
+    beats: [
+      {
+        label: "Hook \u2014 what's new",
+        component: "Outline Dive",
+        frames: 94,
+      },
+      {
+        label: "More \u2014 not just fixes",
+        component: "Glow Swap",
+        frames: 95,
+      },
+      {
+        label: "Shipped \u2014 three new things",
+        component: "Bar Dive",
+        frames: 109,
+      },
+      {
+        label: "Promise \u2014 the new feature",
+        component: "Promise Line",
+        frames: 60,
+      },
+      {
+        label: "Fixes \u2014 what you reported",
+        component: "Error Stack",
+        frames: 157,
+      },
+      {
+        label: "App \u2014 the tour",
+        component: "Phone Tabs",
+        frames: 168,
+      },
+      {
+        label: "List \u2014 everything that shipped",
+        component: "Dark Checklist",
+        frames: 81,
+      },
+      {
+        label: "Result \u2014 the film is ready",
+        component: "Step Result",
+        frames: 87,
+      },
+      {
+        label: "Preview \u2014 the window",
+        component: "Window Preview",
+        frames: 71,
+      },
+      {
+        label: "Publish \u2014 share it",
+        component: "Publish Modal",
+        frames: 77,
+      },
+      {
+        label: "URL \u2014 the outro",
+        component: "Url Outro",
+        frames: 129,
+      },
+    ],
+  },
+  {
+    slug: "template-09",
+    install: "template-09",
+    title: "App launch",
+    description:
+      "The app icon lights up, the list of videos you keep putting off, now on your phone, the screens fold in, what it is, change anything, share it, and the lockup builds.",
+    fps: 30,
+    v: "d639c7af6b",
+    v1080: "0c60e7b20f",
+    stills: ["8c4cabfb38", "c9903f1ffb", "ac843b23eb"],
+    beats: [
+      {
+        label: "Icon \u2014 the app",
+        component: "Corner Icon",
+        frames: 104,
+      },
+      {
+        label: "List \u2014 the someday list",
+        component: "Idea List",
+        frames: 189,
+      },
+      {
+        label: "Caption \u2014 the hook",
+        component: "List Caption",
+        frames: 128,
+      },
+      {
+        label: "Now \u2014 on your phone",
+        component: "Outline Dive",
+        frames: 76,
+      },
+      {
+        label: "Screens \u2014 they fold in",
+        component: "Screens Fold",
+        frames: 72,
+      },
+      {
+        label: "What \u2014 a registry",
+        component: "Mark Stack",
+        frames: 62,
+      },
+      {
+        label: "Where \u2014 scenes, templates, renders",
+        component: "Icon Words",
+        frames: 62,
+      },
+      {
+        label: "Change \u2014 just ask",
+        component: "Phone Caption",
+        frames: 80,
+      },
+      {
+        label: "Share \u2014 with a link",
+        component: "Soft Title",
+        frames: 69,
+      },
+      {
+        label: "Leave \u2014 the phone goes",
+        component: "Phone Return",
+        frames: 37,
+      },
+      {
+        label: "Logo \u2014 the lockup",
+        component: "Lockup Reveal",
+        frames: 76,
+      },
+    ],
+  },
+  {
+    slug: "template-10",
+    install: "template-10",
+    title: "Why switch",
+    description:
+      "Old tools promised a day and buried you in keyframes. This is snapcn: start from scratch or a repo, do anything a timeline does, keep your code private, share the link, install in seconds.",
+    fps: 30,
+    v: "75f6ba71b6",
+    v1080: "bd10a22385",
+    stills: ["17f9bce285", "5c9fc0780f", "dabf614836"],
+    beats: [
+      {
+        label: "Promise \u2014 a video in a day",
+        component: "Bin Promise",
+        frames: 72,
+      },
+      {
+        label: "Busywork \u2014 buried in keyframes",
+        component: "Button Pile",
+        frames: 112,
+      },
+      {
+        label: "Intro \u2014 this is snapcn",
+        component: "Glow Intro",
+        frames: 58,
+      },
+      {
+        label: "Sources \u2014 scratch or a repo",
+        component: "Source Line",
+        frames: 73,
+      },
+      {
+        label: "Claim \u2014 anything a timeline does",
+        component: "Claim Swap",
+        frames: 178,
+      },
+      {
+        label: "More \u2014 it can do",
+        component: "Icon Roller",
+        frames: 102,
+      },
+      {
+        label: "App \u2014 your library",
+        component: "Card Phone",
+        frames: 69,
+      },
+      {
+        label: "Trust \u2014 your code stays yours",
+        component: "Secret Field",
+        frames: 148,
+      },
+      {
+        label: "Link \u2014 the live video",
+        component: "Live Link",
+        frames: 68,
+      },
+      {
+        label: "Sent \u2014 added to your repo",
+        component: "Inline Cycle",
+        frames: 51,
+      },
+      {
+        label: "Logo \u2014 the lockup",
+        component: "Side Lockup",
+        frames: 45,
+      },
+    ],
+  },
 ];

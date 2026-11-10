@@ -8,6 +8,12 @@
  */
 export const SITE_NOTES: { date: string; notes: string[] }[] = [
   {
+    date: "2026-11-10",
+    notes: [
+      "Five more templates: Launch film, Ask snapcn, What's new, App launch and Why switch.",
+    ],
+  },
+  {
     date: "2026-10-21",
     notes: [
       "Cursor & Clicks and Transitions open in the gallery.",
