@@ -1,6 +1,6 @@
 "use client";
 
-import { BANNER_OFFER, bannerOfferEndsIn, OFFER } from "@/lib/plans";
+import { BANNER_OFFER, OFFER } from "@/lib/plans";
 
 /**
  * Who has earned `OFFER.code`, remembered per browser.
@@ -64,16 +64,7 @@ export function codeInUrl(search: string): boolean {
   return new URLSearchParams(search).get("code")?.toUpperCase() === OFFER.code;
 }
 
-/**
- * When this browser's banner offer ends, starting its clock on first call.
- * A year-long cookie, so the end time outlives the window it measures and a
- * returning visitor is not handed a fresh 24 hours.
- */
+/** When the banner offer ends (epoch ms) — one date for everyone. */
 export function bannerOfferEnds(): number {
-  const ends = bannerOfferEndsIn(document.cookie);
-  if (ends) return ends;
-  const until = Date.now() + BANNER_OFFER.hours * 3_600_000;
-  // biome-ignore lint/suspicious/noDocumentCookie: one value, read on the server too
-  document.cookie = `${BANNER_OFFER.cookie}=${until}; path=/; max-age=31536000; samesite=lax`;
-  return until;
+  return Date.parse(BANNER_OFFER.endsAt);
 }

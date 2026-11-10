@@ -18,6 +18,7 @@ function left(end: number, now: number) {
   const s = Math.max(0, Math.floor((end - now) / 1000));
   return {
     total: s,
+    days: Math.floor(s / 86400),
     hours: Math.floor((s % 86400) / 3600),
     minutes: Math.floor((s % 3600) / 60),
     seconds: s % 60,
@@ -74,8 +75,8 @@ function Pair({ value }: { value: number }) {
 const QUIET = ["/signin", "/account", "/studio"];
 
 /**
- * The site-wide offer bar: `BANNER_OFFER.percent` off, framed with the
- * visitor's country from `/api/price`, counting down this browser's window —
+ * The site-wide offer bar: `BANNER_OFFER.percent` off for templates launch
+ * week, counting down to `BANNER_OFFER.endsAt` — days (while any are left),
  * hours, minutes and seconds, each digit rolling like an odometer.
  *
  * The window is real (see `BANNER_OFFER`): at zero the bar goes and checkout
@@ -84,8 +85,9 @@ const QUIET = ["/signin", "/account", "/studio"];
  * as a warning. Lighter than the early-bird's, with no dark vignette. Decided on the
  * client only: most pages are prerendered. Dismissible for the visit.
  *
- * Always the 10% and its countdown — never the 25% intent code: while this
- * window runs, the pricing page and checkout apply the same 10% (`lib/offer.ts`).
+ * Always the banner's percent and its countdown — never the 25% intent code:
+ * while this window runs, the pricing page and checkout apply the same code
+ * (`lib/offer.ts`).
  *
  * Not shown to a paying customer (Pro, Lifetime, Commercial — `PlanTier`): an
  * offer on the plan they already own reads as a billing mistake, and the
@@ -101,16 +103,6 @@ export function SaleBanner() {
   const tier = session?.user?.tier ?? session?.user?.plan ?? "free";
   const [time, setTime] = useState<ReturnType<typeof left> | null>(null);
   const [dismissed, setDismissed] = useState(false);
-  const [country, setCountry] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch(
-      `/api/price${location.search.match(/[?&]country=[^&]+/)?.[0].replace("&", "?") ?? ""}`,
-    )
-      .then((r) => (r.ok ? r.json() : null))
-      .then((p) => p?.country && setCountry(p.country))
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     const end = bannerOfferEnds();
@@ -135,11 +127,20 @@ export function SaleBanner() {
   );
   const label =
     "text-center text-[8px] font-medium uppercase tracking-[0.15em] text-white/60";
-  const units: [number, string][] = [
-    [time.hours, "hrs"],
-    [time.minutes, "min"],
-    [time.seconds, "sec"],
-  ];
+  // Three pairs always, so the bar keeps its width on a phone: days while any
+  // are left, seconds only on the last day.
+  const units: [number, string][] =
+    time.days > 0
+      ? [
+          [time.days, "days"],
+          [time.hours, "hrs"],
+          [time.minutes, "min"],
+        ]
+      : [
+          [time.hours, "hrs"],
+          [time.minutes, "min"],
+          [time.seconds, "sec"],
+        ];
 
   return (
     <div
@@ -172,9 +173,7 @@ export function SaleBanner() {
       />
       <div className="relative flex items-center gap-x-6">
         <span className="hidden font-medium text-sm md:inline">
-          {country
-            ? `${country} has a special offer`
-            : "You have a special offer"}
+          Templates launch week
           <span className="hidden text-white/75 lg:inline">
             {" "}
             — {offer.percent}% off Pro, auto-applied at checkout. Ends in
@@ -186,7 +185,7 @@ export function SaleBanner() {
         <div
           className="inline-grid grid-flow-col grid-rows-[auto_auto] items-center gap-x-1.5"
           role="timer"
-          aria-label={`${time.hours} hours ${time.minutes} minutes left`}
+          aria-label={`${time.days} days ${time.hours} hours ${time.minutes} minutes left`}
         >
           {units.map(([value, name], i) => (
             <Unit
