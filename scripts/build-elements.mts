@@ -8,6 +8,7 @@ import {
   type ElementDependency,
   staticFileRef,
 } from "@remotion/studio-protocol";
+import type { ControlType } from "../lib/customizer-config.ts";
 import { loadConfigs } from "./lib/configs.mts";
 import {
   elementSource,
@@ -16,12 +17,14 @@ import {
 } from "./lib/element-source.mts";
 import {
   adoptDefaults,
+  dropUnused,
   elementDefaults,
   hideLayers,
   isStatic,
   itemStarter,
   type StaticAsset,
   type Studio,
+  sceneProps,
   slotKeys,
   staticAssets,
   studioItemsWrapper,
@@ -30,7 +33,7 @@ import {
 } from "./lib/element-wrapper.mts";
 
 /**
- * The components in `ELEMENTS`, as Remotion Studio Elements:
+ * Every component with a page, as a Remotion Studio Element:
  * `public/elements/<name>.json`, which the "Add to Remotion Studio" button sends
  * to a running Studio over the Studio Protocol. Plus the list of names,
  * `lib/studio-elements.json`, so a page knows whether to offer the button
@@ -131,6 +134,114 @@ const PROVIDED = new Set(["react", "react-dom", "remotion"]);
  * a URL. The build fails on one rather than ship it into someone's project.
  */
 const BRAND = /snap-?cn|snapCn|SNAPCN/i;
+/** The group that draws this site's mark, in every logo component that carries it. */
+const MARK_GROUP =
+  /<g transform="translate\(0,409\) scale\(0\.1,-0\.1\)"[^>]*>[\s\S]*?<\/g>/g;
+
+/**
+ * Pictures and footage a scene's source loads from this site — stock walls,
+ * demo posters, showcase photos — swapped for the Element's neutral starter
+ * media, so nothing in it reaches back here and none of it is ours. A picture
+ * becomes one of the neutral photos, files of the Element's own that Studio
+ * copies into the project; one built per item (`…/${slug}.webp`) picks among
+ * them by its key, so a wall of posters is still a wall of different pictures.
+ * Video becomes Remotion's test footage. A bare base URL is left for a `patch`.
+ */
+const HOSTED = /(["'`])https?:\/\/(?:media\.)?snapcn\.dev\/([^"'`]*)\1/g;
+const PICTURE = /\.(webp|jpe?g|png|gif|avif)(\?|$)/i;
+function rehost(
+  source: string,
+  slug: string,
+): { source: string; files: StaticAsset[] } {
+  // A base URL in a constant (`${SHOWCASE}/a.jpg`), spelled out where it is
+  // used, so each picture is a whole URL; the constant goes when nothing else
+  // reads it.
+  for (const [line, name, base] of source.matchAll(
+    /const (\w+) = "(https?:\/\/(?:media\.)?snapcn\.dev\/[^"]*)";\n/g,
+  )) {
+    if (PICTURE.test(base) || VIDEO_FILE.test(base)) continue;
+    source = source.replaceAll(`\${${name}}`, base);
+    if (!new RegExp(`\\b${name}\\b`).test(source.replace(line, ""))) {
+      source = source.replace(line, "");
+    }
+  }
+  let used = false;
+  let next = 0;
+  const out = source.replace(HOSTED, (m, quote: string, rest: string) => {
+    if (VIDEO_FILE.test(rest)) return JSON.stringify(FOOTAGE);
+    const built = quote === "`" && rest.includes("${");
+    if (!built && !PICTURE.test(rest)) return m;
+    used = true;
+    return built
+      ? `pickPhoto(\`${rest}\`)`
+      : `NEUTRAL_PHOTOS[${next++ % PHOTO_FILES.length}]`;
+  });
+  if (!used) return { source: out, files: [] };
+  const files = PHOTOS(slug);
+  return {
+    source: `import { staticFile as mediaFile } from "remotion";
+const NEUTRAL_PHOTOS = [${files.map((f) => `mediaFile(${JSON.stringify(f.staticFile)})`).join(", ")}];
+const pickPhoto = (key: string) =>
+  NEUTRAL_PHOTOS[[...key].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % NEUTRAL_PHOTOS.length];
+${out}`,
+    files,
+  };
+}
+
+/**
+ * This site's logo as data — `SNAPCN_MARK` / `SNAPCN_LOGO`, the art a lockup
+ * draws when nobody passes their own: `{ width, height, shapes }`, `{ path,
+ * width, height }` or `{ viewBox, path }`, sometimes with the wordmark's glyphs
+ * in it too. Redrawn as one plain rounded square in a square box, keeping the
+ * object's shape, so every lockup still has a mark to animate and none of it is
+ * ours. (The 464x409 `<g>` form is `MARK_GROUP`, in `neutral`.)
+ */
+function unbrandMarks(source: string): string {
+  const head = /const SNAPCN_(?:MARK|LOGO|WORDMARK)\b[^=]*=\s*\{/g;
+  let out = "";
+  let from = 0;
+  for (const m of source.matchAll(head)) {
+    const open = (m.index ?? 0) + m[0].length - 1;
+    let depth = 0;
+    let close = open;
+    for (; close < source.length; close++) {
+      if (source[close] === "{") depth++;
+      if (source[close] === "}" && --depth === 0) break;
+    }
+    const art = source.slice(open, close + 1);
+    // The name set as outlines, used while the name is its `text`: emptied,
+    // so any name — "Acme" included — is set as live text.
+    if (/\btext:/.test(art)) {
+      out +=
+        source.slice(from, open) +
+        art
+          .replace(/\btext:\s*"[^"]*"/, 'text: ""')
+          .replace(/\bpath:\s*"[^"]*"/, 'path: ""');
+      from = close + 1;
+      continue;
+    }
+    const num = (k: string) =>
+      Number(art.match(new RegExp(`\\b${k}:\\s*([\\d.]+)`))?.[1]);
+    const view = art
+      .match(/viewBox:\s*"([^"]+)"/)?.[1]
+      .split(/\s+/)
+      .map(Number);
+    const side = Math.min(
+      ...(view ? [view[2], view[3]] : [num("width"), num("height")]),
+    );
+    const r = +(side * 0.235).toFixed(1);
+    const e = +(side - r).toFixed(1);
+    const square = `M${r} 0H${e}A${r} ${r} 0 0 1 ${side} ${r}V${e}A${r} ${r} 0 0 1 ${e} ${side}H${r}A${r} ${r} 0 0 1 0 ${e}V${r}A${r} ${r} 0 0 1 ${r} 0Z`;
+    const body = view
+      ? `{ viewBox: "0 0 ${side} ${side}", path: "${square}" }`
+      : /\bshapes:/.test(art)
+        ? `{ width: ${side}, height: ${side}, shapes: ["${square}"] }`
+        : `{ path: "${square}", width: ${side}, height: ${side} }`;
+    out += source.slice(from, open) + body;
+    from = close + 1;
+  }
+  return out + source.slice(from);
+}
 
 /** An Element's `patch`, applied to its inlined source. */
 function patched(source: string, studio: Studio): string {
@@ -155,6 +266,22 @@ function neutral(source: string): string {
     source
       // The file stamps: `// Card Rail · snapcn — https://snapcn.dev/…`.
       .replace(/^\/\/[^\n]*snapcn[^\n]*\n/gim, "")
+      // This site's mark — the 464x409 glyph every logo component here draws —
+      // as a plain rounded square, painted as the mark was (text-highlight's
+      // patch, for every scene that carries one).
+      .replace(MARK_GROUP, (group) => {
+        const fill = group.match(/fill=(\{[^}]*\}|"[^"]*")/)?.[1];
+        return `<rect x="27.5" y="0" width="409" height="409" rx="96"${fill ? ` fill=${fill}` : ""} />`;
+      })
+      .replace(/(const SNAPCN_MARK\s*=\s*)(["`])[\s\S]*?\2/, '$1""')
+      .replace(/\bSnapcnMark\b/g, "DefaultMark")
+      // Copy in a string, shown on screen when nobody passes their own: the
+      // name a hand-made entry would use, not "the library". Never a URL.
+      .replace(/"([^"\n:]*)"/g, (m, text: string) =>
+        BRAND.test(text)
+          ? `"${NEUTRAL_COPY.reduce((t, [re, to]) => t.replace(re, to), text)}"`
+          : m,
+      )
       .replace(/\[snap-cn-ui\] ?/g, "")
       .replace(/SNAPCN_/g, "DEFAULT_")
       .replace(/\bSnapCn/g, "Kit")
@@ -178,11 +305,11 @@ type Item = {
 };
 
 /**
- * The components that are Elements: text treatments, captions and frames that
- * sit on top of somebody else's footage. The full scenes — logo sequences,
- * galleries, multi-act titles — are not; they stay on `shadcn add` until they
- * are built from parts that are. Adding one here is the whole opt-in; see
- * `Studio` for what each field answers.
+ * The components hand-fitted as Elements: text treatments, captions and frames
+ * that sit on top of somebody else's footage, cropped to their ink and with
+ * objects of their own. Every other component with a page is an Element too,
+ * as a whole scene (`scene()`); an entry here is how one gets more than that.
+ * See `Studio` for what each field answers.
  */
 const ELEMENTS: Record<string, Studio> = {
   "answer-highlight": {
@@ -793,10 +920,8 @@ const ELEMENTS: Record<string, Studio> = {
       outline: "content",
       // Two cards, left and right: one card fills both, a third has nowhere to go.
       build: `(o) => ({ image1: o[0]?.image || undefined, image2: o[1 % Math.max(o.length, 1)]?.image || undefined })`,
-      starter: (d) => [
-        { image: String(d.image1) },
-        { image: String(d.image2) },
-      ],
+      // The assets themselves: `String()` of one is "[object Object]".
+      starter: (d) => [{ image: d.image1 }, { image: d.image2 }],
     },
     props: {
       // Lit for a dark page by default; on a transparent one, its ink is dark.
@@ -1319,7 +1444,7 @@ const PRO_ELEMENTS: Record<string, Studio> = {
       build: `(o) => Object.fromEntries(Array.from({ length: 9 }, (_, i) => [\`image\${i + 1}\`, o[i % Math.max(o.length, 1)]?.image || undefined]))`,
       starter: (d) =>
         Array.from({ length: 9 }, (_, i) => ({
-          image: String(d[`image${i + 1}`]),
+          image: d[`image${i + 1}`],
         })),
     },
     // Its fallback pile is this site's posters. The Element always passes its
@@ -1343,6 +1468,99 @@ const PRO_ELEMENTS: Record<string, Studio> = {
     },
   },
 };
+/**
+ * Copy that names this site, made neutral: the Element's starter content may
+ * not arrive wearing snapcn. "Acme" is what the hand-made entries above use.
+ */
+const NEUTRAL_COPY: readonly (readonly [RegExp, string])[] = [
+  [/snapcn\.dev/gi, "acme.com"],
+  [/@snapcn/gi, "@acme"],
+  [/SNAPCN/g, "ACME"],
+  [/snap-?cn/gi, "Acme"],
+];
+/** A picture or recording hosted here: it is ours, and it would load from us. */
+const OURS = /^https?:\/\/(media\.)?snapcn\.dev\//;
+const VIDEO_FILE = /\.(mp4|webm|mov|m4v)(\?|$)/i;
+/**
+ * A control the Sequence owns (`name`, `from`), under its type's suffix —
+ * `nameText`, `fromColor` — so the Inspector shows it instead of refusing it.
+ */
+const OWNED = new Set(["from", "name", "style", "layout", "hidden", "loop"]);
+const SUFFIX: Partial<Record<ControlType["type"], string>> = {
+  text: "Text",
+  color: "Color",
+  number: "Value",
+  "number-input": "Value",
+  boolean: "On",
+  image: "Image",
+  select: "Option",
+};
+
+/**
+ * Every component with a page that has no entry of its own, as a whole scene:
+ * laid out at 1280x720 and clipped to it, as glass-prompt is, with every
+ * customizer control in the Inspector — so "Add to Remotion Studio" is on
+ * every page (#87). Its copy and pictures are made neutral; a scene that needs
+ * more than that (a mark in its source, objects of its own) gets an entry.
+ */
+function scene(
+  slug: string,
+  controls: Record<string, ControlType>,
+  own: Partial<Studio> = {},
+): Studio {
+  const alias: Record<string, string> = {};
+  const props: Record<string, unknown> = {};
+  const drop: string[] = [...(own.drop ?? [])];
+  let photo = 0;
+  for (const [key, c] of Object.entries(controls)) {
+    const el = OWNED.has(key) ? `${key}${SUFFIX[c.type] ?? "Value"}` : key;
+    if (el !== key) alias[el] = key;
+    const v = c.default;
+    if (typeof v !== "string" || v === "") continue;
+    const hosted = v.split("|").map((x) => x.trim());
+    if (hosted.every((x) => OURS.test(x) || x.startsWith("/"))) {
+      if (VIDEO_FILE.test(v)) props[el] = FOOTAGE;
+      // One picture, on Studio's picker: a neutral photo of the Element's own.
+      else if (c.type === "image" && hosted.length === 1) {
+        props[el] = PHOTOS(slug)[photo++ % PHOTO_FILES.length];
+      }
+      // A list of pictures in a line of text has no picker to put a file in:
+      // left out, so the scene shows its own default — made neutral by
+      // `rehost` — and the copy stays editable in code.
+      else drop.push(key);
+    } else if (BRAND.test(v)) {
+      props[el] = NEUTRAL_COPY.reduce((s, [re, to]) => s.replace(re, to), v);
+    }
+  }
+  return {
+    box: [1280, 720],
+    clip: true,
+    controls: Object.keys(controls)
+      .filter((k) => !drop.includes(k))
+      .map((k) => Object.keys(alias).find((el) => alias[el] === k) ?? k),
+    ...own,
+    drop,
+    alias: { ...alias, ...own.alias },
+    props: { ...props, ...own.props },
+  };
+}
+
+/**
+ * What a whole-scene Element needs beyond `scene()`'s defaults. These three
+ * have a "Theme" light/dark select in their config that lands on a `theme`
+ * prop typed as token overrides (a config bug: it is `mode` they read), so it
+ * stays out of the Inspector rather than hand Studio a prop it would mistype.
+ */
+const SCENE_OWN: Record<string, Partial<Studio>> = {
+  // Its label is half this site's name, which the brand check cannot see.
+  "metal-chip": { props: { label: "acme" } },
+  "hex-tally": { drop: ["theme"] },
+  "picker-commit": { drop: ["theme"] },
+  "wall-cut": { drop: ["theme"] },
+};
+
+/** Pro components that are `TransitionSeries` presentations: no Element. */
+const TRANSITIONS = new Set(["pixel-peak"]);
 const PRO_DIR = path.join(root, "registry", "snap-cn-pro");
 const PRO_OUT = path.join(
   process.env.PRO_PRIVATE_DIR
@@ -1372,6 +1590,8 @@ for (const f of await readdir(PUBLIC_R)) {
     it.files?.find((x) => x.path.endsWith("/index.tsx")) ?? it.files?.[0];
   if (it.type === "registry:component" && main) {
     registry[`@/components/snap-cn/${it.name}`] = main;
+    // A Pro source imports a free one by its path in this repo.
+    registry[`@/registry/snap-cn/${it.name}`] = main;
   }
 }
 const lib = libItem.files ?? [];
@@ -1391,30 +1611,54 @@ async function buildPayload(
   // The component stays as it is, under another name; its name goes to the
   // schema-enabled wrapper, which is the one export Studio imports.
   const own = config.componentName;
-  const scene = `${own}Scene`;
-  const declaration = `export function ${own}(`;
-  const file = item.files?.find((f) => f.content.includes(declaration));
-  if (!config || !file) {
-    throw new Error(`${name} has no config, or no \`${declaration}\``);
+  // `export function X(`, or `export const X = (` / `export const X: FC<P> = (`.
+  const declaration = new RegExp(
+    `export (function ${own}\\(|const ${own}(?=[:\\s]))`,
+    "g",
+  );
+  const file = item.files?.find((f) => f.content.match(declaration));
+  if (!file) {
+    throw new Error(`${name} has no \`export function|const ${own}\``);
   }
+  // Under a name the file does not already use (the lockups export an `XScene`).
+  const scene = [`${own}Scene`, `${own}Base`].find(
+    (n) => !new RegExp(`\\b${n}\\b`).test(file.content),
+  );
+  if (!scene) throw new Error(`${name}: no free name for the scene`);
   // Its own other files, by the relative path it imports them with.
   const siblings = Object.fromEntries(
     (item.files ?? [])
       .filter((f) => f !== file)
       .map((f) => [`./${path.basename(f.path, path.extname(f.path))}`, f]),
   );
-  if (file.content.split(declaration).length !== 2) {
-    throw new Error(`${name}: expected one \`${declaration}\``);
+  if (file.content.match(declaration)?.length !== 1) {
+    throw new Error(`${name}: expected one \`export … ${own}\``);
+  }
+  const renamed = file.content
+    .replace(declaration, (m) =>
+      m.startsWith("export function") ? `function ${scene}(` : `const ${scene}`,
+    )
+    // The wrapper takes the name; a default export of it would run first.
+    .replace(new RegExp(`^export default ${own};\\n`, "m"), "");
+  // A customizer control the scene never reads is no Inspector control, and
+  // no prop: Studio would write it onto a component that does not take it.
+  const reads = sceneProps(renamed, scene);
+  const unread = reads
+    ? Object.keys(config.controls).filter(
+        (k) => !reads.has(k) && !studio.drop?.includes(k),
+      )
+    : [];
+  if (unread.length) {
+    const alias = studio.alias ?? {};
+    studio = {
+      ...studio,
+      drop: [...(studio.drop ?? []), ...unread],
+      controls: studio.controls.filter((k) => !unread.includes(alias[k] ?? k)),
+    };
   }
   const defaults = elementDefaults(config.controls, studio, SITE);
   const element = elementSource(
-    adoptDefaults(
-      file.content.replace(declaration, `function ${scene}(`),
-      scene,
-      own,
-      studio,
-      defaults,
-    ) +
+    adoptDefaults(renamed, scene, own, studio, defaults) +
       (studio.items ? studioItemsWrapper : studioWrapper)({
         name: own,
         scene,
@@ -1428,6 +1672,15 @@ async function buildPayload(
     { ...registry, ...siblings },
   );
   if (!element) throw new Error(`${name} imports what cannot be inlined`);
+  const hosted = rehost(
+    unbrandMarks(patched(element.sourceCode, studio)).replace(
+      // A scene that turns a root-relative path into `staticFile()` while
+      // rendering would do it twice to a picture that already is one.
+      "if (isLocal && getRemotionEnvironment().isRendering) {",
+      'if (isLocal && !src.startsWith(staticFile("x").slice(0, -1)) && getRemotionEnvironment().isRendering) {',
+    ),
+    name,
+  );
   // Studio shows this file and writes it into the project as-is: format it
   // the way the rest of the source is, generated wrapper included.
   const sourceCode = execFileSync(
@@ -1436,7 +1689,9 @@ async function buildPayload(
     {
       // A stock Remotion template compiles with \`lib: ["es2015"]\`: without
       // these the DOM types the scene uses do not exist there.
-      input: `/// <reference lib="dom" />\n/// <reference lib="dom.iterable" />\n${hideLayers(neutral(patched(element.sourceCode, studio)))}`,
+      // `es2023` for what the scenes call on arrays and strings (`flat`,
+      // `findLastIndex`, `padStart`), which es2015 does not have either.
+      input: `/// <reference lib="dom" />\n/// <reference lib="dom.iterable" />\n/// <reference lib="es2023" />\n${dropUnused(hideLayers(neutral(hosted.source)))}`,
       encoding: "utf8",
     },
   );
@@ -1445,7 +1700,7 @@ async function buildPayload(
   if (branded) {
     const line = sourceCode.slice(0, branded.index).split("\n").length;
     throw new Error(
-      `${name}: "${branded[0]}" left in the Element, line ${line}`,
+      `"${branded[0]}" left in the Element, line ${line}: ${sourceCode.split("\n")[line - 1].trim().slice(0, 160)}`,
     );
   }
 
@@ -1467,10 +1722,13 @@ async function buildPayload(
   // the stage's and each object's, by their path under `public/`.
   const assets = [
     ...new Map(
-      staticAssets([
-        defaults,
-        studio.items ? itemStarter(studio.items, defaults) : [],
-      ]).map((a) => [a.staticFile, a]),
+      [
+        ...staticAssets([
+          defaults,
+          studio.items ? itemStarter(studio.items, defaults) : [],
+        ]),
+        ...hosted.files,
+      ].map((a) => [a.staticFile, a]),
     ).values(),
   ];
   const payload = createElementPayload({
@@ -1521,20 +1779,36 @@ async function buildPayload(
   return payload;
 }
 
+/** Every failure, reported together: one bad scene should not hide the next. */
+const failed: string[] = [];
+const attempt = async (name: string, run: () => Promise<void>) => {
+  try {
+    await run();
+  } catch (e) {
+    failed.push(`${name}: ${(e as Error).message}`);
+  }
+};
+
 const built: string[] = [];
-for (const [name, studio] of Object.entries(ELEMENTS)) {
-  const payload = await buildPayload(
-    name,
-    studio,
-    await readItem(`${name}.json`),
-    configs[name],
-  );
-  await writeFile(
-    path.join(OUT, `${name}.json`),
-    `${JSON.stringify(payload, null, 2)}\n`,
-  );
-  built.push(name);
+// Every free component with a page (a customizer config) and a public item.
+const free = Object.keys(configs).filter(
+  (n) => n in ELEMENTS || existsSync(path.join(PUBLIC_R, `${n}.json`)),
+);
+for (const name of free) {
+  await attempt(name, async () => {
+    const item = await readItem(`${name}.json`);
+    if (item.type !== "registry:component") return;
+    const studio =
+      ELEMENTS[name] ?? scene(name, configs[name].controls, SCENE_OWN[name]);
+    const payload = await buildPayload(name, studio, item, configs[name]);
+    await writeFile(
+      path.join(OUT, `${name}.json`),
+      `${JSON.stringify(payload, null, 2)}\n`,
+    );
+    built.push(name);
+  });
 }
+built.sort();
 
 await writeFile(
   path.join(root, "lib", "studio-elements.json"),
@@ -1546,40 +1820,59 @@ console.log(`elements: built ${built.length}`);
 if (existsSync(PRO_DIR)) {
   await mkdir(PRO_OUT, { recursive: true });
   const proBuilt: string[] = [];
-  for (const [name, studio] of Object.entries(PRO_ELEMENTS)) {
-    const dir = path.join(PRO_DIR, name);
-    const content = await readFile(path.join(dir, "index.tsx"), "utf8");
-    const mod = await import(pathToFileURL(path.join(dir, "config.ts")).href);
-    const config = Object.values(mod).find(
-      (v): v is (typeof configs)[string] =>
-        typeof v === "object" &&
-        v !== null &&
-        "controls" in v &&
-        "componentName" in v,
-    );
-    const source: Item = JSON.parse(
-      await readFile(path.join(PRO_DIR, "registry.json"), "utf8"),
-    ).items.find((i: Item) => i.name === name);
-    const item: Item = {
-      name,
-      title: source?.title ?? name,
-      type: "registry:component",
-      files: [
-        {
-          path: `${name}/index.tsx`,
-          content,
-          type: "registry:component",
-          target: `components/snap-cn/${name}.tsx`,
-        } as RegistryFile,
-      ],
-    };
-    const payload = await buildPayload(name, studio, item, config);
-    await writeFile(
-      path.join(PRO_OUT, `${name}.json`),
-      `${JSON.stringify(payload, null, 2)}\n`,
-    );
-    proBuilt.push(name);
+  // Every released Pro component: the catalogue is what has a page.
+  const released = JSON.parse(
+    await readFile(path.join(root, "lib", "pro-catalogue.json"), "utf8"),
+  ) as { name: string }[];
+  for (const name of new Set(released.map((r) => r.name))) {
+    if (!existsSync(path.join(PRO_DIR, name, "config.ts"))) continue;
+    // A transition is a presentation between two scenes, not a layer.
+    if (TRANSITIONS.has(name)) continue;
+    await attempt(`pro ${name}`, async () => {
+      const dir = path.join(PRO_DIR, name);
+      // The component and the files it imports (`./data`), not its config or tests.
+      const sources = (await readdir(dir)).filter(
+        (f) => /\.tsx?$/.test(f) && f !== "config.ts",
+      );
+      const mod = await import(pathToFileURL(path.join(dir, "config.ts")).href);
+      const config = Object.values(mod).find(
+        (v): v is (typeof configs)[string] =>
+          typeof v === "object" &&
+          v !== null &&
+          "controls" in v &&
+          "componentName" in v,
+      );
+      const source: Item = JSON.parse(
+        await readFile(path.join(PRO_DIR, "registry.json"), "utf8"),
+      ).items.find((i: Item) => i.name === name);
+      const item: Item = {
+        name,
+        title: source?.title ?? name,
+        type: "registry:component",
+        files: await Promise.all(
+          sources.map(
+            async (f) =>
+              ({
+                path: `${name}/${f}`,
+                content: await readFile(path.join(dir, f), "utf8"),
+                type: "registry:component",
+                target: `components/snap-cn/${name}/${f}`,
+              }) as RegistryFile,
+          ),
+        ),
+      };
+      if (!config) throw new Error("no config in config.ts");
+      const studio =
+        PRO_ELEMENTS[name] ?? scene(name, config.controls, SCENE_OWN[name]);
+      const payload = await buildPayload(name, studio, item, config);
+      await writeFile(
+        path.join(PRO_OUT, `${name}.json`),
+        `${JSON.stringify(payload, null, 2)}\n`,
+      );
+      proBuilt.push(name);
+    });
   }
+  proBuilt.sort();
   await writeFile(
     path.join(root, "lib", "studio-elements-pro.json"),
     `${JSON.stringify(proBuilt, null, 2)}\n`,
@@ -1589,4 +1882,9 @@ if (existsSync(PRO_DIR)) {
   );
 } else {
   console.log("elements: no pro tier here — pro Elements left as they were");
+}
+
+if (failed.length) {
+  console.error(`elements: ${failed.length} failed\n  ${failed.join("\n  ")}`);
+  process.exit(1);
 }

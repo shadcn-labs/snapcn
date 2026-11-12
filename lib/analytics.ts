@@ -72,6 +72,13 @@ export type CtaId =
    */
   | "gallery_pro"
   /**
+   * "Add to Remotion Studio" on a Pro card, for someone who does not own Pro:
+   * the button is there on every component, and here it opens the paywall.
+   * Does wanting a component in Studio send more people to pricing than the
+   * card's own "Get the pro catalogue" does?
+   */
+  | "studio_install_pro"
+  /**
    * The Pro banner on the home hero, the gallery and the editor, to pricing.
    *
    * 74 of 2,175 visitors reached the pricing page in the first half of

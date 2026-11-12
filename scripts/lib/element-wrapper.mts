@@ -646,6 +646,138 @@ export function hideLayers(source: string): string {
   return out;
 }
 
+/** The parsed file and the scene's signature: `function Scene(` or `const Scene = (`. */
+function sceneSignature(
+  source: string,
+  scene: string,
+): ts.SignatureDeclaration | undefined {
+  const file = ts.createSourceFile(
+    "element.tsx",
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX,
+  );
+  const arrow = file.statements
+    .filter(ts.isVariableStatement)
+    .flatMap((s) => s.declarationList.declarations)
+    .find((d) => d.name.getText() === scene)?.initializer;
+  return (
+    file.statements.find(
+      (s): s is ts.FunctionDeclaration =>
+        ts.isFunctionDeclaration(s) && s.name?.text === scene,
+    ) ??
+    (arrow && (ts.isArrowFunction(arrow) || ts.isFunctionExpression(arrow))
+      ? arrow
+      : undefined)
+  );
+}
+
+/**
+ * The props a scene destructures, or null when it takes them whole (`props`,
+ * `...rest`) and so may read any. A customizer control the scene never reads
+ * (a shared `speed` it has no use for) is no Inspector control.
+ */
+export function sceneProps(source: string, scene: string): Set<string> | null {
+  const pattern = sceneSignature(source, scene)?.parameters[0]?.name;
+  if (!pattern || !ts.isObjectBindingPattern(pattern)) return null;
+  if (pattern.elements.some((e) => e.dotDotDotToken)) return null;
+  return new Set(
+    pattern.elements.map((e) => (e.propertyName ?? e.name).getText()),
+  );
+}
+
+/**
+ * A local the scene declares and never reads, taken out of the Element: a stock
+ * template compiles with `noUnusedLocals`, and the registry does not. A call's
+ * value is dropped but the call stays (it may be a hook); anything else goes.
+ * Repeated, since one removal can leave the next local unread.
+ */
+export function dropUnused(source: string): string {
+  for (let pass = 0; pass < 4; pass++) {
+    const file = ts.createSourceFile(
+      "element.tsx",
+      source,
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.TSX,
+    );
+    const host = ts.createCompilerHost({});
+    host.getSourceFile = (n) => (n === "element.tsx" ? file : undefined);
+    const program = ts.createProgram(
+      ["element.tsx"],
+      { noUnusedLocals: true, noLib: true, noResolve: true, types: [] },
+      host,
+    );
+    const starts = new Set(
+      program
+        .getSemanticDiagnostics(file)
+        // 6133 a local never read; 6198 a destructuring none of which is.
+        .filter((d) => d.code === 6133 || d.code === 6198)
+        .map((d) => d.start),
+    );
+    const edits: [number, number, string][] = [];
+    const visit = (node: ts.Node) => {
+      if (ts.isVariableStatement(node)) {
+        const [d, ...more] = node.declarationList.declarations;
+        // `const { width, height } = …` with `width` unread: that one goes.
+        if (
+          !more.length &&
+          ts.isObjectBindingPattern(d.name) &&
+          d.initializer
+        ) {
+          const kept = starts.has(d.name.getStart())
+            ? []
+            : d.name.elements.filter((e) => !starts.has(e.name.getStart()));
+          if (kept.length !== d.name.elements.length) {
+            edits.push([
+              node.getStart(),
+              node.end,
+              kept.length
+                ? `const { ${kept.map((e) => e.getText()).join(", ")} } = ${d.initializer.getText()};`
+                : `${d.initializer.getText()};`,
+            ]);
+            return;
+          }
+        }
+        if (
+          !more.length &&
+          ts.isIdentifier(d.name) &&
+          starts.has(d.name.getStart())
+        ) {
+          const init = d.initializer;
+          const keep =
+            init &&
+            (ts.isCallExpression(init) ||
+              ts.isAwaitExpression(init) ||
+              ts.isNewExpression(init));
+          edits.push([
+            node.getStart(),
+            node.end,
+            keep ? `${init.getText()};` : "",
+          ]);
+          return;
+        }
+      }
+      if (
+        ts.isFunctionDeclaration(node) &&
+        node.name &&
+        starts.has(node.name.getStart())
+      ) {
+        edits.push([node.getStart(), node.end, ""]);
+        return;
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(file);
+    if (!edits.length) return source;
+    for (const [a, b, text] of edits.sort((x, y) => y[0] - x[0])) {
+      source = source.slice(0, a) + text + source.slice(b);
+    }
+  }
+  return source;
+}
+
 /**
  * The scene's parameter defaults, made the Element's. The wrapper passes every
  * one of them, so the scene's own are never read — but they are what someone
@@ -661,17 +793,7 @@ export function adoptDefaults(
   studio: Studio,
   defaults: Record<string, unknown>,
 ): string {
-  const file = ts.createSourceFile(
-    "element.tsx",
-    source,
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TSX,
-  );
-  const fn = file.statements.find(
-    (s): s is ts.FunctionDeclaration =>
-      ts.isFunctionDeclaration(s) && s.name?.text === scene,
-  );
+  const fn = sceneSignature(source, scene);
   const pattern = fn?.parameters[0]?.name;
   if (!pattern || !ts.isObjectBindingPattern(pattern)) return source;
   const byScene = Object.fromEntries(

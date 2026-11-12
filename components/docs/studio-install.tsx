@@ -1,7 +1,7 @@
 "use client";
 
 import type { InstallInStudioResult } from "@remotion/studio-protocol";
-import { CheckIcon, Loader2, MonitorPlay } from "lucide-react";
+import { CheckIcon, Loader2, Lock, MonitorPlay } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { CommandLine } from "@/components/command-line";
@@ -56,15 +56,25 @@ const HOW = "/docs/remotion-studio";
 const ENTER =
   "animate-in fade-in-0 slide-in-from-top-1 duration-200 ease-out motion-reduce:animate-none";
 
+/** Where a Pro button goes for someone without Pro. */
+const PAYWALL = "/docs/pricing?ref=studio_install#plans";
+
 export function StudioInstall({
   name,
   surface,
   block = false,
+  locked = false,
 }: {
   name: string;
   surface: "docs" | "gallery";
   /** Full width, for the gallery panel's column of actions. */
   block?: boolean;
+  /**
+   * A Pro component, for someone who does not own Pro: the same button in the
+   * same place, so every component says it goes to Studio, and it opens the
+   * paywall. Its Element is never fetched — the route would only refuse it.
+   */
+  locked?: boolean;
 }) {
   const trackEvent = useTrackEvent();
   const [pending, setPending] = useState(false);
@@ -117,6 +127,34 @@ export function StudioInstall({
       : "Add to Remotion Studio";
   const note = pending ? null : outcome;
 
+  const buttonClass = cn(
+    "inline-flex items-center justify-center rounded-lg font-medium text-sm transition-[background-color,transform] duration-150 ease-out active:scale-[0.97] disabled:cursor-default motion-reduce:transition-none",
+    block
+      ? "h-11 w-full rounded-xl border border-border bg-muted/20 text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] hover:bg-muted/60"
+      : "h-8 border border-border px-3 text-foreground hover:bg-muted",
+  );
+
+  if (locked) {
+    return (
+      <div className={cn("not-prose", block ? "w-full" : "mt-3")}>
+        <Link
+          href={PAYWALL}
+          title="Comes with Pro: see the plans"
+          onClick={() =>
+            trackEvent("cta_clicked", {
+              cta: "studio_install_pro",
+              destination: PAYWALL,
+            })
+          }
+          className={cn(buttonClass, "gap-2")}
+        >
+          <Lock className="size-4" aria-hidden="true" />
+          Add to Remotion Studio
+        </Link>
+      </div>
+    );
+  }
+
   const how = (
     <Link
       href={HOW}
@@ -136,12 +174,7 @@ export function StudioInstall({
           onClick={send}
           disabled={pending}
           title="Sends it to the Remotion Studio running on this computer"
-          className={cn(
-            "inline-flex items-center justify-center rounded-lg font-medium text-sm transition-[background-color,transform] duration-150 ease-out active:scale-[0.97] disabled:cursor-default motion-reduce:transition-none",
-            block
-              ? "h-11 w-full rounded-xl border border-border bg-muted/20 text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] hover:bg-muted/60"
-              : "h-8 border border-border px-3 text-foreground hover:bg-muted",
-          )}
+          className={buttonClass}
         >
           {/* Keyed on the state so each label arrives rather than swaps. */}
           <span

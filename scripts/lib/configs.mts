@@ -1,4 +1,8 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import ts from "typescript";
 import type { ComponentConfig } from "../../lib/customizer-config.ts";
+import { tsconfigWebpackAlias } from "../tsconfig-webpack-alias.mts";
 
 const REPO = new URL("../../", import.meta.url);
 
@@ -20,16 +24,50 @@ export async function loadConfigs(): Promise<Record<string, ComponentConfig>> {
         ctx: unknown,
         next: (s: string, c: unknown) => unknown,
       ) => unknown;
+      load: (
+        url: string,
+        ctx: unknown,
+        next: (u: string, c: unknown) => unknown,
+      ) => unknown;
     }) => void;
   };
+  // tsconfig's paths, the same table the Remotion bundler is given:
+  // `@/lib/snap-cn-ui` is not `lib/snap-cn-ui`.
+  const aliases = tsconfigWebpackAlias(fileURLToPath(REPO));
   registerHooks({
     resolve(spec: string, ctx: unknown, next) {
-      if (spec.startsWith("@/")) spec = new URL(spec.slice(2), REPO).href;
-      try {
-        return next(spec, ctx);
-      } catch {
-        return next(`${spec}.ts`, ctx);
+      const hit = aliases.find((a) =>
+        a.onlyModule ? spec === a.name : spec.startsWith(`${a.name}/`),
+      );
+      if (hit) {
+        spec = pathToFileURL(
+          hit.onlyModule ? hit.alias : hit.alias + spec.slice(hit.name.length),
+        ).href;
+      } else if (spec.startsWith("@/")) {
+        spec = new URL(spec.slice(2), REPO).href;
       }
+      // Extensionless, in the order the bundler tries them: a config that
+      // imports its own component (`from "./index"`) reaches a `.tsx`.
+      for (const tail of ["", ".ts", ".tsx", "/index.ts", "/index.tsx"]) {
+        try {
+          return next(`${spec}${tail}`, ctx);
+        } catch {}
+      }
+      return next(spec, ctx);
+    },
+    // Node strips types from `.ts` but has no JSX: a `.tsx` is transpiled here.
+    load(url: string, ctx: unknown, next: (u: string, c: unknown) => unknown) {
+      if (!url.endsWith(".tsx")) return next(url, ctx);
+      const source = readFileSync(new URL(url), "utf8");
+      const { outputText } = ts.transpileModule(source, {
+        compilerOptions: {
+          module: ts.ModuleKind.ESNext,
+          target: ts.ScriptTarget.ES2022,
+          jsx: ts.JsxEmit.ReactJSX,
+          verbatimModuleSyntax: false,
+        },
+      });
+      return { format: "module", source: outputText, shortCircuit: true };
     },
   });
   const mod = await import(new URL("registry/__configs__.ts", REPO).href);
