@@ -1130,6 +1130,32 @@
       "type": "registry:component"
     },
     {
+      "name": "brand-wheel",
+      "title": "Brand Wheel",
+      "description": "Rotating logos text: a lead word and a wheel of brand pills that rolls through the platforms you ship to, blurred rows above and below, then a cursor clicks the last one. Motion measured frame by frame from a recording.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/snap-cn/brand-wheel/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/brand-wheel/index.tsx"
+        },
+        {
+          "path": "registry/snap-cn/brand-wheel/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/brand-wheel/data.ts"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/text/brand-wheel?ref=cli — lead is the fixed word; items is the reel, comma separated, top to bottom, and it comes to rest on the LAST one. Known brands (X, YouTube, LinkedIn, Instagram, TikTok, Product Hunt, Google, Shopify, Meta, Stripe) get their mark; anything else gets its initial. Six items run 139 frames; each extra item adds 20 (brandWheelDuration).",
+      "type": "registry:component"
+    },
+    {
       "name": "check-cycle",
       "title": "Check Cycle",
       "description": "Rotating words beside a checkbox: a sentence that finishes itself several ways. \"Create your own\" sits left of a ticked shadcn-style checkbox and the word to its right rolls up out of a slot — Intros, Demos, Launches, Changelogs, Tutorials, And more — then the line steps back a little and rests. Every number came off a recording, frame by frame: the two words in the slot move as one strip on the in-out cubic over exactly half a second, a roll every twenty frames. The type moves by fractions of a pixel instead of the whole-pixel steps a browser snaps text to.",

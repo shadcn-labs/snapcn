@@ -939,6 +939,32 @@
       ]
     },
     {
+      "name": "brand-wheel",
+      "type": "registry:component",
+      "docs": "Docs and props: https://snapcn.dev/docs/text/brand-wheel?ref=cli — lead is the fixed word; items is the reel, comma separated, top to bottom, and it comes to rest on the LAST one. Known brands (X, YouTube, LinkedIn, Instagram, TikTok, Product Hunt, Google, Shopify, Meta, Stripe) get their mark; anything else gets its initial. Six items run 139 frames; each extra item adds 20 (brandWheelDuration).",
+      "title": "Brand Wheel",
+      "description": "Rotating logos text: a lead word and a wheel of brand pills that rolls through the platforms you ship to, blurred rows above and below, then a cursor clicks the last one. Motion measured frame by frame from a recording.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json"
+      ],
+      "files": [
+        {
+          "path": "brand-wheel/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/brand-wheel/index.tsx"
+        },
+        {
+          "path": "brand-wheel/data.ts",
+          "type": "registry:component",
+          "target": "components/snap-cn/brand-wheel/data.ts"
+        }
+      ]
+    },
+    {
       "name": "check-cycle",
       "type": "registry:component",
       "docs": "Docs and props: https://snapcn.dev/docs/text/check-cycle?ref=cli — headline is the part of the sentence that never changes; words is what finishes it, comma separated, rolled through in order beside a ticked checkbox, then the line steps back to 80% and rests. Pass mode=\"dark\" if you are rendering onto a dark frame — these default to shadcn's light palette.",

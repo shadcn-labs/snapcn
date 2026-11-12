@@ -1,0 +1,28 @@
+---
+title: Brand Wheel
+description: A lead word and a wheel of brand pills rolling through where you ship, until a cursor clicks the last one
+---
+
+<ComponentPreview name="brand-wheel" />
+
+## Installation
+
+<InstallBlock name="brand-wheel" />
+
+## Component code
+
+The exact files `shadcn add` copies into your project.
+
+<ComponentSource name="brand-wheel" />
+
+## Usage
+
+Six items run 139 frames at 30fps; each extra item adds 20 (`brandWheelDuration(n)`). The wheel comes to rest on the last item. Known brands get their mark, anything else its initial.
+
+```tsx
+import { BrandWheel } from "@/components/snap-cn/brand-wheel";
+
+export const Beat = () => (
+  <BrandWheel lead="launch on" items="X, YouTube, LinkedIn, Instagram, TikTok, Product Hunt" />
+);
+```
