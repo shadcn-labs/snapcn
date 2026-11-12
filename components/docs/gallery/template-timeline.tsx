@@ -75,7 +75,7 @@ const DEFAULTS: Content = {
   product: "snapcn",
   count: "500",
   countNoun: "components",
-  accent: "#3072db",
+  accent: "#1d6bff",
 };
 
 const LAUNCH: Beat[] = [

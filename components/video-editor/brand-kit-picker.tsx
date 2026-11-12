@@ -30,7 +30,7 @@ export function BrandKitPicker({
   onChange: (next: BrandKit) => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const accent = value.accent ?? "#3072DB";
+  const accent = value.accent ?? "#1D6BFF";
 
   const onFile = (file: File | undefined) => {
     if (!file) return;

@@ -56,7 +56,7 @@ const CATEGORY_LABEL = new Map(GALLERY_CATEGORIES.map((c) => [c.id, c.label]));
  * surface to press, and it presses: a touch smaller, 150ms, out.
  */
 const PRIMARY_BTN =
-  "inline-flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-3 font-medium text-primary-foreground text-sm shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_1px_2px_rgb(0_0_0/0.25)] transition-[filter,transform] duration-150 ease-out hover:brightness-110 active:scale-[0.97] motion-reduce:transition-none";
+  "inline-flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-primary bg-primary-gradient px-3 font-medium text-primary-foreground text-sm shadow-[inset_0_1px_0_rgb(255_255_255/0.2),0_1px_2px_rgb(0_0_0/0.25)] transition-[filter,transform] duration-150 ease-out hover:brightness-110 active:scale-[0.97] motion-reduce:transition-none";
 
 /** A card on the panel: a hairline, a whisper of fill. */
 const CARD = "rounded-xl border border-border bg-muted/30 px-3.5 py-3";
@@ -536,12 +536,27 @@ function OverlayBody({
                 <PromptMenu item={item} slug={slug} poster={demoPoster} />
               )}
             </div>
-            {/* A free Element for anyone; a Pro one for its owners, whose
-                session is what `/elements/<name>.json` checks. */}
+            {/* On every component (#87). A free Element for anyone; a Pro one
+                sent for its owners, whose session is what
+                `/elements/<name>.json` checks, and the paywall for everyone
+                else. Held invisible while ownership is unknown, like the
+                primary button, so it never flips from one to the other. */}
             {(item.pro
-              ? owns === true && STUDIO_ELEMENTS_PRO.includes(slug)
+              ? STUDIO_ELEMENTS_PRO.includes(slug)
               : STUDIO_ELEMENTS.includes(slug)) && (
-              <StudioInstall name={slug} surface="gallery" block />
+              <div
+                className={cn(
+                  "w-full",
+                  item.pro && owns === null && "invisible",
+                )}
+              >
+                <StudioInstall
+                  name={slug}
+                  surface="gallery"
+                  block
+                  locked={item.pro && owns !== true}
+                />
+              </div>
             )}
           </div>
 

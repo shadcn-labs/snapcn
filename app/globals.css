@@ -94,28 +94,39 @@
   }
 }
 
+/* A primary surface, lit from above — see the accent note in `:root`. */
+@utility bg-primary-gradient {
+  background-image: linear-gradient(
+    180deg,
+    #2b7fff 0%,
+    #1d6bff 50%,
+    #155dfc 100%
+  );
+}
+
 :root {
   /* snapcn design system — light (first-class). Neutral surfaces, hairline
      borders, one blue accent, shadows kept to a whisper.
 
-     The accent was #3577e0 and is now #3072db. White on #3577e0 measures
-     **4.32:1**, and WCAG AA wants 4.5 for normal text — so the primary button,
-     which is white on the accent, failed. Lighthouse flagged it on the hero.
+     The accent is #1d6bff: a saturated, electric blue in place of #3072db's
+     muted one. White on it measures 4.57:1, so the primary button still
+     clears WCAG AA (4.5). It is every accent token here — ring, chart-1,
+     sidebar — and `theme.ts`, so the site and the videos stay one blue
+     (`check:tokens`). --primary-hover is #155dfc (5.25:1), one step deeper.
 
-     #3072db is that same colour walked down in OKLCH with hue and chroma held:
-     the minimum darkening that clears AA (4.61:1), not a new blue picked by eye.
-     It is applied to every #3577e0 in this file — ring, chart-1, sidebar — on
-     purpose. Fixing only the two tokens that carry white text would have split
-     one accent into two blues, which is the drift `check:tokens` exists to stop.
-     --primary-hover (#2b63c4, 5.70:1) still sits below it, so hover still reads. */
+     A primary *surface* (a button, the offer bar) is lit from above: the
+     gradient #2b7fff → #1d6bff → #155dfc, measured off the reference, flat
+     across and only falling top to bottom. The middle stop is the accent and
+     sits where the label does, so the text is on 4.57:1, not on the lighter
+     top. It is `bg-primary-gradient`, over `bg-primary` as its fallback. */
   --background: #faf9f6;
   --foreground: #141414;
   --card: #ffffff;
   --card-foreground: #141414;
   --popover: #ffffff;
   --popover-foreground: #141414;
-  --primary: #3072db;
-  --primary-hover: #2b63c4;
+  --primary: #1d6bff;
+  --primary-hover: #155dfc;
   --primary-foreground: #ffffff;
   --secondary: #f2f0eb;
   --secondary-foreground: #141414;
@@ -126,8 +137,8 @@
   --destructive: #d92d20;
   --border: #d9d9d9;
   --input: #d9d9d9;
-  --ring: #3072db;
-  --chart-1: #3072db;
+  --ring: #1d6bff;
+  --chart-1: #1d6bff;
   --chart-2: #667085;
   --chart-3: #98a2b3;
   --chart-4: #475467;
@@ -149,12 +160,12 @@
   --shadow-card: 0 1px 2px rgb(16 24 40 / 0.05);
   --sidebar: #faf9f6;
   --sidebar-foreground: #141414;
-  --sidebar-primary: #3072db;
+  --sidebar-primary: #1d6bff;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f2f0eb;
   --sidebar-accent-foreground: #141414;
   --sidebar-border: #d9d9d9;
-  --sidebar-ring: #3072db;
+  --sidebar-ring: #1d6bff;
 
   /* "NEW" sidebar badge — editable accent knob. A soft tint of the system
      blue; recolor the badge by changing these two values per theme. */
@@ -195,8 +206,8 @@
   --card-foreground: #fafafa;
   --popover: #141417;
   --popover-foreground: #fafafa;
-  --primary: #3072db;
-  --primary-hover: #2b63c4;
+  --primary: #1d6bff;
+  --primary-hover: #155dfc;
   --primary-foreground: #ffffff;
   --secondary: #1d1d21;
   --secondary-foreground: #fafafa;
@@ -207,8 +218,8 @@
   --destructive: #f97066;
   --border: #26272b;
   --input: #26272b;
-  --ring: #3072db;
-  --chart-1: #3072db;
+  --ring: #1d6bff;
+  --chart-1: #1d6bff;
   --chart-2: #a1a1aa;
   --chart-3: #7a7a83;
   --chart-4: #55555c;
@@ -216,12 +227,12 @@
   --shadow-card: none;
   --sidebar: #0a0a0b;
   --sidebar-foreground: #fafafa;
-  --sidebar-primary: #3072db;
+  --sidebar-primary: #1d6bff;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #1d1d21;
   --sidebar-accent-foreground: #fafafa;
   --sidebar-border: #26272b;
-  --sidebar-ring: #3072db;
+  --sidebar-ring: #1d6bff;
 
   /* Badge shifts to a deep blue tint so it reads on dark surfaces. */
   --badge-new-bg: #1c3054;

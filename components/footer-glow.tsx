@@ -23,7 +23,7 @@ const BARS = 9;
 const STOPS = [
   { offset: 0, color: "#0B1B4A" },
   { offset: 0.2, color: "#2458B0" },
-  { offset: 0.38, color: "#3072DB" },
+  { offset: 0.38, color: "#1D6BFF" },
   { offset: 0.55, color: "#7FB0F5" },
   { offset: 0.72, color: "#DCEAFE" },
   { offset: 1, color: "#DCEAFE00" },

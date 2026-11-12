@@ -74,7 +74,7 @@ export const defaultLightTheme: SnapCnTheme = {
   cardForeground: "#141414",
   popover: "#ffffff",
   popoverForeground: "#141414",
-  primary: "#3072db", // accent blue
+  primary: "#1d6bff", // accent blue
   primaryForeground: "#ffffff",
   secondary: "#f2f0eb", // subtle fill
   secondaryForeground: "#141414",
@@ -88,7 +88,7 @@ export const defaultLightTheme: SnapCnTheme = {
   destructiveForeground: "#ffffff",
   border: "#d9d9d9", // hairline
   input: "#d9d9d9",
-  ring: "#3072db",
+  ring: "#1d6bff",
   radius: 10,
 };
 
@@ -99,7 +99,7 @@ export const defaultDarkTheme: SnapCnTheme = {
   cardForeground: "#fafafa",
   popover: "#141417",
   popoverForeground: "#fafafa",
-  primary: "#3072db", // the same accent blue in both modes
+  primary: "#1d6bff", // the same accent blue in both modes
   primaryForeground: "#ffffff",
   secondary: "#1d1d21", // subtle fill
   secondaryForeground: "#fafafa",
@@ -111,7 +111,7 @@ export const defaultDarkTheme: SnapCnTheme = {
   destructiveForeground: "#fafafa",
   border: "#26272b", // hairline — separation is borders, not shadows
   input: "#26272b",
-  ring: "#3072db",
+  ring: "#1d6bff",
   radius: 10,
 };
 

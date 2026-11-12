@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 
 const HREF = "/docs/pricing?ref=sale_banner#plans";
 /** Published as `--fd-banner-height`; everything sticky offsets by it. */
-const HEIGHT = "2.75rem";
+const HEIGHT = "2.375rem";
 
 /**
  * Account pages, where an offer reads as "you still have to pay" — and the
@@ -62,14 +62,18 @@ export function SaleBanner() {
   const { percent } = BANNER_OFFER;
 
   return (
-    <div className="sticky top-0 z-40 h-(--fd-banner-height) overflow-hidden bg-primary text-primary-foreground">
-      {/* Lit from above, like the reference: a touch lighter at the top edge. */}
+    // The primary surface, lit from above: flat across, falling top to bottom
+    // (`bg-primary-gradient`, measured off the reference bar).
+    <div className="sticky top-0 z-40 h-(--fd-banner-height) overflow-hidden bg-primary bg-primary-gradient text-white">
+      <style>{`:root { --fd-banner-height: ${HEIGHT}; }
+@keyframes banner-sweep { 0% { transform: translateX(-20vw) translateY(-50%); } 70%, 100% { transform: translateX(120vw) translateY(-50%); } }`}</style>
+      {/* One soft light crossing the bar: 120px wide, ~36% white at its heart
+          and gone at its edge, taller than the bar so it lifts it top to
+          bottom — a radial gradient, not a blur, so it never smears. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/12 to-black/5"
+        className="pointer-events-none absolute top-1/2 left-0 h-[200%] w-30 animate-[banner-sweep_7s_ease-in-out_infinite] bg-[radial-gradient(closest-side,rgb(255_255_255/0.36),rgb(255_255_255/0.16)_50%,transparent)] motion-reduce:hidden"
       />
-      <style>{`:root { --fd-banner-height: ${HEIGHT}; }
-@keyframes banner-sweep { 0% { transform: translateX(-30vw); } 70%, 100% { transform: translateX(130vw); } }`}</style>
       <Link
         href={HREF}
         onClick={() =>
@@ -79,33 +83,28 @@ export function SaleBanner() {
       >
         <span className="hidden truncate sm:inline">
           <span className="font-semibold">Templates launch week:</span>{" "}
-          <span className="text-primary-foreground/90">
-            {percent}% off Pro, applied at checkout. Ends in {remaining(left)}.
-          </span>
+          {percent}% off Pro, applied at checkout. Ends in {remaining(left)}.
         </span>
         <span className="truncate sm:hidden">
           <span className="font-semibold">{percent}% off Pro</span>
-          <span className="text-background/70"> · {remaining(left)} left</span>
+          <span className="text-white/80"> · {remaining(left)} left</span>
         </span>
+        {/* Frosted, not filled: 20% white over the bar, no edge, no shadow. */}
         <span
           className={cn(
-            buttonVariants({ size: "sm" }),
-            "h-7 bg-white/20 px-2.5 font-semibold text-primary-foreground group-hover:bg-white/30",
+            buttonVariants({ variant: "ghost", size: "sm" }),
+            "h-[26px] rounded-md bg-white/20 px-2.5 font-semibold text-white hover:bg-white/30 hover:text-white group-hover:bg-white/30",
           )}
         >
           Claim {percent}%
         </span>
       </Link>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute top-1/2 left-0 h-24 w-40 -translate-y-1/2 animate-[banner-sweep_7s_ease-in-out_infinite] rounded-full bg-white/25 blur-2xl motion-reduce:hidden"
-      />
       <button
         type="button"
         onClick={() => setDismissed(true)}
         className={cn(
           buttonVariants({ variant: "ghost", size: "icon-xs" }),
-          "absolute top-1/2 right-3 -translate-y-1/2 text-primary-foreground/70 hover:bg-white/15 hover:text-primary-foreground",
+          "absolute top-1/2 right-3 -translate-y-1/2 text-white/70 hover:bg-white/15 hover:text-white",
         )}
         aria-label="Dismiss"
       >
