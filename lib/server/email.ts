@@ -217,7 +217,7 @@ const C = {
   ink: "#141414",
   muted: "#6b6b6b",
   line: "#e7e5e0",
-  accent: "#3072db",
+  accent: "#1d6bff",
   code: "#f2f1ee",
 } as const;
 
