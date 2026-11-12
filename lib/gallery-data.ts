@@ -236,6 +236,14 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     added: "2026-09-12",
   },
   {
+    name: "Brand Wheel",
+    description:
+      "A lead word and a wheel of brand pills rolling through where you ship — X, YouTube, LinkedIn, Product Hunt — until a cursor clicks the last one",
+    category: "text",
+    href: "/docs/text/brand-wheel",
+    added: "2026-11-12",
+  },
+  {
     name: "Word Gather",
     description:
       "A sentence that arrives one word at a time, out of order, and gathers — the first word holds the frame alone, then the rest drop in around it in the accent colour and slide the last of the way home",

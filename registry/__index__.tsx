@@ -6,6 +6,8 @@ import { AnnounceTitle } from "@/registry/snap-cn/announce-title";
 import { AnswerHighlight } from "@/registry/snap-cn/answer-highlight";
 import { AnswerStream } from "@/registry/snap-cn/answer-stream";
 import { BlockWordmark } from "@/registry/snap-cn/block-wordmark";
+import { BloomLockup } from "@/registry/snap-cn/bloom-lockup";
+import { BrandWheel } from "@/registry/snap-cn/brand-wheel";
 import { ButtonPress } from "@/registry/snap-cn/button-press";
 import { CaptureReveal } from "@/registry/snap-cn/capture-reveal";
 import { CardRail } from "@/registry/snap-cn/card-rail";
@@ -14,17 +16,13 @@ import { CheckCycle } from "@/registry/snap-cn/check-cycle";
 import { ClickType } from "@/registry/snap-cn/click-type";
 import { CountGrid } from "@/registry/snap-cn/count-grid";
 import { CursorTrack } from "@/registry/snap-cn/cursor-track";
-import { DotBloom } from "@/registry/snap-cn/dot-bloom";
-import { HelloZoom } from "@/registry/snap-cn/hello-zoom";
-import { SpecSweep } from "@/registry/snap-cn/spec-sweep";
-import { DropLine } from "@/registry/snap-cn/drop-line";
-import { TitleSweep } from "@/registry/snap-cn/title-sweep";
-import { BloomLockup } from "@/registry/snap-cn/bloom-lockup";
 import { CutLockup } from "@/registry/snap-cn/cut-lockup";
-import { GatherLockup } from "@/registry/snap-cn/gather-lockup";
-import { SkyLockup } from "@/registry/snap-cn/sky-lockup";
+import { DotBloom } from "@/registry/snap-cn/dot-bloom";
+import { DropLine } from "@/registry/snap-cn/drop-line";
 import { FollowerRush } from "@/registry/snap-cn/follower-rush";
 import { FontShuffle } from "@/registry/snap-cn/font-shuffle";
+import { GatherLockup } from "@/registry/snap-cn/gather-lockup";
+import { HelloZoom } from "@/registry/snap-cn/hello-zoom";
 import { HeroLaunch } from "@/registry/snap-cn/hero-launch";
 import { KaraokeCaptions } from "@/registry/snap-cn/karaoke-captions";
 import { LaptopFrame } from "@/registry/snap-cn/laptop-frame";
@@ -46,6 +44,8 @@ import { ReelWall } from "@/registry/snap-cn/reel-wall";
 import { RosterGrant } from "@/registry/snap-cn/roster-grant";
 import { ScreenRecording } from "@/registry/snap-cn/screen-recording";
 import { SearchTyping } from "@/registry/snap-cn/search-typing";
+import { SkyLockup } from "@/registry/snap-cn/sky-lockup";
+import { SpecSweep } from "@/registry/snap-cn/spec-sweep";
 import { StatusCycle } from "@/registry/snap-cn/status-cycle";
 import { TerminalSimulator } from "@/registry/snap-cn/terminal-simulator";
 import { TextBuild } from "@/registry/snap-cn/text-build";
@@ -55,6 +55,7 @@ import { TextRewrite } from "@/registry/snap-cn/text-rewrite";
 import { TextSelect } from "@/registry/snap-cn/text-select";
 import { TextSwap } from "@/registry/snap-cn/text-swap";
 import { TextSwell } from "@/registry/snap-cn/text-swell";
+import { TitleSweep } from "@/registry/snap-cn/title-sweep";
 import { WordCaptions } from "@/registry/snap-cn/word-captions";
 import { WordFlip } from "@/registry/snap-cn/word-flip";
 import { WordGather } from "@/registry/snap-cn/word-gather";
@@ -160,16 +161,38 @@ const registry: Record<string, RegistryEntry> = {
   "word-gather": { Component: WordGather, config: CONFIGS["word-gather"] },
   "portal-intro": { Component: PortalIntro, config: CONFIGS["portal-intro"] },
   "dot-bloom": { Component: DotBloom, config: CONFIGS["dot-bloom"] },
-  "bloom-lockup": { Component: BloomLockup as React.ComponentType<Record<string, unknown>>, config: CONFIGS["bloom-lockup"] },
+  "bloom-lockup": {
+    Component: BloomLockup as React.ComponentType<Record<string, unknown>>,
+    config: CONFIGS["bloom-lockup"],
+  },
   "cut-lockup": { Component: CutLockup, config: CONFIGS["cut-lockup"] },
-  "gather-lockup": { Component: GatherLockup as React.ComponentType<Record<string, unknown>>, config: CONFIGS["gather-lockup"] },
-  "sky-lockup": { Component: SkyLockup as React.ComponentType<Record<string, unknown>>, config: CONFIGS["sky-lockup"] },
-  "hello-zoom": { Component: HelloZoom as React.ComponentType<Record<string, unknown>>, config: CONFIGS["hello-zoom"] },
-  "spec-sweep": { Component: SpecSweep as React.ComponentType<Record<string, unknown>>, config: CONFIGS["spec-sweep"] },
-  "drop-line": { Component: DropLine as React.ComponentType<Record<string, unknown>>, config: CONFIGS["drop-line"] },
-  "title-sweep": { Component: TitleSweep as React.ComponentType<Record<string, unknown>>, config: CONFIGS["title-sweep"] },
+  "gather-lockup": {
+    Component: GatherLockup as React.ComponentType<Record<string, unknown>>,
+    config: CONFIGS["gather-lockup"],
+  },
+  "sky-lockup": {
+    Component: SkyLockup as React.ComponentType<Record<string, unknown>>,
+    config: CONFIGS["sky-lockup"],
+  },
+  "hello-zoom": {
+    Component: HelloZoom as React.ComponentType<Record<string, unknown>>,
+    config: CONFIGS["hello-zoom"],
+  },
+  "spec-sweep": {
+    Component: SpecSweep as React.ComponentType<Record<string, unknown>>,
+    config: CONFIGS["spec-sweep"],
+  },
+  "drop-line": {
+    Component: DropLine as React.ComponentType<Record<string, unknown>>,
+    config: CONFIGS["drop-line"],
+  },
+  "title-sweep": {
+    Component: TitleSweep as React.ComponentType<Record<string, unknown>>,
+    config: CONFIGS["title-sweep"],
+  },
   "orb-swarm": { Component: OrbSwarm, config: CONFIGS["orb-swarm"] },
   "word-wheel": { Component: WordWheel, config: CONFIGS["word-wheel"] },
+  "brand-wheel": { Component: BrandWheel, config: CONFIGS["brand-wheel"] },
   "capture-reveal": {
     Component: CaptureReveal,
     config: CONFIGS["capture-reveal"],

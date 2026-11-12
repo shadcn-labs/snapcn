@@ -4,6 +4,8 @@ import { announceTitleConfig } from "@/registry/snap-cn/announce-title/config";
 import { answerHighlightConfig } from "@/registry/snap-cn/answer-highlight/config";
 import { answerStreamConfig } from "@/registry/snap-cn/answer-stream/config";
 import { blockWordmarkConfig } from "@/registry/snap-cn/block-wordmark/config";
+import { bloomLockupConfig } from "@/registry/snap-cn/bloom-lockup/config";
+import { brandWheelConfig } from "@/registry/snap-cn/brand-wheel/config";
 import { buttonPressConfig } from "@/registry/snap-cn/button-press/config";
 import { captureRevealConfig } from "@/registry/snap-cn/capture-reveal/config";
 import { cardRailConfig } from "@/registry/snap-cn/card-rail/config";
@@ -12,12 +14,12 @@ import { checkCycleConfig } from "@/registry/snap-cn/check-cycle/config";
 import { clickTypeConfig } from "@/registry/snap-cn/click-type/config";
 import { countGridConfig } from "@/registry/snap-cn/count-grid/config";
 import { cursorTrackConfig } from "@/registry/snap-cn/cursor-track/config";
-import { bloomLockupConfig } from "@/registry/snap-cn/bloom-lockup/config";
 import { cutLockupConfig } from "@/registry/snap-cn/cut-lockup/config";
 import { dotBloomConfig } from "@/registry/snap-cn/dot-bloom/config";
 import { dropLineConfig } from "@/registry/snap-cn/drop-line/config";
 import { followerRushConfig } from "@/registry/snap-cn/follower-rush/config";
 import { fontShuffleConfig } from "@/registry/snap-cn/font-shuffle/config";
+import { gatherLockupConfig } from "@/registry/snap-cn/gather-lockup/config";
 import { helloZoomConfig } from "@/registry/snap-cn/hello-zoom/config";
 import { heroLaunchConfig } from "@/registry/snap-cn/hero-launch/config";
 import { karaokeCaptionsConfig } from "@/registry/snap-cn/karaoke-captions/config";
@@ -40,7 +42,6 @@ import { reelWallConfig } from "@/registry/snap-cn/reel-wall/config";
 import { rosterGrantConfig } from "@/registry/snap-cn/roster-grant/config";
 import { screenRecordingConfig } from "@/registry/snap-cn/screen-recording/config";
 import { searchTypingConfig } from "@/registry/snap-cn/search-typing/config";
-import { gatherLockupConfig } from "@/registry/snap-cn/gather-lockup/config";
 import { skyLockupConfig } from "@/registry/snap-cn/sky-lockup/config";
 import { specSweepConfig } from "@/registry/snap-cn/spec-sweep/config";
 import { statusCycleConfig } from "@/registry/snap-cn/status-cycle/config";
@@ -119,6 +120,7 @@ export const CONFIGS: Record<string, ComponentConfig> = {
   "title-sweep": titleSweepConfig,
   "orb-swarm": orbSwarmConfig,
   "word-wheel": wordWheelConfig,
+  "brand-wheel": brandWheelConfig,
   "capture-reveal": captureRevealConfig,
   "font-shuffle": fontShuffleConfig,
   "button-press": buttonPressConfig,
