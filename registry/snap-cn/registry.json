@@ -474,6 +474,25 @@
       ]
     },
     {
+      "name": "prompt-mark",
+      "type": "registry:component",
+      "docs": "Docs and props: https://snapcn.dev/docs/ai-input/prompt-mark?ref=cli \u2014 text is the prompt (about 11 characters fits the measured pan), name is the lockup's wordmark; colours come from SnapCnTheme (primary is the accent), mode is the mode it opens in and it flashes into the other. 175 frames at 30fps.",
+      "title": "Prompt Mark",
+      "description": "Prompt to logo reveal: a prompt types into a dark pill while the camera rides the caret, pans onto the send button, the arrow becomes the snapcn mark, the room flashes into the other mode inside an accent bloom, and the badge settles into a logo lockup. Camera, keystrokes and cursor measured frame by frame from a recording.",
+      "dependencies": ["remotion", "@remotion/google-fonts"],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json",
+        "https://snapcn.dev/r/input.json"
+      ],
+      "files": [
+        {
+          "path": "prompt-mark/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/prompt-mark.tsx"
+        }
+      ]
+    },
+    {
       "name": "prompt-zoom",
       "type": "registry:component",
       "docs": "Docs and props: https://snapcn.dev/docs/ai-input/prompt-zoom?ref=cli \u2014 pass mode=\"dark\" if you are rendering onto a dark frame \u2014 these default to shadcn's light palette and a bare Remotion render is black.",
