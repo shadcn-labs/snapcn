@@ -248,6 +248,7 @@ const COMPONENT_QUERY: Record<string, string> = {
   "channel-thread": "Remotion Slack chat animation",
   "search-typing": "Remotion search bar animation",
   "prompt-send": "Remotion AI prompt typing animation",
+  "prompt-mark": "Remotion prompt to logo reveal animation",
   "prompt-zoom": "Remotion AI prompt zoom animation",
   "answer-stream": "Remotion AI streaming answer animation",
   "answer-highlight": "Remotion AI answer highlight",

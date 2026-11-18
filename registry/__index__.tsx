@@ -36,6 +36,7 @@ import { OrbitGallery } from "@/registry/snap-cn/orbit-gallery";
 import { PhoneFrame } from "@/registry/snap-cn/phone-frame";
 import { PhoneStack } from "@/registry/snap-cn/phone-stack";
 import { PortalIntro } from "@/registry/snap-cn/portal-intro";
+import { PromptMark } from "@/registry/snap-cn/prompt-mark";
 import { PromptSend } from "@/registry/snap-cn/prompt-send";
 import { PromptZoom } from "@/registry/snap-cn/prompt-zoom";
 import { PunchLines } from "@/registry/snap-cn/punch-lines";
@@ -127,6 +128,7 @@ const registry: Record<string, RegistryEntry> = {
   "phone-frame": { Component: PhoneFrame, config: CONFIGS["phone-frame"] },
   "phone-stack": { Component: PhoneStack, config: CONFIGS["phone-stack"] },
   "prompt-send": { Component: PromptSend, config: CONFIGS["prompt-send"] },
+  "prompt-mark": { Component: PromptMark, config: CONFIGS["prompt-mark"] },
   "prompt-zoom": { Component: PromptZoom, config: CONFIGS["prompt-zoom"] },
   "punch-lines": { Component: PunchLines, config: CONFIGS["punch-lines"] },
   "reel-collage": {

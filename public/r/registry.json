@@ -602,6 +602,28 @@
       "type": "registry:component"
     },
     {
+      "name": "prompt-mark",
+      "title": "Prompt Mark",
+      "description": "Prompt to logo reveal: a prompt types into a dark pill while the camera rides the caret, pans onto the send button, the arrow becomes the snapcn mark, the room flashes into the other mode inside an accent bloom, and the badge settles into a logo lockup. Camera, keystrokes and cursor measured frame by frame from a recording.",
+      "dependencies": [
+        "remotion",
+        "@remotion/google-fonts"
+      ],
+      "registryDependencies": [
+        "https://snapcn.dev/r/snap-cn-ui.json",
+        "https://snapcn.dev/r/input.json"
+      ],
+      "files": [
+        {
+          "path": "registry/snap-cn/prompt-mark/index.tsx",
+          "type": "registry:component",
+          "target": "components/snap-cn/prompt-mark.tsx"
+        }
+      ],
+      "docs": "Docs and props: https://snapcn.dev/docs/ai-input/prompt-mark?ref=cli — text is the prompt (about 11 characters fits the measured pan), name is the lockup's wordmark; colours come from SnapCnTheme (primary is the accent), mode is the mode it opens in and it flashes into the other. 175 frames at 30fps.",
+      "type": "registry:component"
+    },
+    {
       "name": "prompt-zoom",
       "title": "Prompt Zoom",
       "description": "AI prompt zoom: an assistant home screen that cuts into the chat input as the prompt types. An assistant landing screen that offers its suggestions, then cuts — hard, in a single frame — into the caret, where the prompt types itself. The push-in is a measured 2.547× anchored on the text insertion point, not an animated zoom.",

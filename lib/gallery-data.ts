@@ -577,6 +577,14 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     tile: "wide",
   },
   {
+    name: "Prompt Mark",
+    description:
+      "A prompt types into a pill, the camera pans to send, the arrow becomes the snapcn mark and a bloom flashes it into a logo lockup",
+    category: "ai-input",
+    href: "/docs/ai-input/prompt-mark",
+    added: "2026-11-18",
+  },
+  {
     name: "Prompt Zoom",
     description:
       "An assistant landing screen that offers its suggestions, then cuts hard into the caret — a measured 2.547× push anchored on the text insertion point — where the prompt types itself",

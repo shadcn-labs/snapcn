@@ -6,6 +6,7 @@
     "search-typing",
     "prompt-zoom",
     "prompt-send",
+    "prompt-mark",
     "answer-stream",
     "agent-steps",
     "answer-highlight"

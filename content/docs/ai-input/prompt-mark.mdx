@@ -1,0 +1,26 @@
+---
+title: Prompt Mark
+description: A prompt types into a pill, the camera pans to send, the arrow becomes the snapcn mark and it settles into a logo lockup
+---
+
+<ComponentPreview name="prompt-mark" />
+
+## Installation
+
+<InstallBlock name="prompt-mark" />
+
+## Component code
+
+The exact files `shadcn add` copies into your project.
+
+<ComponentSource name="prompt-mark" />
+
+## Usage
+
+175 frames at 30fps. The camera pan was measured for about 11 characters of prompt, so keep `text` short. Colours come from your `SnapCnTheme` (`primary` is the accent); `mode` is the mode it opens in, and the flash lands in the other.
+
+```tsx
+import { PromptMark } from "@/components/snap-cn/prompt-mark";
+
+export const Beat = () => <PromptMark text="Ship a demo" name="snapcn" />;
+```

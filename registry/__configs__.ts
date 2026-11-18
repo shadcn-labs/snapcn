@@ -34,6 +34,7 @@ import { orbitGalleryConfig } from "@/registry/snap-cn/orbit-gallery/config";
 import { phoneFrameConfig } from "@/registry/snap-cn/phone-frame/config";
 import { phoneStackConfig } from "@/registry/snap-cn/phone-stack/config";
 import { portalIntroConfig } from "@/registry/snap-cn/portal-intro/config";
+import { promptMarkConfig } from "@/registry/snap-cn/prompt-mark/config";
 import { promptSendConfig } from "@/registry/snap-cn/prompt-send/config";
 import { promptZoomConfig } from "@/registry/snap-cn/prompt-zoom/config";
 import { punchLinesConfig } from "@/registry/snap-cn/punch-lines/config";
@@ -94,6 +95,7 @@ export const CONFIGS: Record<string, ComponentConfig> = {
   "phone-frame": phoneFrameConfig,
   "phone-stack": phoneStackConfig,
   "prompt-send": promptSendConfig,
+  "prompt-mark": promptMarkConfig,
   "prompt-zoom": promptZoomConfig,
   "punch-lines": punchLinesConfig,
   "reel-collage": reelCollageConfig,
