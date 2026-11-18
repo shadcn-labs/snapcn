@@ -2,6 +2,9 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import {
   ANONYMOUS,
+  BANNER_OFFER,
+  bannerOfferFor,
+  bannerOfferLive,
   CATALOGUE_PRICE,
   CHECKOUT_PRODUCTS,
   entitledPlan,
@@ -240,5 +243,25 @@ describe("entitledPlan", () => {
       expect(entitledPlan(row(status, later), now), status).toBe("free");
     }
     expect(entitledPlan(row("active", earlier), now)).toBe("free");
+  });
+});
+
+describe("BANNER_OFFER (Black Friday)", () => {
+  it("prices Lifetime at $199 and Commercial at $399, the annual not at all", () => {
+    const at = (product: string, cents: number) =>
+      Math.round(cents * (1 - (bannerOfferFor(product)?.percent ?? 0) / 100));
+    expect(at("lifetime", 27900)).toBe(19898);
+    expect(at("commercial", 49900)).toBe(39900);
+    expect(bannerOfferFor("everything_annual")).toBeNull();
+    expect(bannerOfferFor("toString")).toBeNull();
+  });
+
+  it("is live only inside its window", () => {
+    const start = Date.parse(BANNER_OFFER.startsAt);
+    const end = Date.parse(BANNER_OFFER.endsAt);
+    expect(bannerOfferLive(start - 1)).toBe(false);
+    expect(bannerOfferLive(start)).toBe(true);
+    expect(bannerOfferLive(end - 1)).toBe(true);
+    expect(bannerOfferLive(end)).toBe(false);
   });
 });

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import {
-  BANNER_OFFER,
+  bannerOfferFor,
+  bannerOfferLive,
   CHECKOUT_PRODUCTS,
   type CheckoutProduct,
   isCheckoutProduct,
@@ -92,24 +93,24 @@ export async function POST(request: Request) {
   // Only the codes we hand out. Anyone can type any code on Dodo's own page,
   // so this is not a guard on money — it keeps this route from being a probe
   // for which codes exist.
-  // The banner's code whenever its window is live, sent or not: the banner
-  // promises "auto-applied at checkout" on every page, and several buttons
-  // start a checkout (pricing, the editor, the watermark) — applying it here
-  // keeps that promise for all of them. After `endsAt`, never (Dodo expires it
-  // at the same moment).
-  const bannerLive = Date.now() < Date.parse(BANNER_OFFER.endsAt);
-  const discountCode =
-    discount === OFFER.code
-      ? OFFER.code
-      : bannerLive
-        ? BANNER_OFFER.code
-        : undefined;
   if (!isCheckoutProduct(product)) {
     return NextResponse.json(
       { error: "Unknown product.", code: "unknown_product" },
       { status: 400 },
     );
   }
+  // The banner's code for this product whenever its window is open, sent or
+  // not: the banner promises "applied at checkout" on every page, and several
+  // buttons start a checkout (pricing, the editor, the watermark) — applying it
+  // here keeps that promise for all of them. It wins over the earned code on
+  // the products it covers (it is the deeper cut); outside its window, never
+  // (Dodo's own starts_at/expires_at match it).
+  const banner = bannerOfferLive() ? bannerOfferFor(product) : null;
+  const discountCode = banner
+    ? banner.code
+    : discount === OFFER.code
+      ? OFFER.code
+      : undefined;
 
   // Ids are configuration, not code: the test and live dashboards mint
   // entirely different ones, so a hardcoded id means whichever mode it did not

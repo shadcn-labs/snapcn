@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useTrackEvent } from "@/lib/analytics";
 import {
-  bannerOfferEnds,
   codeInUrl,
   countPricingVisit,
   earnOffer,
@@ -17,6 +16,8 @@ import {
 } from "@/lib/offer";
 import {
   BANNER_OFFER,
+  bannerOfferFor,
+  bannerOfferLive,
   OFFER,
   type PlanTier,
   TIER_NAME,
@@ -126,7 +127,7 @@ function OfferPrice({
         </span>
         {done && (
           <span className="animate-[offer-pop_350ms_ease-out_both] rounded-md bg-emerald-500/10 px-1.5 py-0.5 font-medium text-emerald-600 text-xs dark:text-emerald-400">
-            −{percent}%{firstYear ? " first year" : ""}
+            −{Math.round(percent)}%{firstYear ? " first year" : ""}
           </span>
         )}
       </span>
@@ -197,10 +198,13 @@ export function PricingPlans({
 }) {
   const trackEvent = useTrackEvent();
   const [pending, setPending] = useState<UpgradeProduct | null>(null);
-  // The banner's code for anyone not paying; the intent offer once earned.
-  const [offer, setOffer] = useState<typeof OFFER | typeof BANNER_OFFER | null>(
-    null,
-  );
+  // For anyone not paying: the banner's sale inside its window (per product),
+  // and the intent offer once earned. Both can hold at once — the banner covers
+  // Lifetime and Commercial, the earned code still covers the annual.
+  const [offer, setOffer] = useState<{
+    banner: boolean;
+    earned: boolean;
+  } | null>(null);
   const layout = LAYOUT[tiers.length] ?? LAYOUT[4];
   const held = currentPlan === "anonymous" ? null : currentPlan;
   /** Holds a paid plan: their card is the one highlighted, and no promos. */
@@ -230,27 +234,26 @@ export function PricingPlans({
         trackEvent("offer_shown", { trigger: earned });
       }
     }
-    // The banner's offer wins while its countdown runs, so the bar and this page
-    // always quote the same offer; the earned code only after the window.
-    setOffer(
-      bannerOfferEnds() > Date.now()
-        ? BANNER_OFFER
-        : earned !== null || offerEarned()
-          ? OFFER
-          : null,
-    );
+    // The banner's offer wins on the products it covers while its window is
+    // open, so the bar, this page and checkout quote the same price.
+    const banner = bannerOfferLive();
+    const hasEarned = earned !== null || offerEarned();
+    setOffer(banner || hasEarned ? { banner, earned: hasEarned } : null);
   }, [currentPlan, paying, trackEvent]);
 
   async function buy(product: UpgradeProduct) {
     if (pending) return;
     setPending(product);
+    const code =
+      (offer?.banner ? bannerOfferFor(product)?.code : undefined) ??
+      (offer?.earned ? OFFER.code : undefined);
     trackEvent("upgrade_started", {
       from,
       plan: product,
-      ...(offer ? { discount: offer.code } : {}),
+      ...(code ? { discount: code } : {}),
     });
     try {
-      await startCheckout(product, offer?.code);
+      await startCheckout(product, offer?.earned ? OFFER.code : undefined);
     } catch (err) {
       setPending(null);
       toast.error(
@@ -272,17 +275,25 @@ export function PricingPlans({
               <TicketPercent className="size-3.5" aria-hidden="true" />
             </span>
             <span>
-              {offer.code === OFFER.code ? (
+              {offer.banner ? (
                 <>
-                  Code{" "}
-                  <span className="font-medium font-mono">{offer.code}</span>{" "}
-                  applied
+                  <span className="font-medium">
+                    {BANNER_OFFER.name} prices applied
+                  </span>{" "}
+                  — Lifetime −
+                  {Math.round(BANNER_OFFER.products.lifetime.percent)}%,
+                  Commercial −
+                  {Math.round(BANNER_OFFER.products.commercial.percent)}%,
+                  automatically at checkout.
                 </>
               ) : (
-                <span className="font-medium">Launch offer applied</span>
-              )}{" "}
-              — {offer.percent}% off your first payment, automatically at
-              checkout.
+                <>
+                  Code{" "}
+                  <span className="font-medium font-mono">{OFFER.code}</span>{" "}
+                  applied — {OFFER.percent}% off your first payment,
+                  automatically at checkout.
+                </>
+              )}
             </span>
             <span
               aria-hidden
@@ -317,7 +328,11 @@ export function PricingPlans({
             "group/cta h-12 w-full gap-2 rounded-button text-base font-medium transition-[background-color,transform] duration-150 ease-out active:scale-[0.97] lg:h-11";
           /** The offer's percent where it lands on this card, else 0. */
           const discounted =
-            offer && tier.product && !owned ? offer.percent : 0;
+            offer && tier.product && !owned
+              ? ((offer.banner
+                  ? bannerOfferFor(tier.product)?.percent
+                  : undefined) ?? (offer.earned ? OFFER.percent : 0))
+              : 0;
           const priceClass = cn(
             "whitespace-nowrap font-semibold text-foreground tracking-tight",
             tier.price.length <= 5

@@ -476,19 +476,49 @@ export const OFFER = {
 } as const;
 
 /**
- * The site-wide banner's offer: templates launch week, 15% off for everyone
- * until `endsAt` (end of 17 Nov IST). `SNAPCN15` was created in both Dodo modes
- * on 2026-11-10 with the same terms as `OFFER` (three snapcn products, first
- * payment, once per customer) and Dodo's own `expires_at` set to `endsAt`, so
- * the code dies at the same moment the banner does.
+ * The site-wide banner's offer: Black Friday, run early — from 18 Nov 12:45 UTC to the end of
+ * Mon 1 Dec PT (`startsAt`/`endsAt`, UTC). Not one percent for everything —
+ * Lifetime $279 → $199 and Commercial $499 → $399; the annual is not on sale,
+ * so none of the annual subscribers is undercut.
  *
- * One date for everyone, not a per-browser clock — it replaced the 24-hour
- * per-browser SNAPCN10 window (that code still exists in Dodo, no expiry).
- * Past `endsAt` the banner hides and `/api/checkout` stops applying the code.
- * The banner never prints the code — once the window closes, the offer is gone.
+ * Each product has its own code because Dodo codes are one percentage each.
+ * Both were created in live and test on 2026-11-18, each restricted to its one
+ * product, `per_customer_usage_limit: 1`, with Dodo's own `starts_at` and
+ * `expires_at` set to this window, so a code can neither start early nor
+ * outlive the banner. The percents are what Dodo holds (basis points / 100):
+ * 28.68% of $279 is $198.98, 20.04% of $499 is $399.00 — rounded to the
+ * price's own precision they read "$199" and "$399". Regional (PPP) prices
+ * take the same percentage.
+ *
+ * SNAPCN10 (the old per-browser banner code) was set to expire at `startsAt`.
+ * `OFFER` (SNAPCN25) stays: inside the window the banner wins on the products
+ * it covers, and the earned code still applies to the annual.
  */
 export const BANNER_OFFER = {
-  code: "SNAPCN15",
-  percent: 15,
-  endsAt: "2026-11-17T18:30:00Z",
+  name: "Black Friday",
+  startsAt: "2026-11-18T12:45:00Z",
+  endsAt: "2026-12-02T08:00:00Z",
+  products: {
+    lifetime: { code: "SNAPCNBF", percent: 28.68 },
+    commercial: { code: "SNAPCNBFTEAM", percent: 20.04 },
+  },
 } as const;
+
+export type BannerProduct = keyof typeof BANNER_OFFER.products;
+
+/** Whether the banner's window is open at `now`. */
+export function bannerOfferLive(now: number = Date.now()): boolean {
+  return (
+    now >= Date.parse(BANNER_OFFER.startsAt) &&
+    now < Date.parse(BANNER_OFFER.endsAt)
+  );
+}
+
+/** The banner's code and percent for `product`, or null when it is not on sale. */
+export function bannerOfferFor(
+  product: string,
+): { code: string; percent: number } | null {
+  return Object.hasOwn(BANNER_OFFER.products, product)
+    ? BANNER_OFFER.products[product as BannerProduct]
+    : null;
+}
