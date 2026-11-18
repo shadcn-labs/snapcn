@@ -68,3 +68,8 @@ export function codeInUrl(search: string): boolean {
 export function bannerOfferEnds(): number {
   return Date.parse(BANNER_OFFER.endsAt);
 }
+
+/** When the banner offer starts (epoch ms). */
+export function bannerOfferStarts(): number {
+  return Date.parse(BANNER_OFFER.startsAt);
+}
