@@ -280,6 +280,7 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
       { href: "/docs/pricing", label: "Pricing" },
       { href: "/docs/video-editor", label: "Video editor" },
       { href: "/docs/templates", label: "Templates" },
+      { href: "/affiliates", label: "Affiliates" },
     ],
   },
   {

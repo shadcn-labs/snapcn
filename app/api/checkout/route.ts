@@ -1,5 +1,7 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { AFFONSO_COOKIE, referralId } from "@/lib/affiliate";
 import {
   bannerOfferFor,
   bannerOfferLive,
@@ -125,6 +127,11 @@ export async function POST(request: Request) {
     );
   }
 
+  // The affiliate who sent this buyer, if one did. Affonso's pixel wrote the
+  // cookie on landing; Affonso reads it back off Dodo's payment event and books
+  // the commission — this route only carries it across (lib/affiliate.ts).
+  const referral = referralId((await cookies()).get(AFFONSO_COOKIE)?.value);
+
   const checkout = (code: string | undefined) =>
     createCheckout({
       discountCode: code,
@@ -140,6 +147,7 @@ export async function POST(request: Request) {
         ...(userId ? { user_id: userId } : {}),
         product,
         ...(code ? { offer: code } : {}),
+        ...(referral ? { affonso_referral: referral } : {}),
       },
       // Through the sync route, not straight to the editor. Dodo's redirect is
       // the earliest moment we can be certain the payment happened, and routing

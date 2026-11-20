@@ -128,6 +128,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.7,
     },
+    {
+      url: `${SITE_URL}/affiliates`,
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
   ];
 
   // Posts carry a real `lastModified` because a post has a real date — the one
