@@ -1,11 +1,13 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import { Caveat, Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { NudgeCard } from "@/components/nudge-card";
 import { SaleBanner } from "@/components/sale-banner";
+import { AFFILIATE, AFFONSO_PROGRAM_ID } from "@/lib/affiliate";
 import { cn } from "@/lib/utils";
 import { PostHogProvider } from "./posthog-provider";
 import { SnapCnThemeBridge } from "./snap-cn-theme-bridge";
@@ -152,6 +154,18 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
+        {/* Affonso's referral pixel. Not analytics — PostHog stays the only
+            tracker — but billing attribution: it turns `?via=<code>` into the
+            cookie `/api/checkout` hands to Dodo (lib/affiliate.ts). On every
+            page, because an affiliate can link to any of them. */}
+        {AFFONSO_PROGRAM_ID ? (
+          <Script
+            src="https://cdn.affonso.io/js/pixel.min.js"
+            data-affonso={AFFONSO_PROGRAM_ID}
+            data-cookie_duration={AFFILIATE.cookieDays}
+            strategy="afterInteractive"
+          />
+        ) : null}
         <SessionProvider>
           <PostHogProvider>
             <NuqsAdapter>
