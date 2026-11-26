@@ -1,5 +1,11 @@
 [
   {
+    "name": "clear-view",
+    "title": "Clear View",
+    "description": "A card of light under a dot matrix: a headline types in and settles smaller as it grows, cuts to a short answer while a glowing line chart draws in beneath it, and the camera drifts with the chart, then snaps forward to chase its last rise to a marker. Replayed from a 5.6s screen recording measured frame by frame: the light fitted as one moving gradient per frame, the dots' own field and lattice, every keystroke, the chart's path and the camera's track.",
+    "added": "2026-11-26"
+  },
+  {
     "name": "prompt-roll",
     "title": "Prompt Roll",
     "description": "A prompt card is pushed in on while \"Make your own …\" types, cuts closer, and the last words wrap into a pill that rolls through what you can make, each in its own tint. The sentence finishes, the camera whips to a send button that draws itself in, a pointer presses it into a halo, and the arrow pulls free and flies off as the frame washes to white. Replayed from a 6.4s screen recording measured frame by frame: the push-in's card rect, the tracked pan, every keystroke, each roll step, the pointer's path and the press.",
