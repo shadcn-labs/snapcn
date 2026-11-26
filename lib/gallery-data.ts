@@ -721,6 +721,7 @@ const PRO_CATEGORY: Record<string, CategoryId> = {
   // subject is a plot or a number: a scatter plot, a hex unit chart, a line
   // chart, a bar histogram, a payout figure, and a balance (on a phone, but the
   // phone never moves; the number is the shot).
+  "clear-view": "charts",
   "scatter-bloom": "charts",
   "hex-tally": "charts",
   "ticker-climb": "charts",
