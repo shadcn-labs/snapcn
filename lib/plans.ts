@@ -443,6 +443,30 @@ export const PPP_PRICES = {
 } as const;
 
 /**
+ * The billing country when a payment took that country's regional price with
+ * a card issued somewhere else, or null. No card country (UPI, a local
+ * wallet) passes: that is a local payment method by definition.
+ */
+export function regionalCardMismatch(
+  data: Record<string, unknown>,
+  product: unknown,
+): string | null {
+  const billing = nonEmpty(
+    (data.billing as { country?: unknown } | undefined)?.country,
+  );
+  const card = nonEmpty(data.card_issuing_country);
+  if (!billing || !card || billing === card) return null;
+  if (!Object.hasOwn(PPP_PRICES, billing) || typeof product !== "string")
+    return null;
+  const prices = PPP_PRICES[billing as keyof typeof PPP_PRICES];
+  return Object.hasOwn(prices, product) ? billing : null;
+}
+
+// Hoisted-safe: only called at runtime, after module init.
+const nonEmpty = (v: unknown): string | null =>
+  typeof v === "string" && v ? v : null;
+
+/**
  * The one pro component a confirmed subscriber gets for nothing.
  *
  * The paywall used to have one exit, which was paying: 96 people hit it in 21

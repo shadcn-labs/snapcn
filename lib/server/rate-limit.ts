@@ -30,7 +30,8 @@ export type RateLimitBucket =
   | "checkout"
   | "subscribe"
   | "apiKey"
-  | "studio";
+  | "studio"
+  | "studioGuest";
 
 /** Env prefix per bucket. `render` keeps `RENDER_*` so existing config still applies. */
 const ENV_PREFIX: Record<RateLimitBucket, string> = {
@@ -42,6 +43,7 @@ const ENV_PREFIX: Record<RateLimitBucket, string> = {
   subscribe: "SUBSCRIBE",
   apiKey: "API_KEY",
   studio: "STUDIO",
+  studioGuest: "STUDIO_GUEST",
 };
 
 /**
@@ -69,6 +71,15 @@ const DEFAULT_LIMIT: Record<RateLimitBucket, number> = {
   // One prompt is an LLM call that can run several tool steps — the priciest
   // request the site serves. Six a minute is a person iterating fast.
   studio: 6,
+  // Signed-out studio prompts: a taste before sign-in, per IP. Paired with a
+  // day-long window below. ponytail: in-memory per instance, so the real cap is
+  // 2 × warm instances; move to a shared store if guest spend shows up.
+  studioGuest: 2,
+};
+
+/** Window fallbacks other than a minute. */
+const DEFAULT_WINDOW_MS: Partial<Record<RateLimitBucket, number>> = {
+  studioGuest: 24 * 60 * 60 * 1000,
 };
 
 function envInt(name: string, fallback: number, min = 1): number {
@@ -85,7 +96,10 @@ function limit(bucket: RateLimitBucket): number {
 
 /** Window over which a full bucket refills. */
 function windowMs(bucket: RateLimitBucket): number {
-  return envInt(`${ENV_PREFIX[bucket]}_RATE_WINDOW_MS`, 60_000);
+  return envInt(
+    `${ENV_PREFIX[bucket]}_RATE_WINDOW_MS`,
+    DEFAULT_WINDOW_MS[bucket] ?? 60_000,
+  );
 }
 
 const buckets = new Map<string, Bucket>();

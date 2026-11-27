@@ -16,6 +16,7 @@ import {
   pitch,
   ringOf,
   SEED,
+  toCards,
 } from "../index";
 
 /**
@@ -182,5 +183,12 @@ describe("the grid", () => {
 
   it("switches the count on the frame the grid starts filling", () => {
     expect(FILL_AT).toBe(37);
+  });
+});
+
+describe("toCards", () => {
+  it("splits the string form and drops empties", () => {
+    expect(toCards(" a.png | b.png ||")).toEqual(["a.png", "b.png"]);
+    expect(toCards("")).toEqual([]);
   });
 });

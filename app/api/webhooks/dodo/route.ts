@@ -4,14 +4,21 @@ import {
   licenceForProduct,
   oneTimePlanFor,
   planForProduct,
+  regionalCardMismatch,
   TIER_NAME,
   tierForProduct,
 } from "@/lib/plans";
 import { isDbConfigured } from "@/lib/server/db";
-import { type DodoEvent, verifyWebhookSignature } from "@/lib/server/dodo";
+import {
+  cancelSubscription,
+  type DodoEvent,
+  refundPayment,
+  verifyWebhookSignature,
+} from "@/lib/server/dodo";
 import {
   paymentFailedEmail,
   proReadyEmail,
+  regionalRefundEmail,
   sendEmail,
 } from "@/lib/server/email";
 import {
@@ -224,6 +231,12 @@ export async function POST(request: Request) {
       row.currentPeriodEnd === null;
     if (outright) return false;
     const eventSub = str(data.subscription_id);
+    // Refused at payment (a regional price on a foreign card, below): nothing
+    // about that subscription may write again. `subscription.active` landing
+    // after the refund would re-grant it, and Dodo's own `cancelled` after our
+    // cancel would read as "keep the paid year".
+    if (row.status === "refunded" && row.subscriptionId === eventSub)
+      return false;
     if (
       lapse &&
       row.subscriptionId &&
@@ -324,6 +337,39 @@ export async function POST(request: Request) {
       }
 
       case "payment.succeeded": {
+        // A regional (PPP) price paid with a card issued in another country:
+        // the billing address is a dropdown and the IP is a VPN, but the card
+        // is the one thing the buyer cannot pick — so it decides. Refund, no
+        // plan, and a mail with the standard price. Only on a checkout
+        // payment: a renewal a year later is not re-litigated.
+        const region = regionalCardMismatch(data, metadata.product);
+        if (region && str(data.checkout_session_id)) {
+          const subId = str(data.subscription_id);
+          const subPlan = planForProduct(metadata.product);
+          if (subId && subPlan && (await subscriptionMayWrite(true))) {
+            await activatePlan({
+              userId,
+              plan: subPlan,
+              subscriptionId: subId,
+              status: "refunded",
+              currentPeriodEnd: null,
+            });
+          }
+          if (subId) await cancelSubscription(subId);
+          const paymentId = str(data.payment_id);
+          if (paymentId)
+            await refundPayment(
+              paymentId,
+              `Regional ${region} price paid with a card issued in ${str(data.card_issuing_country)}`,
+            );
+          if (guestEmail)
+            await sendEmail(regionalRefundEmail(guestEmail, region));
+          console.warn(
+            `[dodo] ${paymentId} refused: ${region} price, ${str(data.card_issuing_country)} card`,
+          );
+          break;
+        }
+
         // A lifetime seat arrives here and nowhere else: Dodo reports a
         // one-time purchase as a payment and never as a subscription, so this
         // is the only branch that can grant it.

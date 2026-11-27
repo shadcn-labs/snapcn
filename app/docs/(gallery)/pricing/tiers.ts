@@ -134,7 +134,7 @@ const REGIONAL_NOTE = `Lower prices for Pro and Lifetime in ${new Intl.ListForma
   "en",
 ).format(
   Object.keys(PPP_PRICES).map(regionName),
-)}, applied at checkout from your billing country.`;
+)}, applied at checkout from your billing country. Needs a card issued there.`;
 
 /**
  * An amount as its own currency writes it — "₹4,699", "€112.26",
@@ -328,8 +328,8 @@ export function pricingFor(
   const footnote =
     localised && place
       ? quotes
-        ? `Prices for ${place}, ${how} — the amounts checkout charges. Your billing country decides the final price.`
-        : `Prices for ${place}, ${how}. Checkout confirms them from your billing country.`
+        ? `Prices for ${place}, ${how} — the amounts checkout charges. Your billing country decides the final price, and a regional price needs a card issued there.`
+        : `Prices for ${place}, ${how}. Checkout confirms them from your billing country, with a card issued there.`
       : REGIONAL_NOTE;
 
   return { tiers: shown, footnote };

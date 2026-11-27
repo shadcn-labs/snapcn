@@ -2,7 +2,7 @@
 
 import { loadFont as loadGoogleSans } from "@remotion/google-fonts/GoogleSans";
 import type { CSSProperties, ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AbsoluteFill,
   continueRender,
@@ -330,6 +330,50 @@ interface LineFit {
   maxWidth: number;
 }
 
+/**
+ * Bumps every time the page finishes loading a font, and holds the render while
+ * one is loading.
+ *
+ * A width read while a face is still loading is the *fallback's* width. A clip
+ * dropped into a timeline that loads its typeface through a `<link>` mounts
+ * before that face arrives, measures Times or Arial, and fits every line to the
+ * wrong size — measured: all three cards running edge to edge (0–1280px) under
+ * a late-loading Unbounded, against 55–1222px once the face is in. So measure
+ * again when the font set settles, and call `settle()` after that measurement
+ * commits; the render waits for it.
+ */
+function useFontLoads(label: string): { epoch: number; settle: () => void } {
+  const [epoch, setEpoch] = useState(0);
+  const hold = useRef<number | null>(null);
+  const settle = useCallback(() => {
+    if (hold.current === null) return;
+    if (typeof document !== "undefined" && document.fonts?.status === "loading")
+      return;
+    continueRender(hold.current);
+    hold.current = null;
+  }, []);
+  useEffect(() => {
+    const fonts = typeof document === "undefined" ? undefined : document.fonts;
+    if (!fonts) return;
+    const onLoading = () => {
+      hold.current ??= delayRender(`${label}: re-measure once the face loads`);
+    };
+    const onDone = () => setEpoch((n) => n + 1);
+    if (fonts.status === "loading") onLoading();
+    fonts.addEventListener("loading", onLoading);
+    fonts.addEventListener("loadingdone", onDone);
+    fonts.addEventListener("loadingerror", onDone);
+    return () => {
+      fonts.removeEventListener("loading", onLoading);
+      fonts.removeEventListener("loadingdone", onDone);
+      fonts.removeEventListener("loadingerror", onDone);
+      if (hold.current !== null) continueRender(hold.current);
+      hold.current = null;
+    };
+  }, [label]);
+  return { epoch, settle };
+}
+
 function useFitScales(lines: LineFit[]): {
   probes: ReactNode;
   scales: number[];
@@ -347,7 +391,9 @@ function useFitScales(lines: LineFit[]): {
   // Every input the measurement depends on. The `lines` array itself is a fresh
   // object each render, so depending on it would re-measure forever.
   const key = lines.map((l) => `${l.text}@${Math.round(l.fontSize)}`).join("|");
+  const fonts = useFontLoads("announce-title");
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: fonts.epoch is the trigger — re-measure when a face finishes loading.
   useEffect(() => {
     setMeasured({
       key,
@@ -356,11 +402,13 @@ function useFitScales(lines: LineFit[]): {
         (_, i) => refs.current[i]?.offsetWidth ?? 0,
       ),
     });
-  }, [key, count]);
+  }, [key, count, fonts.epoch]);
 
   useEffect(() => {
-    if (measured) continueRender(handle);
-  }, [measured, handle]);
+    if (!measured) return;
+    continueRender(handle);
+    fonts.settle();
+  }, [measured, handle, fonts.settle]);
 
   const probes = (
     <div

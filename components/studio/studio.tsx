@@ -4,18 +4,12 @@ import type { PlayerRef } from "@remotion/player";
 import {
   ArrowDown,
   ArrowUp,
-  Clapperboard,
   Layers,
-  LayoutGrid,
-  MessageSquare,
+  Music,
   PanelLeft,
-  PanelLeftClose,
-  Plus,
   SlidersHorizontal,
-  SquarePen,
   Trash2,
 } from "lucide-react";
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Group,
@@ -24,7 +18,6 @@ import {
   Separator,
   useDefaultLayout,
 } from "react-resizable-panels";
-import { SnapCnLogo } from "@/components/snapcn-logo";
 import {
   Sheet,
   SheetContent,
@@ -32,12 +25,14 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Toaster } from "@/components/ui/sonner";
-import { X_URL } from "@/config/site";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTrackEvent } from "@/lib/analytics";
 import { getDefaults } from "@/lib/customizer-config";
 import { ITEM_BY_SLUG } from "@/lib/gallery-data";
+import { syncToTrack } from "@/lib/studio/beat-sync";
 import { lookup } from "@/lib/studio/catalog";
+import { lookOps } from "@/lib/studio/look";
+import { levelledVolume, musicSrc, type Track } from "@/lib/studio/music";
 import {
   applyOp,
   DEFAULT_STUDIO_MODEL,
@@ -45,14 +40,16 @@ import {
   planMove,
   planRemove,
   type Scene,
-  type StudioModel,
   type StudioOp,
   type StudioState,
 } from "@/lib/studio/ops";
+import { useProVersion } from "@/lib/studio/pro-runtime";
+import type { Mode } from "@/lib/studio/scene-data";
 import { cn } from "@/lib/utils";
 import { EMPTY_BRAND } from "@/lib/video-editor/brand";
 import type { EditorDraft } from "@/lib/video-editor/draft";
 import { DEFAULT_FONT } from "@/lib/video-editor/fonts";
+import { DEFAULT_TITLE } from "@/lib/video-editor/project";
 import { DEFAULT_TEMPO } from "@/lib/video-editor/tempo";
 import {
   type AudioTrack,
@@ -66,6 +63,7 @@ import { LibraryPanel } from "../video-editor/library-panel";
 import { PropertiesPanel } from "../video-editor/properties-panel";
 import { useEditorExport } from "../video-editor/use-editor-export";
 import { useProjects } from "../video-editor/use-projects";
+import { MusicPanel } from "./music-panel";
 import {
   clipStarts,
   type Region,
@@ -73,6 +71,7 @@ import {
   sceneName,
 } from "./studio-canvas";
 import { type ChatMessage, type Snapshot, StudioChat } from "./studio-chat";
+import { VideoSidebar } from "./video-sidebar";
 
 /**
  * The library defaults to `localStorage` and reads it during render, which
@@ -162,21 +161,32 @@ function describeOps(ops: StudioOp[], before: StudioState): string[] {
   });
 }
 
+/** Served only to a session whose plan unlocks components (see the route). */
+const PRO_BUNDLE_URL = "/api/studio/pro/pro.js";
+
 export function Studio({
   signedIn,
   canRemoveWatermark,
+  canUsePro = false,
 }: {
   signedIn: boolean;
   canRemoveWatermark: boolean;
+  /** The plan unlocks components: Pro scenes play, and the AI may cast them. */
+  canUsePro?: boolean;
 }) {
+  // Re-render when Pro scenes arrive, so the inspector can open one.
+  useProVersion();
   const [tl, setTl] = useState<StudioState>({ clips: [], scenes: {} });
   const [audio, setAudio] = useState<AudioTrack | null>(null);
   const [font, setFont] = useState(DEFAULT_FONT);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [pending, setPending] = useState(false);
-  const [model, setModel] = useState<StudioModel>(DEFAULT_STUDIO_MODEL);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [inspector, setInspector] = useState<"scene" | "scenes" | null>(null);
+  const [inspector, setInspector] = useState<
+    "scene" | "scenes" | "music" | null
+  >(null);
+  /** The video's light/dark — the product site's, until the user switches. */
+  const [mode, setMode] = useState<Mode>("light");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [chatOpen, setChatOpen] = useState(true);
   const [libraryOpen, setLibraryOpen] = useState(false);
@@ -201,6 +211,8 @@ export function Studio({
   // The AI turn resolves seconds after it was sent; it must read the timeline
   // as it is then, not as it was when the closure was made.
   const tlRef = useRef(tl);
+  const audioRef = useRef(audio);
+  audioRef.current = audio;
   tlRef.current = tl;
 
   useEffect(() => {
@@ -293,6 +305,15 @@ export function Studio({
   }, [messages, tl.scenes]);
 
   const selectedIndex = tl.clips.findIndex((c) => c.id === selectedId);
+  // While a prompt that names a site is in flight, say so: the researcher
+  // reading it is most of the wait. Label only — the server decides for real.
+  const readingHost = pending
+    ? messages
+        .findLast((m) => m.role === "user")
+        ?.content.match(
+          /\b(?:https?:\/\/)?(?:www\.)?([a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|dev|io|ai|app|co|so|sh|xyz|net|org|tech|tools|studio|design|run|page|site|cloud|me|gg)\b)/i,
+        )?.[1]
+    : undefined;
   const selected = selectedIndex >= 0 ? tl.clips[selectedIndex] : null;
 
   const selectScene = useCallback(
@@ -343,7 +364,10 @@ export function Studio({
             })),
             scenes: before.scenes,
             selected: selectedIndex >= 0 ? selectedIndex + 1 : null,
-            model,
+            brief: history.findLast((m) => m.brief)?.brief,
+            mode,
+            // A track the user has — uploaded files aren't stock, so not sent.
+            music: audioRef.current?.stock,
           }),
         });
         status = res.status;
@@ -351,12 +375,63 @@ export function Studio({
           text?: string;
           ops?: StudioOp[];
           error?: string;
+          brief?: string;
+          mode?: Mode;
+          font?: string;
+          music?: {
+            slug: string;
+            title: string;
+            artist: string;
+            trimStart: number;
+            volume: number;
+            durationSeconds: number;
+          };
         };
         ops = data.ops ?? [];
         // Replayed onto the timeline as it is *now*: an edit the user made
         // while the AI was thinking stays, and an op aimed at a scene they
         // deleted meanwhile finds nothing and does nothing.
         if (ops.length > 0) setTl((prev) => ops.reduce(applyOp, prev));
+        if (data.mode) setMode(data.mode);
+        // Name an untitled video after what it's for — the product the
+        // researcher read, else the ask itself — never over a name the user
+        // gave it.
+        if (res.ok && ops.length > 0 && projects.title === DEFAULT_TITLE) {
+          let named = "";
+          try {
+            named = data.brief ? `${JSON.parse(data.brief).name} launch` : "";
+          } catch {}
+          if (!named) {
+            named = text
+              .replace(/https?:\/\/\S+/g, "")
+              .replace(/\s+/g, " ")
+              .trim()
+              .slice(0, 48);
+            named = named.charAt(0).toUpperCase() + named.slice(1);
+          }
+          if (named) {
+            projects.setTitle(named);
+            projects.commitTitle();
+          }
+        }
+        // The product's own typeface, unless the user already picked one.
+        if (data.font)
+          setFont((f) => (f === DEFAULT_FONT ? (data.font as string) : f));
+        // The soundtrack the server chose (or kept) and already cut the video
+        // to — attached as-is; re-syncing here would just repeat the work.
+        if (data.music) {
+          const m = data.music;
+          setAudio((prev) => ({
+            src: musicSrc(m.slug),
+            uploadId: null,
+            stock: m.slug,
+            name: `${m.title} · ${m.artist}`,
+            // Keep a volume the user set by hand on the same track.
+            volume: prev?.stock === m.slug ? prev.volume : m.volume,
+            trimStart: m.trimStart,
+            durationSeconds: m.durationSeconds,
+          }));
+        }
         reply = {
           id: crypto.randomUUID(),
           role: "assistant",
@@ -364,6 +439,7 @@ export function Studio({
           added: ops.flatMap((op) => (op.op === "add" ? [op.scene] : [])),
           log: describeOps(ops, before),
           error: res.status === 401 ? "signin" : res.ok ? undefined : "failed",
+          ...(data.brief ? { brief: data.brief } : {}),
         };
       } catch {
         reply = {
@@ -377,14 +453,53 @@ export function Studio({
       setMessages((prev) => [...prev, reply]);
       setPending(false);
       trackEvent("ai_studio_prompted", {
-        model,
+        // The studio routes models itself now; recorded so the funnel can be
+        // read against the model that actually served the turn.
+        model: DEFAULT_STUDIO_MODEL,
         ops: ops.length,
         status,
         scene_count: before.clips.length,
       });
     },
-    [messages, model, selectedIndex, snapshot, trackEvent],
+    [
+      messages,
+      mode,
+      selectedIndex,
+      snapshot,
+      trackEvent,
+      projects.commitTitle,
+      projects.setTitle,
+      projects.title,
+    ],
   );
+
+  /**
+   * Cut the timeline to a stock track (or drop the music). Every cut moves onto
+   * the track's measured beat grid — see `lib/studio/beat-sync.ts`.
+   */
+  const pickTrack = useCallback((track: Track | null) => {
+    if (!track) {
+      setAudio(null);
+      return;
+    }
+    const synced = syncToTrack(tlRef.current.clips, track);
+    setTl((prev) => ({ ...prev, clips: synced.clips }));
+    setAudio({
+      src: musicSrc(track.slug),
+      uploadId: null,
+      stock: track.slug,
+      name: `${track.title} · ${track.artist}`,
+      volume: levelledVolume(track),
+      trimStart: synced.trimStart,
+      durationSeconds: track.durationSeconds,
+    });
+  }, []);
+
+  /** One look for the whole video: every scene re-themed for `next`. */
+  const switchMode = useCallback((next: Mode) => {
+    setMode(next);
+    setTl((prev) => lookOps(prev, next).reduce(applyOp, prev));
+  }, []);
 
   const retry = useCallback(() => {
     const lastUser = messages.findLastIndex((m) => m.role === "user");
@@ -438,11 +553,15 @@ export function Studio({
       onTitleCommit={projects.commitTitle}
       messages={messages}
       pending={pending}
-      pendingLabel={tl.clips.length === 0 ? "Storyboarding" : "Directing"}
+      pendingLabel={
+        readingHost
+          ? `Reading ${readingHost} · storyboarding`
+          : tl.clips.length === 0
+            ? "Storyboarding"
+            : "Directing"
+      }
       onSend={(text) => void send(text)}
       onRetry={retry}
-      model={model}
-      onModel={setModel}
       selectedLabel={
         selected
           ? `Scene ${selectedIndex + 1} · ${sceneName(selected, tl.scenes)}`
@@ -467,6 +586,7 @@ export function Studio({
       watermark={!canRemoveWatermark}
       font={font}
       audio={audio}
+      proBundle={canUsePro ? PRO_BUNDLE_URL : null}
       exporting={exporting}
       progress={progress}
       onExport={onExport}
@@ -500,9 +620,25 @@ export function Studio({
         >
           All scenes
         </TabButton>
+        <TabButton
+          active={inspector === "music"}
+          onClick={() => setInspector("music")}
+        >
+          Music & look
+        </TabButton>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {inspector === "scene" ? (
+        {inspector === "music" ? (
+          <MusicPanel
+            selected={audio?.stock ?? null}
+            videoSeconds={
+              tl.clips.reduce((a, c) => a + c.durationInFrames, 0) / 30
+            }
+            onPick={pickTrack}
+            mode={mode}
+            onMode={switchMode}
+          />
+        ) : inspector === "scene" ? (
           <PropertiesPanel
             clip={selected}
             maxFrames={selected ? maxFramesForClip(tl.clips, selected.id) : 1}
@@ -554,80 +690,18 @@ export function Studio({
     // `fixed inset-0`: the studio is an application, so it takes the whole
     // viewport — over the site-wide banners the root layout mounts, which in
     // a document flow would push the transport off the bottom of the screen.
-    <div className="fixed inset-0 z-50 flex overflow-hidden bg-[#0f0f0f] text-[#eeeeee]">
+    <div className="fixed inset-0 z-50 flex overflow-hidden bg-[#0f0f0f] text-[#eeeeee] [&_svg.lucide]:[stroke-width:1.5]">
       {sidebarOpen && (
-        <aside className="hidden w-[238px] shrink-0 flex-col px-2 pt-3 pb-2 lg:flex">
-          <div className="flex h-8 items-center justify-between pl-2">
-            <Link href="/" className="flex items-center gap-2">
-              <SnapCnLogo className="h-5" />
-              <span className="text-[14px] font-medium text-[#eeeeee]">
-                Studio
-              </span>
-            </Link>
-            <SideIcon
-              label="Hide sidebar"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <PanelLeftClose className="size-4" />
-            </SideIcon>
-          </div>
-
-          <nav className="mt-4 flex flex-col gap-0.5">
-            <NavRow icon={Clapperboard} label="Videos" active />
-            <NavRow
-              icon={LayoutGrid}
-              label="Components"
-              href="/docs/components"
-            />
-            <NavRow
-              icon={SquarePen}
-              label="Timeline editor"
-              href="/docs/video-editor"
-            />
-          </nav>
-
-          <button
-            type="button"
-            onClick={() => void projects.newProject()}
-            className="mt-4 flex h-8 items-center justify-center gap-1.5 rounded-md bg-[#f2f2f2] text-[13px] font-medium text-[#111] transition-colors hover:bg-white"
-          >
-            <Plus className="size-4" />
-            New Video…
-          </button>
-
-          <div className="mt-5 min-h-0 flex-1 overflow-y-auto">
-            <p className="px-2 pb-1 text-[12px] text-[#6b6b6b]">Your videos</p>
-            {projects.enabled ? (
-              projects.projects.map((p) => (
-                <ProjectRow
-                  key={p.id}
-                  title={p.title}
-                  when={p.updatedAt}
-                  active={p.id === projects.currentId}
-                  onOpen={() => void projects.openProject(p.id)}
-                />
-              ))
-            ) : (
-              <ProjectRow title={projects.title} active onOpen={() => {}} />
-            )}
-          </div>
-
-          <div className="flex flex-col gap-0.5 pt-2">
-            {!signedIn && (
-              <NavRow
-                icon={SquarePen}
-                label="Sign in to save videos"
-                href="/signin?callbackUrl=%2Fstudio"
-              />
-            )}
-            <NavRow icon={MessageSquare} label="Send feedback" href={X_URL} />
-          </div>
-        </aside>
+        <VideoSidebar
+          projects={projects}
+          signedIn={signedIn}
+          onHide={() => setSidebarOpen(false)}
+        />
       )}
 
       <main
         className={cn(
-          "relative m-2 flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-[#222] bg-[#171717] md:flex-row",
+          "relative m-2 flex min-w-0 flex-1 flex-col overflow-hidden rounded-[16px] border border-[#222] bg-[#171717] md:flex-row",
           sidebarOpen && "lg:ml-0",
         )}
       >
@@ -706,6 +780,15 @@ export function Studio({
           >
             <SlidersHorizontal className="size-4" />
           </SideIcon>
+          <SideIcon
+            label="Music & look"
+            active={inspector === "music"}
+            onClick={() =>
+              setInspector((v) => (v === "music" ? null : "music"))
+            }
+          >
+            <Music className="size-4" />
+          </SideIcon>
           <div className="mt-auto">
             <SideIcon
               label={chatOpen ? "Hide chat" : "Show chat"}
@@ -781,7 +864,7 @@ function SceneList({
         <li
           key={clip.id}
           className={cn(
-            "group flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-[#2a2a2a]",
+            "group flex items-center gap-2 rounded-[10px] px-2 py-1.5 hover:bg-[#2a2a2a]",
             clip.id === selectedId && "bg-[#262626]",
           )}
         >
@@ -817,75 +900,6 @@ function SceneList({
   );
 }
 
-function relativeTime(iso: string): string {
-  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60_000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.round(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.round(hours / 24)}d ago`;
-}
-
-function ProjectRow({
-  title,
-  when,
-  active,
-  onOpen,
-}: {
-  title: string;
-  when?: string;
-  active: boolean;
-  onOpen: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className={cn(
-        "flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] text-[#cfcfcf] transition-colors hover:bg-[#2a2a2a]",
-        active && "bg-[#1f1f1f] text-[#eeeeee]",
-      )}
-    >
-      <span className="min-w-0 flex-1 truncate">{title}</span>
-      {when && (
-        <span className="shrink-0 text-[11px] text-[#6b6b6b]">
-          {relativeTime(when)}
-        </span>
-      )}
-    </button>
-  );
-}
-
-function NavRow({
-  icon: Icon,
-  label,
-  href,
-  active,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  href?: string;
-  active?: boolean;
-}) {
-  const className = cn(
-    "flex h-8 items-center gap-2 rounded-md px-2 text-[13px] text-[#a0a0a0] transition-colors hover:bg-[#2a2a2a] hover:text-[#eeeeee]",
-    active && "bg-[#242424] text-[#eeeeee]",
-  );
-  const body = (
-    <>
-      <Icon className="size-4" />
-      {label}
-    </>
-  );
-  return href ? (
-    <Link href={href} className={className}>
-      {body}
-    </Link>
-  ) : (
-    <span className={className}>{body}</span>
-  );
-}
-
 function SideIcon({
   label,
   active,
@@ -905,7 +919,7 @@ function SideIcon({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "grid size-8 place-items-center rounded-md text-[#a0a0a0] transition-colors hover:bg-[#2a2a2a] hover:text-[#eeeeee]",
+        "grid size-8 place-items-center rounded-[10px] text-[#a0a0a0] transition-colors hover:bg-[#2a2a2a] hover:text-[#eeeeee]",
         active && "bg-[#262626] text-[#eeeeee]",
       )}
     >
@@ -928,7 +942,7 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "h-7 rounded-md px-2.5 text-[13px] text-[#a0a0a0] transition-colors hover:bg-[#2a2a2a]",
+        "h-7 rounded-full px-3 text-[13px] text-[#a0a0a0] transition-colors hover:bg-[#2a2a2a]",
         active && "bg-[#262626] text-[#eeeeee]",
       )}
     >

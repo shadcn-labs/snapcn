@@ -1,7 +1,10 @@
+import { writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { bundle } from "@remotion/bundler";
 import { enableTailwind } from "@remotion/tailwind-v4";
+import { VERSION as REMOTION_VERSION } from "remotion/version";
+import { BUNDLE_STAMP } from "../lib/server/bundle-stamp.ts";
 import { remotionWebpackAlias } from "../lib/server/remotion-aliases.ts";
 
 /**
@@ -41,7 +44,13 @@ async function main() {
       };
     },
   });
-  console.log(`Remotion bundle ready at: ${serveUrl}`);
+  // The renderer refuses a bundle built by another Remotion ("Incompatible
+  // site … Found version: 11 - Required version: 12"), so stamp the one that
+  // built this; `getServeUrl()` only trusts a prebundle whose stamp matches.
+  writeFileSync(path.join(outDir, BUNDLE_STAMP), REMOTION_VERSION);
+  console.log(
+    `Remotion bundle ready at: ${serveUrl} (remotion ${REMOTION_VERSION})`,
+  );
 }
 
 main().catch((err) => {

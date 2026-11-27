@@ -85,9 +85,18 @@ function resolveColorString(s: string): string {
   return trimmed;
 }
 
+// A near-gray still carries a hue (#faf9f6 is h≈91), and oklch interpolation
+// sweeps it toward the other colour's hue: off-white → blue passed through
+// green (#82d6af at 0.42). Grays have no real hue, so drop it and let culori
+// borrow the other end's.
+function hueless(color: string): Oklch {
+  const o = toOklch(resolveColorString(color)) as Oklch;
+  return o.c < 0.02 ? { ...o, h: undefined } : o;
+}
+
 export function mixOklch(a: string, b: string, t: number): string {
   const mixed = clampChroma(
-    interpolate([resolveColorString(a), resolveColorString(b)], "oklch")(t),
+    interpolate([hueless(a), hueless(b)], "oklch")(t),
     "oklch",
     "rgb",
   );

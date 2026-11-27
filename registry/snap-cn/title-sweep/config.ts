@@ -10,6 +10,12 @@ export const titleSweepConfig: ComponentConfig = {
   componentName: "TitleSweep",
   importPath: "@/components/snap-cn/title-sweep",
   controls: {
+    // One title per `|`. Each title adds 36 frames; the last holds for 40.
+    titles: {
+      type: "text",
+      default: "snapcn Pro | snapcn.dev",
+      label: "Titles (| separated)",
+    },
     fontFamily: FONT_FAMILY_CONTROL,
     fontSize: {
       type: "number",

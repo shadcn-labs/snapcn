@@ -1,22 +1,25 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { PRO_NAMES } from "@/config/catalogue";
 import { anonymousId, distinctIdFromCookie } from "@/lib/analytics-server";
 import type { PlanLimits } from "@/lib/plans";
 import { audioUploadExists } from "@/lib/server/audio-file";
 import { ensureCleanupSweep } from "@/lib/server/cleanup";
+import { clientIp } from "@/lib/server/client-ip";
 import { isDbConfigured } from "@/lib/server/db";
 import {
   consumeRender,
   planFor,
   QuotaExceededError,
 } from "@/lib/server/entitlements";
-import { clientIp } from "@/lib/server/client-ip";
 import { checkRateLimit } from "@/lib/server/rate-limit";
 import { enqueueRender, type RenderSpec } from "@/lib/server/render-queue";
+import { mintStudioProToken } from "@/lib/server/studio-pro-token";
 import {
   parseVideoTimelineInput,
   RenderInputError,
 } from "@/lib/server/validate-input";
+import { musicSrc } from "@/lib/studio/music";
 import { CANVAS, totalDuration } from "@/lib/video-editor/types";
 
 // Node runtime: native Remotion render (Chromium) needs full Node, not edge.
@@ -92,7 +95,11 @@ export async function POST(request: NextRequest) {
 
   let spec: RenderSpec;
   try {
-    spec = buildSpec(body, { limits, origin: publicOrigin(request) });
+    spec = buildSpec(body, {
+      limits,
+      origin: publicOrigin(request),
+      proToken: mintStudioProToken(),
+    });
   } catch (err) {
     if (err instanceof RenderInputError) {
       return NextResponse.json(
@@ -189,11 +196,29 @@ export async function POST(request: NextRequest) {
  * Exported for test — this is the one function where getting the argument
  * wrong gives away the paid feature.
  */
+const PRO_SET = new Set(PRO_NAMES);
+
 export function buildSpec(
   body: unknown,
-  { limits, origin = "" }: { limits: PlanLimits; origin?: string },
+  {
+    limits,
+    origin = "",
+    proToken = null,
+  }: { limits: PlanLimits; origin?: string; proToken?: string | null },
 ): RenderSpec {
   const { clips, font, audio } = parseVideoTimelineInput(body);
+  // Pro scenes render only for a plan that unlocks them — read from the plan,
+  // never the body. Their code reaches the renderer through a signed,
+  // short-lived URL on our own origin, minted only on this path.
+  const hasPro = clips.some((c) => PRO_SET.has(c.slug));
+  if (hasPro && !limits.components) {
+    throw new RenderInputError(
+      "This video has Pro scenes. Upgrade to Pro to export it, or remove them.",
+    );
+  }
+  if (hasPro && !proToken) {
+    throw new RenderInputError("Pro scenes can't be exported on this server.");
+  }
   // The composition is authored at CANVAS but rendered at whatever size the
   // spec carries — `render.ts` reaches it with `scale`, not a bigger page — so the
   // plan's ceiling *is* the output size, and the same clips come out 720p on
@@ -210,15 +235,24 @@ export function buildSpec(
       // the plan.
       watermark: limits.watermark,
       font,
+      // Present only on a Pro export, so a free render carries no script URL.
+      ...(hasPro && proToken
+        ? {
+            proBundle: `${origin}/api/studio/pro/pro.js?t=${encodeURIComponent(proToken)}`,
+          }
+        : {}),
       // Built here from *our* origin and a validated id, so the only URL the
       // renderer can be pointed at is one of our own files.
       audio: audio
         ? {
-            src: `${origin}/api/audio/${audio.id}`,
+            src: audio.stock
+              ? musicSrc(audio.stock, origin)
+              : `${origin}/api/audio/${audio.id}`,
             name: "soundtrack",
             volume: audio.volume,
             trimStart: audio.trimStart,
-            uploadId: audio.id,
+            // Only an upload can go missing; a stock track is always served.
+            uploadId: audio.id ?? null,
             durationSeconds: 0,
           }
         : null,
@@ -301,4 +335,3 @@ export function quotaMessage(err: QuotaExceededError, plan: string): string {
   const who = plan === "anonymous" ? " Signing in raises it." : "";
   return `That's ${err.limit} exports this month — the fair-use ceiling.${who} Email support@simplifyingai.com and we'll lift it.`;
 }
-

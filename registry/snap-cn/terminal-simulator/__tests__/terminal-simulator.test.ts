@@ -8,7 +8,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-
+import { terminalSimulatorConfig } from "../config";
 import {
   autoPause,
   buildCameraStops,
@@ -21,6 +21,8 @@ import {
   parseIntro,
   resolveZoom,
   type TerminalLine,
+  toCommand,
+  toLines,
   typingDuration,
 } from "../index";
 
@@ -245,5 +247,42 @@ describe("commandSpans", () => {
   it("preserves whitespace so the joined text is unchanged", () => {
     const spans = commandSpans("yarn add react react-dom");
     expect(spans.map((s) => s.text).join("")).toBe("yarn add react react-dom");
+  });
+});
+
+describe("string props", () => {
+  it("the config's default lines parse to the component's own", () => {
+    expect(
+      toLines(terminalSimulatorConfig.controls.lines.default as string),
+    ).toEqual([
+      { text: "{labels: ['bug']})", type: "log", delay: 0 },
+      { text: "→   label added", type: "success", delay: 6 },
+      { text: "$", type: "log", delay: 10 },
+      { text: "One task", type: "command", delay: 4 },
+    ]);
+  });
+
+  it("puts the command's own manager tab first", () => {
+    expect(toCommand("npm install One Tool")?.managers).toEqual([
+      "npm",
+      "pnpm",
+      "yarn",
+      "bun",
+    ]);
+    expect(toCommand("bunx shadcn add x")?.managers?.[0]).toBe("bun");
+    expect(toCommand("brew install x")?.managers).toEqual(["brew"]);
+  });
+
+  it("dims a runner's package with the verb, lights the last word", () => {
+    const lit = (cmd: string) =>
+      commandSpans(cmd, "ARG")
+        .filter((p) => p.color === "ARG" && p.text.trim())
+        .map((p) => p.text);
+    expect(lit("npx shadcn@latest add @panelo/analytics")).toEqual([
+      "@panelo/analytics",
+    ]);
+    expect(lit("pnpm dlx shadcn@latest add @x/y")).toEqual(["@x/y"]);
+    expect(lit("npx create-next-app my-app")).toEqual(["my-app"]);
+    expect(lit("npm install One Tool")).toEqual(["One", "Tool"]);
   });
 });

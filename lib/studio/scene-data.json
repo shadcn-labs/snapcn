@@ -1,0 +1,1257 @@
+{
+  "phone-stack": {
+    "light": {
+      "set": {},
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "background": "#0a0a0a",
+        "glowColor": "#3b2a52"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 3,
+    "hitFrame": 74,
+    "exitStartFrame": 120,
+    "naturalFrames": 120,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "hello-zoom": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["inkColor", "paperColor"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["inkColor", "paperColor"]
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 30,
+    "exitStartFrame": 44,
+    "naturalFrames": 75,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "bloom-lockup": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 8,
+    "hitFrame": 80,
+    "exitStartFrame": 120,
+    "naturalFrames": 120,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "gather-lockup": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 40,
+    "exitStartFrame": 60,
+    "naturalFrames": 60,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "orb-swarm": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 56,
+    "exitStartFrame": 160,
+    "naturalFrames": 160,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "card-rail": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": null,
+    "firstContentFrame": 0,
+    "hitFrame": 10,
+    "exitStartFrame": 108,
+    "naturalFrames": 108,
+    "speed": null,
+    "imageMinVisible": 0.9,
+    "step": {
+      "first": 0,
+      "frames": 30,
+      "prop": "every"
+    }
+  },
+  "logo-collapse": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["accent"]
+    },
+    "dark": null,
+    "firstContentFrame": 0,
+    "hitFrame": 32,
+    "exitStartFrame": 52,
+    "naturalFrames": 52,
+    "speed": null
+  },
+  "channel-thread": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 90,
+    "exitStartFrame": 110,
+    "naturalFrames": 110,
+    "speed": null
+  },
+  "check-cycle": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 12,
+    "exitStartFrame": 136,
+    "naturalFrames": 136,
+    "speed": null
+  },
+  "word-wheel": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 45,
+    "exitStartFrame": 66,
+    "naturalFrames": 66,
+    "speed": null
+  },
+  "brand-wheel": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 112,
+    "exitStartFrame": 139,
+    "naturalFrames": 139,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    },
+    "step": {
+      "first": 35,
+      "frames": 20
+    }
+  },
+  "word-gather": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 38,
+    "exitStartFrame": 49,
+    "naturalFrames": 49,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "font-shuffle": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 5,
+    "hitFrame": 70,
+    "exitStartFrame": 115,
+    "naturalFrames": 115,
+    "speed": null
+  },
+  "type-morph": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["background", "ink"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["background", "ink"]
+    },
+    "firstContentFrame": 6,
+    "hitFrame": 32,
+    "exitStartFrame": 94,
+    "naturalFrames": 94,
+    "speed": null
+  },
+  "text-reveal": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["color"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["color"]
+    },
+    "firstContentFrame": 5,
+    "hitFrame": 30,
+    "exitStartFrame": 90,
+    "naturalFrames": 90,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "punch-lines": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["ground", "ink"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["ground", "ink"]
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 13,
+    "exitStartFrame": 144,
+    "naturalFrames": 144,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "text-swell": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["color"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["color"]
+    },
+    "firstContentFrame": 8,
+    "hitFrame": 45,
+    "exitStartFrame": 66,
+    "naturalFrames": 110,
+    "speed": {
+      "min": 1,
+      "max": 4
+    },
+    "step": {
+      "first": 27,
+      "frames": 14
+    }
+  },
+  "text-highlight": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["baseColor", "highlightedTextColor"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["baseColor", "highlightedTextColor"]
+    },
+    "firstContentFrame": 8,
+    "hitFrame": 20,
+    "exitStartFrame": 40,
+    "naturalFrames": 56,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "text-rewrite": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 31,
+    "hitFrame": 75,
+    "exitStartFrame": 102,
+    "naturalFrames": 102,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "text-select": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 36,
+    "hitFrame": 46,
+    "exitStartFrame": 72,
+    "naturalFrames": 72,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "text-swap": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["color"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["color"]
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 30,
+    "exitStartFrame": 90,
+    "naturalFrames": 90,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "text-build": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["color"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["color"]
+    },
+    "firstContentFrame": 5,
+    "hitFrame": 45,
+    "exitStartFrame": 75,
+    "naturalFrames": 75,
+    "speed": {
+      "min": 1,
+      "max": 4
+    },
+    "step": {
+      "first": 11,
+      "frames": 13
+    }
+  },
+  "word-flip": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["color"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["color"]
+    },
+    "firstContentFrame": 12,
+    "hitFrame": 96,
+    "exitStartFrame": 180,
+    "naturalFrames": 180,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "word-captions": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["textColor"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["textColor"]
+    },
+    "firstContentFrame": 3,
+    "hitFrame": 8,
+    "exitStartFrame": 96,
+    "naturalFrames": 96,
+    "speed": {
+      "min": 1,
+      "max": 4
+    }
+  },
+  "karaoke-captions": {
+    "light": {
+      "set": {
+        "theme": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "theme": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 11,
+    "hitFrame": 18,
+    "exitStartFrame": 132,
+    "naturalFrames": 150,
+    "speed": {
+      "min": 1,
+      "max": 4
+    }
+  },
+  "logo-drift": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 9,
+    "hitFrame": 36,
+    "exitStartFrame": 108,
+    "naturalFrames": 108,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "logo-assemble": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["background"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["background"]
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 80,
+    "exitStartFrame": 108,
+    "naturalFrames": 108,
+    "speed": {
+      "min": 1,
+      "max": 4
+    },
+    "imageMinVisible": 0.78
+  },
+  "logo-flicker": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["background"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["background"]
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 80,
+    "exitStartFrame": 100,
+    "naturalFrames": 100,
+    "speed": {
+      "min": 1,
+      "max": 4
+    },
+    "imageMinVisible": 0.11
+  },
+  "block-wordmark": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["color", "background"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["color", "background"]
+    },
+    "firstContentFrame": 10,
+    "hitFrame": 113,
+    "exitStartFrame": 150,
+    "naturalFrames": 150,
+    "speed": {
+      "min": 1,
+      "max": 4
+    }
+  },
+  "phone-frame": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["bezelColor", "screenColor"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["bezelColor", "screenColor"]
+    },
+    "firstContentFrame": 10,
+    "hitFrame": 84,
+    "exitStartFrame": 160,
+    "naturalFrames": 240,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    },
+    "imageMinVisible": 0.12
+  },
+  "laptop-frame": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 10,
+    "hitFrame": 30,
+    "exitStartFrame": 140,
+    "naturalFrames": 240,
+    "speed": {
+      "min": 1,
+      "max": 4
+    },
+    "imageMinVisible": 0.82
+  },
+  "screen-recording": {
+    "light": {
+      "set": {
+        "mode": "light",
+        "backdropColor": "#faf9f6"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark",
+        "backdropColor": "#0a0a0a"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 10,
+    "hitFrame": 56,
+    "exitStartFrame": 139,
+    "naturalFrames": 139,
+    "speed": {
+      "min": 1,
+      "max": 4
+    },
+    "imageMinVisible": 0.36
+  },
+  "click-type": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 5,
+    "hitFrame": 70,
+    "exitStartFrame": 103,
+    "naturalFrames": 103,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "button-press": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 8,
+    "hitFrame": 33,
+    "exitStartFrame": 126,
+    "naturalFrames": 126,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "capture-reveal": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 63,
+    "exitStartFrame": 130,
+    "naturalFrames": 130,
+    "speed": null,
+    "imageMinVisible": 0.49
+  },
+  "roster-grant": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["theme"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["theme"]
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 80,
+    "exitStartFrame": 120,
+    "naturalFrames": 120,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "wordmark-cut": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["theme"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["theme"]
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 40,
+    "exitStartFrame": 66,
+    "naturalFrames": 66,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "announce-title": {
+    "light": {
+      "set": {
+        "nightColor": "#faf9f6",
+        "voidColor": "#f3f3f0",
+        "taglineColor": "#141414",
+        "inkColor": "#141414",
+        "titleColor": "#141414"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "paperColor": "#0a0a0a",
+        "titleColor": "#ffffff",
+        "nightColor": "#0a0a0a",
+        "voidColor": "#050505"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 60,
+    "exitStartFrame": 170,
+    "naturalFrames": 170,
+    "speed": {
+      "min": 1,
+      "max": 4
+    }
+  },
+  "status-cycle": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": [
+        "pageColor",
+        "pillColor",
+        "pillLabelColor",
+        "prefixColor",
+        "chipTextColor",
+        "chipBorderColor"
+      ]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": [
+        "pageColor",
+        "pillColor",
+        "pillLabelColor",
+        "prefixColor",
+        "chipTextColor",
+        "chipBorderColor"
+      ]
+    },
+    "firstContentFrame": 10,
+    "hitFrame": 20,
+    "exitStartFrame": 198,
+    "naturalFrames": 198,
+    "speed": {
+      "min": 1,
+      "max": 4
+    },
+    "step": {
+      "first": 24,
+      "frames": 30
+    }
+  },
+  "hero-launch": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 15,
+    "hitFrame": 156,
+    "exitStartFrame": 170,
+    "naturalFrames": 170,
+    "speed": null,
+    "imageMinVisible": 0.29
+  },
+  "orbit-gallery": {
+    "light": null,
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 10,
+    "hitFrame": 27,
+    "exitStartFrame": 300,
+    "naturalFrames": 300,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "moodboard-reveal": {
+    "light": null,
+    "dark": {
+      "set": {
+        "lightColor": "#141414"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 10,
+    "hitFrame": 104,
+    "exitStartFrame": 150,
+    "naturalFrames": 150,
+    "speed": {
+      "min": 1,
+      "max": 4
+    },
+    "imageMinVisible": 0.38
+  },
+  "reel-collage": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark",
+        "background": "#0a0a0a",
+        "glowColor": "#16201c",
+        "flushColor": "#3a1d17"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 72,
+    "exitStartFrame": 96,
+    "naturalFrames": 96,
+    "speed": {
+      "min": 1,
+      "max": 4
+    }
+  },
+  "dot-bloom": {
+    "light": {
+      "set": {},
+      "unset": []
+    },
+    "dark": null,
+    "firstContentFrame": 3,
+    "hitFrame": 22,
+    "exitStartFrame": 30,
+    "naturalFrames": 30,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "search-typing": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 152,
+    "exitStartFrame": 420,
+    "naturalFrames": 420,
+    "speed": {
+      "min": 1,
+      "max": 4
+    }
+  },
+  "prompt-send": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 8,
+    "hitFrame": 125,
+    "exitStartFrame": 165,
+    "naturalFrames": 165,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "prompt-zoom": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 56,
+    "exitStartFrame": 90,
+    "naturalFrames": 90,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "answer-stream": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 104,
+    "exitStartFrame": 150,
+    "naturalFrames": 150,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "answer-highlight": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["paperColor", "pillColor", "questionColor", "answerColor"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["paperColor", "pillColor", "questionColor", "answerColor"]
+    },
+    "firstContentFrame": 17,
+    "hitFrame": 120,
+    "exitStartFrame": 190,
+    "naturalFrames": 190,
+    "speed": {
+      "min": 1,
+      "max": 4
+    }
+  },
+  "agent-steps": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": ["paperColor", "glowColor", "pillColor", "inkColor", "stepColor"]
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["paperColor", "glowColor", "pillColor", "inkColor", "stepColor"]
+    },
+    "firstContentFrame": 10,
+    "hitFrame": 145,
+    "exitStartFrame": 160,
+    "naturalFrames": 160,
+    "speed": {
+      "min": 1,
+      "max": 4
+    },
+    "step": {
+      "first": 21,
+      "frames": 14
+    }
+  },
+  "title-sweep": {
+    "light": null,
+    "dark": {
+      "set": {},
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 8,
+    "exitStartFrame": 76,
+    "naturalFrames": 76,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    },
+    "step": {
+      "first": 36,
+      "frames": 36
+    }
+  },
+  "drop-line": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 24,
+    "exitStartFrame": 38,
+    "naturalFrames": 38,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    },
+    "step": {
+      "first": 9,
+      "frames": 7
+    }
+  },
+  "terminal-simulator": {
+    "light": null,
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": ["background", "borderColor"]
+    },
+    "firstContentFrame": 18,
+    "hitFrame": 108,
+    "exitStartFrame": 200,
+    "naturalFrames": 200,
+    "speed": {
+      "min": 1,
+      "max": 4
+    }
+  },
+  "count-grid": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 4,
+    "hitFrame": 42,
+    "exitStartFrame": 47,
+    "naturalFrames": 47,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "portal-intro": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 9,
+    "hitFrame": 90,
+    "exitStartFrame": 108,
+    "naturalFrames": 108,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "spec-sweep": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 40,
+    "exitStartFrame": 75,
+    "naturalFrames": 75,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  },
+  "sky-lockup": {
+    "light": {
+      "set": {
+        "mode": "light"
+      },
+      "unset": []
+    },
+    "dark": {
+      "set": {
+        "mode": "dark"
+      },
+      "unset": []
+    },
+    "firstContentFrame": 0,
+    "hitFrame": 50,
+    "exitStartFrame": 57,
+    "naturalFrames": 57,
+    "speed": {
+      "min": 0.25,
+      "max": 4
+    }
+  }
+}

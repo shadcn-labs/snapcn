@@ -354,6 +354,58 @@ export async function getPayment(
 }
 
 /**
+ * Refund a payment in full, and cancel a subscription now. Both are called
+ * from the webhook on a payment it refuses (a regional price paid with a card
+ * from elsewhere), and both are retried with it — so a 4xx is swallowed and
+ * logged: on a redelivery it is "already refunded / already cancelled", and
+ * throwing there would loop the event forever. A 5xx throws for the retry.
+ */
+export async function refundPayment(
+  paymentId: string,
+  reason: string,
+): Promise<void> {
+  await dodoWrite("POST", "/refunds", { payment_id: paymentId, reason });
+}
+
+export async function cancelSubscription(
+  subscriptionId: string,
+): Promise<void> {
+  await dodoWrite(
+    "PATCH",
+    `/subscriptions/${encodeURIComponent(subscriptionId)}`,
+    { status: "cancelled" },
+  );
+}
+
+async function dodoWrite(
+  method: string,
+  path: string,
+  body: unknown,
+): Promise<void> {
+  const apiKey = process.env.DODO_API_KEY;
+  if (!apiKey) return;
+  const res = await fetch(`${baseUrl()}${path}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (res.ok) return;
+  const text = await res.text().catch(() => "");
+  if (res.status < 500) {
+    console.warn(`[dodo] ${method} ${path} → ${res.status}, skipped: ${text}`);
+    return;
+  }
+  throw new DodoApiError(
+    res.status,
+    null,
+    `Dodo ${res.status} ${method} ${path}`,
+  );
+}
+
+/**
  * Point a Dodo customer at a new address. A guest's renewal events carry the
  * customer's email and nothing else (no `user_id`), so after a claim this is
  * what keeps next year's renewal landing on the account that claimed it.

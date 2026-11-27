@@ -15,6 +15,12 @@ export const laptopFrameConfig: ComponentConfig = {
       default: "https://media.snapcn.dev/demos/answer-stream.mp4",
       label: "Screen (image or video)",
     },
+    screenFit: {
+      type: "select",
+      default: "cover",
+      options: ["cover", "contain"],
+      label: "Screen fit",
+    },
     entrance: {
       type: "select",
       default: "open",

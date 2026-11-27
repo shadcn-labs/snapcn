@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { SWEEP_FIRST, SWEEP_LAST } from "../data";
-import { fitLine, pullBack, sample, sweepFor, titleAt } from "../index";
+import {
+  fitLine,
+  parseTitles,
+  pullBack,
+  sample,
+  sweepFor,
+  titleAt,
+} from "../index";
 
 describe("title-sweep", () => {
   it("samples a table and holds its ends", () => {
@@ -32,5 +39,14 @@ describe("title-sweep", () => {
     expect(pullBack(50)).toBeLessThan(1);
     expect(fitLine(500, 1920)).toBe(1);
     expect(fitLine(3456, 1920) * 3456).toBeCloseTo(1920 * 0.9);
+  });
+
+  it("takes titles as a | string or an array", () => {
+    expect(parseTitles("snapcn Pro | snapcn.dev")).toEqual([
+      "snapcn Pro",
+      "snapcn.dev",
+    ]);
+    expect(parseTitles(["a", "b"])).toEqual(["a", "b"]);
+    expect(parseTitles(" a || ")).toEqual(["a"]);
   });
 });

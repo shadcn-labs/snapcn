@@ -262,8 +262,12 @@ export interface CountGridProps {
   to?: string;
   /** The noun after the number. */
   noun?: string;
-  /** Card images, cycled across the grid. Anything `<Img>` can load. */
-  cards?: string[];
+  /**
+   * Card images, cycled across the grid. Anything `<Img>` can load; also takes
+   * a `|`-separated string. Empty (`[]` or `""`) draws neutral cards out of the
+   * theme — a wall of placeholder UI — instead of pictures. Unset, snapcn's own.
+   */
+  cards?: string[] | string;
   /** Defaults to the theme's `background`. */
   background?: string;
   /**
@@ -370,11 +374,128 @@ function resolveSrc(src: string): string {
   }
 }
 
+/** How many neutral-card layouts the empty grid cycles through. */
+const NEUTRAL_SLOTS = 6;
+
+/**
+ * A card with no picture: a shadcn card's own skeleton — muted fills on the
+ * card surface, the same hairline every card has, no shadow. Three layouts
+ * (media + title, avatar + text, a small chart) so forty of them read as a
+ * library of different things rather than one tile repeated. Everything is a
+ * fraction of the card, so it scales with the pull-back like a picture would.
+ */
+function NeutralCard({
+  variant,
+  w,
+  h,
+  t,
+}: {
+  variant: number;
+  w: number;
+  h: number;
+  t: SnapCnTheme;
+}) {
+  const pad = 0.1 * w;
+  const r = 0.035 * w;
+  const fill = t.muted;
+  const line = mixOklch(t.muted, t.mutedForeground, 0.3);
+  const faint = mixOklch(t.muted, t.mutedForeground, 0.12);
+  const bar = (top: number, width: number, color = faint, height = 0.045) => (
+    <div
+      style={{
+        position: "absolute",
+        left: pad,
+        top: top * h,
+        width: width * (w - 2 * pad),
+        height: height * h,
+        borderRadius: (height * h) / 2,
+        background: color,
+      }}
+    />
+  );
+  const v = variant % 3;
+  return (
+    <div style={{ position: "absolute", inset: 0 }}>
+      {v === 0 && (
+        <>
+          <div
+            style={{
+              position: "absolute",
+              left: pad,
+              top: pad,
+              right: pad,
+              height: 0.5 * h,
+              borderRadius: r,
+              background: fill,
+            }}
+          />
+          {bar(0.66, 0.75, line, 0.05)}
+          {bar(0.76, 0.5)}
+          {bar(0.84, 0.62)}
+        </>
+      )}
+      {v === 1 && (
+        <>
+          <div
+            style={{
+              position: "absolute",
+              left: pad,
+              top: pad,
+              width: 0.26 * w,
+              height: 0.26 * w,
+              borderRadius: "50%",
+              background: fill,
+            }}
+          />
+          {bar(0.33, 0.6, line, 0.05)}
+          {bar(0.43, 0.9)}
+          {bar(0.51, 0.82)}
+          {bar(0.59, 0.88)}
+          {bar(0.67, 0.55)}
+        </>
+      )}
+      {v === 2 && (
+        <>
+          {bar(0.09, 0.55, line, 0.05)}
+          {bar(0.18, 0.35)}
+          {[0.32, 0.5, 0.42, 0.66, 0.56].map((bh, j) => (
+            <div
+              // biome-ignore lint/suspicious/noArrayIndexKey: fixed chart
+              key={j}
+              style={{
+                position: "absolute",
+                left: pad + j * ((w - 2 * pad) / 5) + 0.02 * w,
+                bottom: pad,
+                width: (w - 2 * pad) / 5 - 0.04 * w,
+                height: bh * 0.62 * h,
+                borderRadius: r * 0.6,
+                // The tallest bar takes the label's own accent; the rest stay
+                // neutral, so the grid has one colour and it is the theme's.
+                background: j === 3 ? mixOklch(t.card, t.primary, 0.55) : fill,
+              }}
+            />
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+/** `cards` as a list: a string splits on `|`, empties dropped. */
+export function toCards(cards: string[] | string): string[] {
+  return typeof cards === "string"
+    ? cards
+        .split("|")
+        .map((c) => c.trim())
+        .filter(Boolean)
+    : cards;
+}
+
 export function CountGrid({
   from = "5",
   to = "500",
   noun = "clips",
-  cards = OWN_CARDS,
+  cards: cardsProp = OWN_CARDS,
   background,
   inkFrom,
   inkTo,
@@ -383,6 +504,11 @@ export function CountGrid({
   mode,
 }: CountGridProps) {
   const t = useSnapCnTheme(theme, mode);
+  const cards = toCards(cardsProp);
+  // snapcn's own list alternates pictures and stills, and the seed cells take
+  // only its even (picture) slots; any other list is used in order.
+  const own = cards.join("|") === OWN_CARDS.join("|");
+  const slots = cards.length || NEUTRAL_SLOTS;
   const page = background ?? t.background;
   const ink0 = inkFrom ?? mixOklch(t.primary, t.foreground, 0.5);
   const ink1 = inkTo ?? t.primary;
@@ -458,9 +584,10 @@ export function CountGrid({
       const seed = col * 2 + row;
       const i =
         ringOf(col, row) === 0
-          ? (2 * (((seed % SEED.length) + SEED.length) % SEED.length)) %
-            cards.length
-          : ((mix % cards.length) + cards.length) % cards.length;
+          ? ((own ? 2 : 1) *
+              (((seed % SEED.length) + SEED.length) % SEED.length)) %
+            slots
+          : ((mix % slots) + slots) % slots;
       cells.push({ col, row, x: cx, y: cy, o, i, src: cards[i] ?? "" });
     }
   }
@@ -566,6 +693,8 @@ export function CountGrid({
                   }}
                   alt=""
                 />
+              ) : cards.length === 0 ? (
+                <NeutralCard variant={c.i} w={cardW} h={cardH} t={t} />
               ) : null}
             </div>
           </Item>

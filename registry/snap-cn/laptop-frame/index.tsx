@@ -34,6 +34,13 @@ export interface LaptopFrameProps {
    * through `staticFile()` in Remotion Studio and a render.
    */
   screenSrc?: string;
+  /**
+   * How `screenSrc` sits in the screen. `cover` (default) fills it edge to
+   * edge and crops what doesn't fit; `contain` shows the whole image,
+   * letterboxed in `screenColor` — for a wide screenshot whose headline runs
+   * to its edges (a 1200×630 OG card loses its first letters under `cover`).
+   */
+  screenFit?: "cover" | "contain";
   /** How the laptop enters. `open` lifts the lid up from the deck. */
   entrance?: LaptopFrameEntrance;
   /**
@@ -545,7 +552,15 @@ function resolveSrc(src: string): string {
 }
 
 /** Fills the screen with an image or a video, fading and un-blurring it in. */
-function ScreenMedia({ src, frame }: { src: string; frame: number }) {
+function ScreenMedia({
+  src,
+  frame,
+  fit = "cover",
+}: {
+  src: string;
+  frame: number;
+  fit?: "cover" | "contain";
+}) {
   const t = interpolate(frame, [4, 22], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -558,7 +573,7 @@ function ScreenMedia({ src, frame }: { src: string; frame: number }) {
     // Tailwind's preflight sets `img { max-width: 100% }`, which can collapse a
     // media element we size ourselves to 0px wide. Opt out. (motion-quality skill.)
     maxWidth: "none",
-    objectFit: "cover",
+    objectFit: fit,
     opacity: t,
     filter: `blur(${(1 - t) * 8}px)`,
   };
@@ -698,6 +713,7 @@ function Notch({
 export function LaptopFrame({
   children,
   screenSrc,
+  screenFit = "cover",
   entrance = "rise",
   finale = "none",
   bezelColor,
@@ -751,7 +767,7 @@ export function LaptopFrame({
   const screenContent =
     children ??
     (screenSrc ? (
-      <ScreenMedia src={screenSrc} frame={frame} />
+      <ScreenMedia src={screenSrc} frame={frame} fit={screenFit} />
     ) : (
       <PlaceholderScreen frame={frame} t={t} />
     ));

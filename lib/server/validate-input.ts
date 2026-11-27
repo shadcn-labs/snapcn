@@ -1,4 +1,5 @@
 import "server-only";
+import { trackFor } from "@/lib/studio/music";
 import { isValidFont, normalizeFont } from "@/lib/video-editor/fonts";
 import {
   type Clip,
@@ -224,7 +225,14 @@ const MAX_CLIP_PROPS_BYTES = 4_000_000;
 export function parseVideoTimelineInput(body: unknown): {
   clips: Clip[];
   font: string;
-  audio: { id: string; volume: number; trimStart: number } | null;
+  audio: {
+    /** An upload's id — absent when the track is from the stock library. */
+    id?: string;
+    /** A stock track's slug, checked against the library. */
+    stock?: string;
+    volume: number;
+    trimStart: number;
+  } | null;
 } {
   if (!isPlainObject(body)) {
     throw new RenderInputError("request body must be a JSON object");
@@ -299,7 +307,24 @@ export function parseVideoTimelineInput(body: unknown): {
         ? raw.font
         : undefined;
 
-    return { id, slug, props, durationInFrames, background, font: clipFont };
+    // The in-point: a frame offset into the component, so finite, whole, and
+    // no further in than a clip can be long.
+    const trimBefore =
+      typeof raw.trimBefore === "number" &&
+      Number.isFinite(raw.trimBefore) &&
+      raw.trimBefore > 0
+        ? Math.min(Math.round(raw.trimBefore), MAX_CLIP_FRAMES)
+        : undefined;
+
+    return {
+      id,
+      slug,
+      props,
+      durationInFrames,
+      background,
+      font: clipFont,
+      ...(trimBefore ? { trimBefore } : {}),
+    };
   });
 
   // Allow-list, not a free string: the value reaches both a `font-family` and a
@@ -313,12 +338,22 @@ export function parseVideoTimelineInput(body: unknown): {
   // URL would let anyone aim that request at any host they liked. The render
   // route turns this id into a URL on its own origin.
   const rawAudio = isPlainObject(body) ? body.audio : undefined;
-  const audio =
+  // A stock track is named by its slug and must be in the library — like an
+  // upload id, never a URL, so the renderer only ever fetches our own files.
+  const stock =
+    isPlainObject(rawAudio) && trackFor(rawAudio.stock)
+      ? (rawAudio.stock as string)
+      : undefined;
+  const uploadId =
     isPlainObject(rawAudio) &&
     typeof rawAudio.id === "string" &&
     AUDIO_ID_RE.test(rawAudio.id)
+      ? rawAudio.id
+      : undefined;
+  const audio =
+    isPlainObject(rawAudio) && (stock || uploadId)
       ? {
-          id: rawAudio.id,
+          ...(stock ? { stock } : { id: uploadId }),
           volume:
             typeof rawAudio.volume === "number" &&
             Number.isFinite(rawAudio.volume)

@@ -22,13 +22,22 @@ const DOTTED = /[ij]/;
  * drops whole.
  */
 export interface DropLineProps {
-  /** One word per card; the last one drops. */
-  words?: string[];
+  /**
+   * One word per card; the last one drops. A string is split on `,`, which is
+   * how the customizer and the Studio set it.
+   */
+  words?: string[] | string;
   fontFamily?: string;
   fontWeight?: number;
   /** Type size on a 1920x1080 stage. */
   fontSize?: number;
-  /** Size per word on that stage, for faces that set a card differently. */
+  /**
+   * The four per-word arrays below have no defaults: they are indexed against
+   * your own `words`, so they never land on copy they were not set for, and an
+   * index past the end falls back to the shared value.
+   *
+   * Size per word on that stage, for faces that set a card differently.
+   */
   wordSize?: number[];
   /** Horizontal nudge per word, in stage px, for optical centring. */
   wordNudge?: number[];
@@ -36,14 +45,24 @@ export interface DropLineProps {
   wordTracking?: number[];
   /** Per-letter offsets per word, in em. */
   wordKerning?: number[][];
-  /** The card. Defaults to the theme foreground. */
+  /** The card. Defaults to the theme background. */
   ink?: string;
-  /** The type. Defaults to the theme background. */
+  /** The type. Defaults to the theme foreground. */
   paper?: string;
   speed?: number;
   theme?: Partial<SnapCnTheme>;
+  /**
+   * `light` is a light card with dark type, `dark` the reverse, as everywhere
+   * else. Defaults to `dark`: the shipped look is type on a dark card.
+   */
   mode?: "light" | "dark";
 }
+
+/** `"a, b"` -> `["a", "b"]`; an array passes through. */
+export const parseWords = (words: string[] | string) =>
+  (typeof words === "string" ? words.split(",") : words)
+    .map((w) => w.trim())
+    .filter(Boolean);
 
 /** Sample a measured table at a fractional frame; holds both ends. */
 export const sample = (table: readonly number[], at: number) => {
@@ -109,7 +128,7 @@ const Line: React.FC<{
 };
 
 export const DropLine: React.FC<DropLineProps> = ({
-  words = ["then", "ships", "the", "film"],
+  words: wordsProp = ["then", "ships", "the", "film"],
   fontFamily = inter,
   fontWeight = 700,
   fontSize = FONT_SIZE,
@@ -121,15 +140,16 @@ export const DropLine: React.FC<DropLineProps> = ({
   paper,
   speed = 1,
   theme,
-  mode,
+  mode = "dark",
 }) => {
   const t = useSnapCnTheme(theme, mode);
+  const words = parseWords(wordsProp);
   const uid = useId().replace(/:/g, "");
   const f = useCurrentFrame() * speed;
   const { width, height } = useVideoConfig();
   const px = Math.max(width / STAGE_W, height / STAGE_H);
-  const card = ink ?? t.foreground;
-  const type = paper ?? t.background;
+  const card = ink ?? t.background;
+  const type = paper ?? t.foreground;
 
   const line = timeline(words.length);
   const index = cardAt(line.starts, f);

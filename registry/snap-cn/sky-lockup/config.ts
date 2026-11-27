@@ -12,6 +12,14 @@ export const skyLockupConfig: ComponentConfig = {
     },
     after: { type: "text", default: "as one install", label: "After the mark" },
     wordmark: { type: "text", default: "snapcn", label: "Wordmark" },
+    logoSrc: {
+      type: "image",
+      // Empty = no logo: the snapcn mark beside the wordmark snapcn, no mark
+      // beside any other. A brand kit's logo lands here.
+      default: "",
+      label: "Logo",
+      brand: "logo",
+    },
     speed: {
       type: "number",
       default: 1,

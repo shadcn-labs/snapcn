@@ -69,10 +69,18 @@ export async function renderComposition({
     await loadRenderer();
   const serveUrl = await getServeUrl();
 
+  // `REMOTION_LOG_LEVEL=verbose` surfaces the browser's side of a failure
+  // ("Target closed" says only that the page died, not why).
+  const logLevel = (process.env.REMOTION_LOG_LEVEL || "info") as
+    | "verbose"
+    | "info"
+    | "warn"
+    | "error";
   const composition = await selectComposition({
     serveUrl,
     id: compositionId,
     inputProps,
+    logLevel,
   });
 
   const { cancelSignal, cancel } = makeCancelSignal();
@@ -89,6 +97,7 @@ export async function renderComposition({
       scale: outputScale(composition, width, height),
       concurrency: remotionConcurrency(),
       cancelSignal,
+      logLevel,
       onProgress: onProgress
         ? ({ progress }) => onProgress(progress)
         : undefined,

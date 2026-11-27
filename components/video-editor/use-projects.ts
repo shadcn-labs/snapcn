@@ -9,7 +9,11 @@ import {
   reviveDraft,
   saveDraft,
 } from "@/lib/video-editor/draft";
-import { DEFAULT_TITLE, type ProjectSummary } from "@/lib/video-editor/project";
+import {
+  DEFAULT_TITLE,
+  MAX_TITLE_LEN,
+  type ProjectSummary,
+} from "@/lib/video-editor/project";
 import registry from "@/registry/__index__";
 
 /**
@@ -51,6 +55,10 @@ export interface UseProjects {
   newProject: () => Promise<void>;
   openProject: (id: string) => Promise<void>;
   removeProject: (id: string) => Promise<void>;
+  /** Rename any saved video, not only the open one. */
+  renameProject: (id: string, title: string) => Promise<void>;
+  /** A copy beside the original ("… copy"), left closed. */
+  duplicateProject: (id: string) => Promise<void>;
 }
 
 export function useProjects({
@@ -330,6 +338,65 @@ export function useProjects({
     [onRestore, setTitle],
   );
 
+  const renameProject = useCallback(
+    async (id: string, next: string) => {
+      const title = next.trim().slice(0, MAX_TITLE_LEN) || DEFAULT_TITLE;
+      // The open video's title lives in this hook; route it through the same
+      // save path so a pending autosave can't write the old title back.
+      if (id === idRef.current) {
+        setTitle(title);
+        await persist({ title });
+        refresh();
+        return;
+      }
+      setProjects((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, title } : p)),
+      );
+      try {
+        const res = await fetch(`/api/projects/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title }),
+        });
+        if (!res.ok) throw new Error(await readError(res));
+      } catch (err) {
+        toast.error("Couldn't rename that video.", {
+          description: err instanceof Error ? err.message : String(err),
+        });
+        refresh();
+      }
+    },
+    [persist, refresh, setTitle],
+  );
+
+  const duplicateProject = useCallback(
+    async (id: string) => {
+      // The open one may have unsaved edits; the copy should carry them.
+      if (id === idRef.current) await persist({ data: latestRef.current });
+      try {
+        const res = await fetch(`/api/projects/${id}`);
+        if (!res.ok) throw new Error(await readError(res));
+        const source = (await res.json()) as { title: string; data: unknown };
+        const made = await fetch("/api/projects", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: `${source.title} copy`.slice(0, MAX_TITLE_LEN),
+            data: source.data,
+          }),
+        });
+        if (!made.ok) throw new Error(await readError(made));
+        refresh();
+        toast.success("Duplicated.");
+      } catch (err) {
+        toast.error("Couldn't duplicate that video.", {
+          description: err instanceof Error ? err.message : String(err),
+        });
+      }
+    },
+    [persist, refresh],
+  );
+
   const commitTitle = useCallback(() => {
     if (mode !== "remote") return;
     void persist({ title: titleRef.current });
@@ -349,6 +416,8 @@ export function useProjects({
     newProject,
     openProject,
     removeProject,
+    renameProject,
+    duplicateProject,
   };
 }
 

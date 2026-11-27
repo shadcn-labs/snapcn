@@ -12,14 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { type Scene, STUDIO_MODELS, type StudioModel } from "@/lib/studio/ops";
+import type { Scene } from "@/lib/studio/ops";
 import { cn } from "@/lib/utils";
 
 export interface ChatMessage {
@@ -34,6 +27,8 @@ export interface ChatMessage {
   error?: "signin" | "failed";
   /** A frame (or a region of one) pinned from the canvas camera. */
   snapshot?: Snapshot;
+  /** The researcher's brief of the product's site, sent back on later turns. */
+  brief?: string;
 }
 
 /**
@@ -65,8 +60,6 @@ export function StudioChat({
   pendingLabel,
   onSend,
   onRetry,
-  model,
-  onModel,
   selectedLabel,
   onClearSelection,
   snapshotLabel,
@@ -82,8 +75,6 @@ export function StudioChat({
   pendingLabel: string;
   onSend: (text: string) => void;
   onRetry: () => void;
-  model: StudioModel;
-  onModel: (model: StudioModel) => void;
   selectedLabel: string | null;
   onClearSelection: () => void;
   snapshotLabel: string | null;
@@ -125,7 +116,7 @@ export function StudioChat({
               m.role === "user" ? (
                 <div
                   key={m.id}
-                  className="ml-auto max-w-[85%] rounded-lg bg-[#262626] px-3 py-2 text-[14px] leading-5 whitespace-pre-wrap text-[#eeeeee]"
+                  className="ml-auto max-w-[85%] rounded-[18px] rounded-br-[6px] bg-[#262626] px-3.5 py-2 text-[14px] leading-5 whitespace-pre-wrap text-[#eeeeee]"
                 >
                   {m.snapshot && (
                     <span className="mb-1 flex items-center gap-1 text-[12px] text-[#a0a0a0]">
@@ -152,8 +143,6 @@ export function StudioChat({
       <Composer
         pending={pending}
         onSend={onSend}
-        model={model}
-        onModel={onModel}
         selectedLabel={selectedLabel}
         onClearSelection={onClearSelection}
         snapshotLabel={snapshotLabel}
@@ -181,7 +170,7 @@ function Welcome({ onPick }: { onPick: (text: string) => void }) {
             key={s}
             type="button"
             onClick={() => onPick(s)}
-            className="rounded-md px-2.5 py-2 text-left text-[13px] leading-5 text-[#cfcfcf] transition-colors hover:bg-[#2a2a2a]"
+            className="rounded-[12px] border border-[#262626] px-3 py-2.5 text-left text-[13px] leading-5 text-[#cfcfcf] transition-colors hover:border-[#333] hover:bg-[#1f1f1f]"
           >
             {s}
           </button>
@@ -218,7 +207,7 @@ function AssistantTurn({
       {message.error === "signin" && (
         <a
           href="/signin?callbackUrl=%2Fstudio"
-          className="w-fit rounded-md bg-[#f2f2f2] px-3 py-1.5 text-[13px] font-medium text-[#111] hover:bg-white"
+          className="w-fit rounded-[10px] bg-[#f2f2f2] px-3 py-1.5 text-[13px] font-medium text-[#111] hover:bg-white"
         >
           Sign in — it's free
         </a>
@@ -304,8 +293,6 @@ function Thinking({ label }: { label: string }) {
 function Composer({
   pending,
   onSend,
-  model,
-  onModel,
   selectedLabel,
   onClearSelection,
   snapshotLabel,
@@ -314,8 +301,6 @@ function Composer({
 }: {
   pending: boolean;
   onSend: (text: string) => void;
-  model: StudioModel;
-  onModel: (model: StudioModel) => void;
   selectedLabel: string | null;
   onClearSelection: () => void;
   snapshotLabel: string | null;
@@ -332,7 +317,7 @@ function Composer({
 
   return (
     <div className="shrink-0 p-3 pt-1">
-      <div className="rounded-lg bg-[#212121] px-3 pt-2.5 pb-2">
+      <div className="rounded-[18px] border border-[#2a2a2a] bg-[#1d1d1d] px-3.5 pt-3 pb-2.5 transition-colors focus-within:border-[#3a3a3a]">
         {(selectedLabel || snapshotLabel) && (
           <div className="mb-2 flex flex-wrap gap-1">
             {snapshotLabel && (
@@ -375,42 +360,12 @@ function Composer({
             <Plus className="size-4" />
           </IconButton>
           <div className="ml-auto flex items-center gap-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <button
-                    type="button"
-                    className="flex h-7 items-center gap-1 rounded-md px-2 text-[13px] text-[#cfcfcf] hover:bg-[#2a2a2a]"
-                  />
-                }
-              >
-                <Sparkle className="size-3.5" />
-                {STUDIO_MODELS[model].label}
-                <ChevronDown className="size-3.5 text-[#8a8a8a]" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                side="top"
-                className="w-auto min-w-40 rounded-lg"
-              >
-                <DropdownMenuRadioGroup
-                  value={model}
-                  onValueChange={(v) => onModel(v as StudioModel)}
-                >
-                  {(Object.keys(STUDIO_MODELS) as StudioModel[]).map((key) => (
-                    <DropdownMenuRadioItem key={key} value={key}>
-                      {STUDIO_MODELS[key].label}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
             <button
               type="button"
               aria-label="Send"
               disabled={!canSend}
               onClick={submit}
-              className="grid size-7 place-items-center rounded-md bg-[#f2f2f2] text-[#111] transition-opacity disabled:bg-[#3a3a3a] disabled:text-[#8a8a8a]"
+              className="grid size-8 place-items-center rounded-full bg-[#f2f2f2] text-[#111] transition-opacity disabled:bg-[#3a3a3a] disabled:text-[#8a8a8a]"
             >
               <ArrowUp className="size-4" />
             </button>
@@ -431,13 +386,13 @@ function Chip({
   children: React.ReactNode;
 }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded bg-[#2e2e2e] py-0.5 pr-1 pl-2 text-[12px] text-[#cfcfcf]">
+    <span className="inline-flex items-center gap-1 rounded-full bg-[#2e2e2e] py-0.5 pr-1 pl-2.5 text-[12px] text-[#cfcfcf]">
       {children}
       <button
         type="button"
         aria-label={label}
         onClick={onClear}
-        className="rounded p-0.5 hover:bg-[#3a3a3a]"
+        className="rounded-full p-0.5 hover:bg-[#3a3a3a]"
       >
         <X className="size-3" />
       </button>
@@ -460,7 +415,7 @@ function IconButton({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="grid size-7 place-items-center rounded-md text-[#a0a0a0] transition-colors hover:bg-[#2a2a2a] hover:text-[#eeeeee]"
+      className="grid size-7 place-items-center rounded-[8px] text-[#a0a0a0] transition-colors hover:bg-[#2a2a2a] hover:text-[#eeeeee]"
     >
       {children}
     </button>

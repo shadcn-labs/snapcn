@@ -72,3 +72,7 @@ BILLING_LOCAL.md
 
 # scratch renders and one-off scripts
 /tmp/
+
+# Stock music for the studio. Licensed audio, never in the public repo; prod
+# serves it from STUDIO_MUSIC_DIR (the /data volume) or MUSIC_BASE_URL.
+media/
