@@ -49,6 +49,13 @@ export type StudioOp =
       op: "update";
       id: string;
       props?: Record<string, unknown>;
+      /**
+       * Prop keys to delete, so the component's own default applies again —
+       * how a theme drops a pinned light colour. Applied before `props`.
+       */
+      unset?: string[];
+      /** Frames into the component the clip starts at (its in-point). */
+      trimBefore?: number;
       durationInFrames?: number;
       background?: string;
       scene?: Partial<Scene>;
@@ -62,7 +69,12 @@ export interface CatalogEntry {
   durationInFrames: number;
   /** The docs preview's backdrop — the right first canvas colour. */
   backdrop?: string;
+  /** Measured max characters per text prop (see `TEXT_LIMITS`). */
+  limits?: Record<string, TextLimit>;
 }
+
+/** Max characters for the whole prop, or for each item of a comma list. */
+export type TextLimit = number | { each: number };
 
 export type Lookup = (slug: string) => CatalogEntry | undefined;
 
@@ -72,13 +84,21 @@ export type Lookup = (slug: string) => CatalogEntry | undefined;
  * (and arbitrarily expensive) model.
  */
 export const STUDIO_MODELS = {
+  // `moonshotai/` ids go straight to Moonshot (MOONSHOT_API_KEY); the rest go
+  // through the AI Gateway (AI_GATEWAY_API_KEY). See resolveModel in the route.
+  kimi: { label: "Kimi K3", id: "moonshotai/kimi-k3" },
+  "kimi-fast": {
+    label: "Kimi K2.7 Fast",
+    id: "moonshotai/kimi-k2.7-code-highspeed",
+  },
+  "kimi-pro": { label: "Kimi K3.1 Pro", id: "moonshotai/kimi-k3.1-pro" },
   sonnet: { label: "Sonnet 5.5", id: "anthropic/claude-sonnet-5.5" },
   opus: { label: "Opus 5.5", id: "anthropic/claude-opus-5.5" },
   haiku: { label: "Haiku 5.5", id: "anthropic/claude-haiku-5.5" },
 } as const;
 
 export type StudioModel = keyof typeof STUDIO_MODELS;
-export const DEFAULT_STUDIO_MODEL: StudioModel = "sonnet";
+export const DEFAULT_STUDIO_MODEL: StudioModel = "kimi-fast";
 
 const MAX_TEXT = 500;
 const MAX_URL = 2000;
@@ -142,6 +162,63 @@ export function coerceProps(
 
 const toFrames = (seconds: number) => Math.round(seconds * CANVAS.fps);
 
+/**
+ * The first text prop longer than the component can show, as a sentence the
+ * model can act on. A refusal, not a trim: cutting a headline mid-word ships a
+ * typo, and the model can rewrite it shorter in one more call.
+ */
+function overLimit(
+  entry: CatalogEntry,
+  props: Record<string, unknown>,
+): string | null {
+  // Safety net where nothing was measured: a plain sentence prop (its default
+  // has no list or script separators) holds at most twice its designed
+  // length. A 65-char line in a 28-char design collides with itself.
+  for (const [key, ctrl] of Object.entries(entry.controls)) {
+    if (ctrl.type !== "text" || entry.limits?.[key] !== undefined) continue;
+    if (Object.keys(entry.limits ?? {}).some((k) => k.split("+").includes(key)))
+      continue;
+    const value = props[key];
+    const designed = ctrl.default;
+    if (
+      typeof value !== "string" ||
+      designed.length < 8 ||
+      /[|,>\n/]/.test(designed) ||
+      value.length <= Math.max(designed.length * 2, 24)
+    )
+      continue;
+    return `\`${key}\` is ${value.length} characters; this component is designed for about ${designed.length}. Rewrite it shorter (don't truncate).`;
+  }
+  for (const [key, limit] of Object.entries(entry.limits ?? {})) {
+    // "a+b+c" limits the props together — one sentence split across three.
+    const parts = key.split("+");
+    const value =
+      parts.length > 1
+        ? parts
+            .map((k) => (typeof props[k] === "string" ? props[k] : ""))
+            .join("")
+        : props[key];
+    if (typeof value !== "string") continue;
+    if (parts.length > 1 && value.length > (limit as number)) {
+      return `\`${parts.join("` + `")}\` together are ${value.length} characters; the sentence fits ${limit} on one line. Rewrite it shorter (don't truncate).`;
+    }
+    if (typeof limit === "number") {
+      if (value.length > limit) {
+        return `\`${key}\` is ${value.length} characters; this component fits ${limit} before the type leaves the frame. Rewrite it shorter (don't truncate).`;
+      }
+      continue;
+    }
+    const long = value
+      .split(",")
+      .map((item) => item.trim())
+      .find((item) => item.length > limit.each);
+    if (long) {
+      return `\`${key}\` item "${long}" is ${long.length} characters; each item fits ${limit.each}. Rewrite it shorter (don't truncate).`;
+    }
+  }
+  return null;
+}
+
 function cleanScene(scene: Partial<Scene>): Partial<Scene> {
   const out: Partial<Scene> = {};
   if (typeof scene.title === "string")
@@ -193,6 +270,9 @@ export function planAdd(
       ? toFrames(input.seconds)
       : entry.durationInFrames;
   const durationInFrames = Math.max(1, Math.min(wanted, MAX_CLIP_FRAMES, left));
+  const props = coerceProps(entry.controls, input.props);
+  const tooLong = overLimit(entry, props);
+  if (tooLong) return { error: tooLong };
   const background = isHexColor(input.background)
     ? input.background
     : (entry.backdrop ?? DEFAULT_BACKGROUND);
@@ -209,10 +289,7 @@ export function planAdd(
       clip: {
         id,
         slug: input.slug,
-        props: {
-          ...getDefaults(entry.controls),
-          ...coerceProps(entry.controls, input.props),
-        },
+        props: { ...getDefaults(entry.controls), ...props },
         durationInFrames,
         background,
       },
@@ -246,6 +323,8 @@ export function planUpdate(
     id: at.clip.id,
   };
   const props = coerceProps(entry.controls, input.props);
+  const tooLong = overLimit(entry, props);
+  if (tooLong) return { error: tooLong };
   if (Object.keys(props).length > 0) op.props = props;
   if (typeof input.seconds === "number" && Number.isFinite(input.seconds)) {
     op.durationInFrames = Math.max(
@@ -304,9 +383,22 @@ export function applyOp(state: StudioState, op: StudioOp): StudioState {
           ? c
           : {
               ...c,
-              props: op.props ? { ...c.props, ...op.props } : c.props,
+              props:
+                op.props || op.unset
+                  ? {
+                      ...Object.fromEntries(
+                        Object.entries(c.props).filter(
+                          ([k]) => !op.unset?.includes(k),
+                        ),
+                      ),
+                      ...op.props,
+                    }
+                  : c.props,
               durationInFrames: op.durationInFrames ?? c.durationInFrames,
               background: op.background ?? c.background,
+              ...(op.trimBefore !== undefined
+                ? { trimBefore: op.trimBefore }
+                : {}),
             },
       );
       const prev = state.scenes[op.id] ?? { title: "", note: "" };

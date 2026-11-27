@@ -22,6 +22,7 @@ export default async function StudioPage() {
       <Studio
         signedIn={Boolean(session?.user)}
         canRemoveWatermark={!limits.watermark}
+        canUsePro={limits.components}
       />
     </>
   );

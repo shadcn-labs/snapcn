@@ -54,3 +54,25 @@ export async function readProElement(name: string): Promise<string | null> {
     return null;
   }
 }
+
+/** Files of the studio's Pro script, built by `scripts/build-studio-pro.mts`. */
+export const STUDIO_PRO_FILES = {
+  "pro.js": "text/javascript; charset=utf-8",
+  "pro-meta.json": "application/json",
+} as const;
+
+export type StudioProFile = keyof typeof STUDIO_PRO_FILES;
+
+/**
+ * The studio's Pro script or its metadata, or null when this server has none.
+ * `file` must already be one of `STUDIO_PRO_FILES` — it is joined onto a path.
+ */
+export async function readStudioPro(
+  file: StudioProFile,
+): Promise<string | null> {
+  try {
+    return await readFile(path.join(PRIVATE_DIR, "studio", file), "utf8");
+  } catch {
+    return null;
+  }
+}

@@ -3,6 +3,7 @@
 import { ComponentCustomizer } from "@/components/docs/component-customizer";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { ITEM_BY_SLUG } from "@/lib/gallery-data";
+import { proEntry } from "@/lib/studio/pro-runtime";
 import {
   CANVAS,
   type Clip,
@@ -45,7 +46,8 @@ export function PropertiesPanel({
     );
   }
 
-  const entry = registry[clip.slug];
+  // A Pro scene's config arrives with the studio's Pro script.
+  const entry = registry[clip.slug] ?? proEntry(clip.slug);
   if (!entry) return null;
   const name = ITEM_BY_SLUG.get(clip.slug)?.name ?? clip.slug;
   const secs = clip.durationInFrames / CANVAS.fps;

@@ -105,6 +105,7 @@ export function StudioCanvas({
   watermark,
   font,
   audio,
+  proBundle = null,
   exporting,
   progress,
   onExport,
@@ -124,6 +125,8 @@ export function StudioCanvas({
   watermark: boolean;
   font: string;
   audio: AudioTrack | null;
+  /** The Pro script, for a session whose plan unlocks components; else null. */
+  proBundle?: string | null;
   exporting: boolean;
   progress: number;
   onExport: () => void;
@@ -178,8 +181,8 @@ export function StudioCanvas({
   // Memoised for the same reason the editor's is: a fresh object here
   // re-renders the whole composition, soundtrack included.
   const inputProps = useMemo(
-    () => ({ clips, watermark, audio, font }),
-    [clips, watermark, audio, font],
+    () => ({ clips, watermark, audio, font, proBundle }),
+    [clips, watermark, audio, font, proBundle],
   );
 
   const drag = useRef<{ x: number; y: number } | null>(null);
@@ -231,7 +234,7 @@ export function StudioCanvas({
             (chat dragged wide, inspector open) stacks them instead of
             painting one over the other. */}
         <div className="pointer-events-none absolute inset-x-3 top-3 z-20 flex flex-wrap items-start justify-between gap-2 *:pointer-events-auto">
-          <div className="flex items-center gap-0.5 rounded-lg bg-[#222] p-1 text-[13px] text-[#cfcfcf]">
+          <div className="flex items-center gap-0.5 rounded-[12px] bg-[#222] p-1 text-[13px] text-[#cfcfcf]">
             <ToolButton
               label="Hand tool"
               active={tool === "hand"}
@@ -290,7 +293,7 @@ export function StudioCanvas({
               type="button"
               onClick={onExport}
               disabled={exporting || clips.length === 0}
-              className="flex h-8 items-center gap-1.5 rounded-md bg-[#f2f2f2] px-3 text-[13px] font-medium text-[#111] transition-colors hover:bg-white disabled:opacity-45"
+              className="flex h-8 items-center gap-1.5 rounded-[10px] bg-[#f2f2f2] px-3.5 text-[13px] font-medium text-[#111] transition-colors hover:bg-white disabled:opacity-45"
             >
               {exporting ? (
                 <>
@@ -326,7 +329,9 @@ export function StudioCanvas({
             </span>
           </div>
           <div
-            className="relative bg-black"
+            // Rounded in the preview only — the export is the composition,
+            // edge to edge. The ring is a hairline, lit for a dark stage.
+            className="relative overflow-hidden rounded-[12px] bg-black ring-1 ring-white/[0.06]"
             style={{ width: boxW, height: boxH }}
           >
             {clips.length > 0 ? (
@@ -377,7 +382,7 @@ export function StudioCanvas({
                 type="button"
                 aria-label="Dismiss"
                 onClick={onDismissExported}
-                className="rounded p-0.5 hover:bg-[#2a2a2a]"
+                className="rounded-[6px] p-0.5 hover:bg-[#2a2a2a]"
               >
                 <X className="size-3.5" />
               </button>
@@ -425,7 +430,7 @@ function ToolButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "grid h-7 min-w-7 place-items-center rounded-md text-[#cfcfcf] transition-colors hover:bg-[#2a2a2a] disabled:pointer-events-none disabled:opacity-40",
+        "grid h-7 min-w-7 place-items-center rounded-[8px] text-[#cfcfcf] transition-colors hover:bg-[#2a2a2a] disabled:pointer-events-none disabled:opacity-40",
         active && "bg-[#2e2e2e] text-white",
       )}
     >
@@ -629,7 +634,7 @@ function SelectionOverlay({
               )}
             />
           ))}
-          <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 rounded bg-[#38b2e8] px-1.5 py-0.5 font-mono text-[11px] text-[#0b2633]">
+          <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 rounded-full bg-[#38b2e8] px-2 py-0.5 font-mono text-[11px] text-[#0b2633]">
             {CANVAS.width} × {CANVAS.height}
           </span>
         </span>
@@ -692,7 +697,7 @@ function Transport({
   };
 
   return (
-    <div className="rounded-xl bg-[#222] px-4 pt-3 pb-2.5">
+    <div className="rounded-[14px] bg-[#222] px-4 pt-3 pb-2.5">
       <div className="relative h-5 text-[12px]">
         {clips.map((clip, i) => (
           <span
@@ -718,7 +723,7 @@ function Transport({
         aria-valuemin={0}
         aria-valuemax={total}
         aria-valuenow={frame}
-        className="relative mt-1 h-8 cursor-pointer rounded-md bg-[#2c2c2c] select-none"
+        className="relative mt-1 h-8 cursor-pointer overflow-hidden rounded-[8px] bg-[#2c2c2c] select-none"
         onPointerDown={(e) => {
           e.currentTarget.setPointerCapture(e.pointerId);
           seekFromPointer(e.clientX);
