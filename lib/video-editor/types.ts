@@ -36,6 +36,15 @@ export interface Clip {
    * validated exactly the way the video font is — see `lib/video-editor/fonts`.
    */
   font?: string;
+  /**
+   * Frames into the component this clip starts at — its in-point. Absent is 0.
+   *
+   * Lets a cut land on a scene's first real frame instead of its blank intro:
+   * a cut onto an empty fade-in reads as the video dipping to nothing, which is
+   * the first thing anyone notices about an edit. The clip still runs
+   * `durationInFrames`; the component just starts that many frames in.
+   */
+  trimBefore?: number;
 }
 
 /**
@@ -70,6 +79,11 @@ export interface AudioTrack {
   trimStart: number;
   /** Length of the source file, once its metadata has loaded. 0 until then. */
   durationSeconds: number;
+  /**
+   * Set when the track is from the studio's stock library (`lib/studio/music`).
+   * The export sends this slug instead of an upload id; `uploadId` stays null.
+   */
+  stock?: string;
 }
 
 export const DEFAULT_AUDIO_VOLUME = 0.8;

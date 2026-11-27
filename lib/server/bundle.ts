@@ -1,6 +1,8 @@
 import "server-only";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { VERSION as REMOTION_VERSION } from "remotion/version";
+import { BUNDLE_STAMP } from "./bundle-stamp";
 import { remotionWebpackAlias } from "./remotion-aliases";
 
 /**
@@ -17,12 +19,27 @@ const ENTRY_POINT = path.join(process.cwd(), "src", "remotion", "index.ts");
 
 let serveUrlPromise: Promise<string> | null = null;
 
+function readStamp(): string | null {
+  try {
+    return readFileSync(path.join(PREBUNDLED_DIR, BUNDLE_STAMP), "utf8").trim();
+  } catch {
+    return null;
+  }
+}
+
 export function getServeUrl(): Promise<string> {
   if (serveUrlPromise) return serveUrlPromise;
 
   serveUrlPromise = (async () => {
     if (existsSync(PREBUNDLED_DIR)) {
-      return PREBUNDLED_DIR;
+      // A prebundle left behind by an older Remotion renders nothing — the
+      // renderer rejects it outright — so it is only used when the version
+      // that built it is the version installed. Otherwise bundle fresh.
+      const stamp = readStamp();
+      if (stamp === REMOTION_VERSION) return PREBUNDLED_DIR;
+      console.warn(
+        `[render] ignoring .remotion-bundle (built by remotion ${stamp ?? "unknown"}, installed ${REMOTION_VERSION}); bundling fresh. Run \`pnpm bundle:remotion\` to refresh it.`,
+      );
     }
     try {
       // Both imported here, not at module scope, and for the same reason: they

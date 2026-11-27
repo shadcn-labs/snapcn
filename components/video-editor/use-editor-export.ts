@@ -67,6 +67,7 @@ export function useEditorExport() {
         font?: string;
         audio?: {
           uploadId: string | null;
+          stock?: string;
           volume: number;
           trimStart: number;
         } | null;
@@ -95,7 +96,7 @@ export function useEditorExport() {
       // Only when the upload genuinely failed. A soundtrack that uploaded fine
       // is in the export, so warning unconditionally — which is what this used
       // to do — was telling people their audio was missing when it was not.
-      if (audio && !audio.uploadId) {
+      if (audio && !audio.uploadId && !audio.stock) {
         toast.warning("Your soundtrack won't be in this export.", {
           description: "The upload didn't finish. Re-add the file and retry.",
         });
@@ -121,13 +122,19 @@ export function useEditorExport() {
             clips,
             removeWatermark,
             font,
-            audio: audio?.uploadId
+            audio: audio?.stock
               ? {
-                  id: audio.uploadId,
+                  stock: audio.stock,
                   volume: audio.volume,
                   trimStart: audio.trimStart,
                 }
-              : null,
+              : audio?.uploadId
+                ? {
+                    id: audio.uploadId,
+                    volume: audio.volume,
+                    trimStart: audio.trimStart,
+                  }
+                : null,
           }),
         });
         // 402 is the quota wall, and it is the one failure that is not a

@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import {
   AbsoluteFill,
   Audio,
+  cancelRender,
   continueRender,
   delayRender,
+  Sequence,
   Series,
   useVideoConfig,
 } from "remotion";
 import { SnapCnUIProvider } from "@/lib/snap-cn-ui";
+import { loadPro, proEntry, useProVersion } from "@/lib/studio/pro-runtime";
 import {
   DEFAULT_FONT,
   googleFontHref,
@@ -42,6 +45,12 @@ export type VideoTimelineProps = {
   audio?: AudioTrack | null;
   /** Built-in id or Google family. See `lib/video-editor/fonts`. */
   font?: string;
+  /**
+   * Where this video's Pro scenes load from, when it has any — set only by
+   * `/api/render` (a signed, short-lived URL) or by the studio for a session
+   * whose plan unlocks components. See `lib/studio/pro-runtime.ts`.
+   */
+  proBundle?: string | null;
 };
 
 /**
@@ -57,11 +66,22 @@ export function VideoTimeline({
   watermark = true,
   audio = null,
   font = DEFAULT_FONT,
+  proBundle = null,
 }: VideoTimelineProps) {
-  const { fps } = useVideoConfig();
+  const { fps, durationInFrames: total } = useVideoConfig();
   const resolved = resolveFont(font);
+  useProVersion();
+  const entryFor = (slug: string) => registry[slug] ?? proEntry(slug);
+  // Pro scenes keep their slot while their script loads, so the timeline is
+  // never shorter than the duration `calculateMetadata` gave the render.
   const valid = clips.filter(
-    (c) => registry[c.slug] && (c.durationInFrames ?? 0) > 0,
+    (c) =>
+      (entryFor(c.slug) || (proBundle && !registry[c.slug])) &&
+      (c.durationInFrames ?? 0) > 0,
+  );
+  useProScenes(
+    proBundle,
+    valid.some((c) => !entryFor(c.slug)),
   );
 
   // Every Google family this video needs, deduped: the video's own face plus
@@ -94,8 +114,8 @@ export function VideoTimeline({
       {valid.length > 0 ? (
         <Series>
           {valid.map((clip) => {
-            const Component = registry[clip.slug]
-              .Component as React.ComponentType<Record<string, unknown>>;
+            const Component = (entryFor(clip.slug)?.Component ??
+              EmptyScene) as React.ComponentType<Record<string, unknown>>;
             return (
               <Series.Sequence
                 key={clip.id}
@@ -127,7 +147,18 @@ export function VideoTimeline({
                       fontFamily: resolveFont(clip.font ?? font).stack,
                     }}
                   >
-                    <Component {...clip.props} />
+                    {clip.trimBefore && clip.trimBefore > 0 ? (
+                      // The in-point: the component's clock starts
+                      // `trimBefore` frames in, so the cut lands on content.
+                      <Sequence
+                        from={-Math.round(clip.trimBefore)}
+                        layout="none"
+                      >
+                        <Component {...clip.props} />
+                      </Sequence>
+                    ) : (
+                      <Component {...clip.props} />
+                    )}
                   </SnapCnUIProvider>
                 </AbsoluteFill>
               </Series.Sequence>
@@ -143,7 +174,12 @@ export function VideoTimeline({
       {audio?.src ? (
         <Audio
           src={audio.src}
-          volume={Math.min(1, Math.max(0, audio.volume))}
+          // Faded out over the last second: a track cut dead mid-bar at the
+          // final frame sounds like a mistake, not an ending.
+          volume={(f) =>
+            Math.min(1, Math.max(0, audio.volume)) *
+            Math.min(1, Math.max(0, (total - f) / fps))
+          }
           // The crop: which window of the file plays. No counterpart for the
           // end — the composition stops and takes the audio with it.
           trimBefore={Math.max(0, Math.round((audio.trimStart ?? 0) * fps))}
@@ -347,4 +383,25 @@ function Watermark() {
       snapcn
     </div>
   );
+}
+
+/** A Pro scene's slot while its script is still on the way. */
+function EmptyScene() {
+  return null;
+}
+
+/**
+ * Load the Pro script when the video has scenes this bundle doesn't carry.
+ * Holds the render until they're registered, so no exported frame is drawn
+ * without them; a failure fails the render loudly rather than shipping an
+ * MP4 with empty slots.
+ */
+function useProScenes(url: string | null, needed: boolean) {
+  useEffect(() => {
+    if (!url || !needed) return;
+    const handle = delayRender("Loading Pro scenes");
+    loadPro(url)
+      .then(() => continueRender(handle))
+      .catch((err) => cancelRender(err));
+  }, [url, needed]);
 }

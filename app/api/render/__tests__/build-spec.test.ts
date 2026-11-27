@@ -72,6 +72,57 @@ describe("buildSpec watermark", () => {
   });
 });
 
+describe("buildSpec soundtrack", () => {
+  const audioOf = (audio: unknown) =>
+    buildSpec(
+      { clips, audio },
+      { limits: ANONYMOUS, origin: "https://snapcn.dev" },
+    ).inputProps.audio as { src: string; uploadId: string | null } | null;
+
+  it("turns a stock slug into our own URL, never the caller's", () => {
+    const a = audioOf({
+      stock: "mondamusic-product-launch-review-512834",
+      volume: 0.5,
+      trimStart: 1.5,
+    });
+    expect(a?.src).toBe(
+      "https://snapcn.dev/api/music/mondamusic-product-launch-review-512834",
+    );
+    // A stock track can't go missing, so it carries no upload id to check.
+    expect(a?.uploadId).toBeNull();
+  });
+
+  it("drops a slug that is not in the library", () => {
+    expect(audioOf({ stock: "../../etc/passwd", volume: 1 })).toBeNull();
+    expect(audioOf({ stock: "https://evil.example/x.mp3" })).toBeNull();
+  });
+
+  it("keeps a clip's in-point, whole and capped", () => {
+    const spec = buildSpec(
+      {
+        clips: [
+          {
+            slug: "text-reveal",
+            durationInFrames: 30,
+            props: {},
+            trimBefore: 4.6,
+          },
+          {
+            slug: "text-reveal",
+            durationInFrames: 30,
+            props: {},
+            trimBefore: -3,
+          },
+        ],
+      },
+      { limits: ANONYMOUS },
+    );
+    const out = spec.inputProps.clips as { trimBefore?: number }[];
+    expect(out[0].trimBefore).toBe(5);
+    expect(out[1].trimBefore).toBeUndefined();
+  });
+});
+
 describe("buildSpec output size", () => {
   it("renders at the plan's ceiling, in the canvas aspect", () => {
     // The second thing being sold. `render.ts` spreads these over the
