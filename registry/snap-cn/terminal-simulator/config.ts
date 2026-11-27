@@ -15,6 +15,18 @@ export const terminalSimulatorConfig: ComponentConfig = {
       default: "*work* one step at a *time.*",
       label: "Intro",
     },
+    // The string forms of `command` and `lines` (`toCommand`, `toLines`). The
+    // defaults parse to the component's own DEFAULT_COMMAND / DEFAULT_LINES.
+    command: {
+      type: "text",
+      default: "npm install One Tool",
+      label: "Install command",
+    },
+    lines: {
+      type: "text",
+      default: "{labels: ['bug']}) | + →   label added | $ | > One task",
+      label: "Output (| line; > command, + success, ! error)",
+    },
     background: { type: "color", default: "#141417", label: "Panel surface" },
     borderColor: { type: "color", default: "#26272B", label: "Panel hairline" },
     fontSize: {

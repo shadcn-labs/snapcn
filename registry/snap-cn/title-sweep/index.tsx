@@ -24,10 +24,11 @@ import { DEFAULT_STOPS, SWEEP_FIRST, SWEEP_LAST, type SweepStop } from "./data";
  * pale band.
  */
 
-const { fontFamily: INTER } = loadFont("normal", {
+const interFace = loadFont("normal", {
   weights: ["300", "400", "500", "600", "700", "800"],
   subsets: ["latin"],
 });
+const INTER = interFace.fontFamily;
 
 const STAGE_W = 1920;
 const STAGE_H = 1080;
@@ -43,8 +44,11 @@ const PULL_BACK = 0.00119;
 const BASELINE = 0.267;
 
 export interface TitleSweepProps {
-  /** Shown in order, each cut in on black. One title is fine. */
-  titles?: string[];
+  /**
+   * Shown in order, each cut in on black. One title is fine. A string is split
+   * on `|`, which is how the customizer and the Studio set it.
+   */
+  titles?: string[] | string;
   /** A family from `fonts.ts`, or a CSS family you have loaded yourself. */
   fontFamily?: string;
   /** Type size, px on a 1920 stage. Long copy shrinks from here to fit. */
@@ -54,7 +58,11 @@ export interface TitleSweepProps {
   tracking?: number;
   /** Extra space between words, em. */
   wordSpacing?: number;
-  /** Horizontal offset per title, px on a 1920 stage. */
+  /**
+   * Horizontal offset per title, px on a 1920 stage. Like `titleScale`, it has
+   * no default: it is indexed against your own `titles`, so it never lands on
+   * copy it was not set for. An index past the end is no nudge.
+   */
   nudge?: number[];
   /** Size multiplier per title, for a line set a touch larger than the last. */
   titleScale?: number[];
@@ -71,6 +79,12 @@ export const sample = (table: readonly number[], at: number) => {
   const to = table[i + 1] ?? from;
   return from + (to - from) * Math.min(1, Math.max(0, at - i));
 };
+
+/** `"a | b"` -> `["a", "b"]`; an array passes through. */
+export const parseTitles = (titles: string[] | string) =>
+  (typeof titles === "string" ? titles.split("|") : titles)
+    .map((t) => t.trim())
+    .filter(Boolean);
 
 /** Which title is on screen at `f`, and how long it has been up. */
 export const titleAt = (f: number, count: number) => {
@@ -92,8 +106,18 @@ export const pullBack = (f: number) => Math.max(0.5, 1 - PULL_BACK * f);
 export const fitLine = (lineWidth: number, stageWidth: number) =>
   Math.min(1, (MAX_LINE * stageWidth) / Math.max(1, lineWidth));
 
+let probe: CanvasRenderingContext2D | null | undefined;
+/** Width of a test string in `font`: changes when the face behind it does. */
+const faceKeyOf = (font: string) => {
+  if (typeof document === "undefined") return 0;
+  probe ??= document.createElement("canvas").getContext("2d");
+  if (!probe) return 0;
+  probe.font = font;
+  return probe.measureText("Hamburgefonstiv").width;
+};
+
 export const TitleSweep = ({
-  titles = ["snapcn Pro", "snapcn.dev"],
+  titles: titlesProp = ["snapcn Pro", "snapcn.dev"],
   fontFamily = "Inter",
   fontSize = 110.96,
   fontWeight = 500,
@@ -119,10 +143,17 @@ export const TitleSweep = ({
       : null,
   );
   const fontSpec = `${fontWeight} 100px ${family}`;
+  // `document.fonts.load()` alone is not that wait: @remotion/google-fonts only
+  // adds the face to `document.fonts` once it has fetched it, so until then
+  // there is no "Inter" to load, the promise resolves at once, and the fit is
+  // measured on the canvas's narrower serif fallback. `waitUntilDone()` is the
+  // face itself.
   useEffect(() => {
     let alive = true;
-    document.fonts
-      .load(fontSpec)
+    interFace
+      .waitUntilDone()
+      .catch(() => undefined)
+      .then(() => document.fonts.load(fontSpec))
       .catch(() => [])
       .then(() => {
         if (alive) setFontTick((n) => n + 1);
@@ -135,12 +166,19 @@ export const TitleSweep = ({
     if (fontTick > 0 && handle != null) continueRender(handle);
   }, [fontTick, handle]);
 
+  const titles = useMemo(() => parseTitles(titlesProp), [titlesProp]);
   const { index, age } = titleAt(f, titles.length);
   const text = titles[index] ?? "";
+
+  // The face's own width, read every frame: a face that lands later than the
+  // wait above knows about (a family from `fonts.ts`, or your own) changes this,
+  // and the fit below re-measures instead of keeping the fallback's width.
+  const faceKey = faceKeyOf(fontSpec);
 
   // Advance width in em, tracking and word spacing included.
   const lineEm = useMemo(() => {
     void fontTick;
+    void faceKey;
     const ctx =
       typeof document === "undefined"
         ? null
@@ -153,7 +191,7 @@ export const TitleSweep = ({
       text.length * tracking +
       spaces * wordSpacing
     );
-  }, [fontTick, fontSpec, text, tracking, wordSpacing]);
+  }, [fontTick, faceKey, fontSpec, text, tracking, wordSpacing]);
 
   const fit = fitLine(lineEm * fontSize, STAGE_W);
   const size = fontSize * fit * (titleScale?.[index] ?? 1);

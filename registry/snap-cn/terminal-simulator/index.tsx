@@ -50,7 +50,8 @@ export interface TerminalZoom {
 }
 
 export interface TerminalSimulatorProps {
-  lines?: TerminalLine[];
+  /** The terminal's output. Also takes the string form: see `toLines`. */
+  lines?: TerminalLine[] | string;
   /**
    * Headline at the first camera station. Wrap words in `*asterisks*` to tint
    * them with the accent gradient. `null`/"" skips the station — the camera
@@ -59,8 +60,10 @@ export interface TerminalSimulatorProps {
   intro?: string | null;
   /**
    * Command panel at the second camera station. `null` skips the station.
+   * Also takes the bare command, e.g. `"npx shadcn@latest add @acme/chart"` —
+   * see `toCommand` for the tab row it gets.
    */
-  command?: CommandSpec | null;
+  command?: CommandSpec | string | null;
   /** Command-panel surface color. */
   /** Overrides the design system's `card`. */
   background?: string;
@@ -132,6 +135,10 @@ const TERM_TEXT_OFFSET = 90; // text column left edge relative to focus
 const TERM_BLOCK_TOP = 215; // first line sits this far above the focus point
 const TERM_LINE_H = 83;
 const TERM_FONT = 44;
+/** World px of text that stays in frame at the 1.5x landing zoom (517 to the edge, less a cursor). */
+const TERM_FIT_W = 500;
+/** Rows the 1.5x landing frame shows in full before the buffer scrolls. */
+const TERM_VISIBLE_LINES = 5;
 
 /** Lead-in used for the terminal lines' start schedule. */
 const LEAD_IN_FRAMES = 10;
@@ -188,6 +195,74 @@ const DEFAULT_LINES: TerminalLine[] = [
 ];
 
 // ─── Pure helpers ────────────────────────────────────────────────────────────
+
+const MANAGERS = ["npm", "pnpm", "yarn", "bun"];
+
+/** Which tab a command's first word belongs to. */
+const MANAGER_OF: Record<string, string> = {
+  npm: "npm",
+  npx: "npm",
+  pnpm: "pnpm",
+  pnpx: "pnpm",
+  yarn: "yarn",
+  bun: "bun",
+  bunx: "bun",
+};
+
+/**
+ * The string form of `command`. The tab row is the four package managers with
+ * the one the command runs under in front (`npx` → npm, `bunx` → bun); a
+ * command that is not a package manager's gets a single tab named after it.
+ */
+export function toCommand(
+  input: CommandSpec | string | null | undefined,
+): CommandSpec | null {
+  if (input == null) return null;
+  if (typeof input !== "string") return input;
+  const text = input.trim();
+  const first = text.split(/\s+/)[0] ?? "";
+  const tab = MANAGER_OF[first];
+  return {
+    text,
+    managers: tab
+      ? [tab, ...MANAGERS.filter((m) => m !== tab)]
+      : first
+        ? [first]
+        : MANAGERS,
+  };
+}
+
+/** `>` types as a command, `+` is success, `!` an error; anything else logs. */
+const LINE_TYPE: Record<string, TerminalLineType> = {
+  ">": "command",
+  "+": "success",
+  "!": "error",
+};
+
+/**
+ * The string form of `lines`, for the customizer: lines split by `|`, each
+ * optionally led by `>`, `+` or `!` (see LINE_TYPE).
+ *
+ *   "Resolving @acme/chart... | + Done. | > npm run dev"
+ *
+ * A line takes the delay of the default line in the same slot, so a rewrite of
+ * the default copy keeps its rhythm; past the fourth line it is the usual 8.
+ */
+export function toLines(input: TerminalLine[] | string): TerminalLine[] {
+  if (typeof input !== "string") return input;
+  return input
+    .split("|")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l, i) => {
+      const type = LINE_TYPE[l[0]];
+      return {
+        text: type ? l.slice(1).replace(/^ /, "") : l,
+        type: type ?? "log",
+        delay: DEFAULT_LINES[i]?.delay ?? 8,
+      };
+    });
+}
 
 /** Auto freeze-frame heuristic: any line ending in "..." holds the camera. */
 export function autoPause(line: TerminalLine): number {
@@ -302,12 +377,25 @@ export function parseIntro(
   return out;
 }
 
-/** Colour a shell command: word 0 = manager, word 1 = subcommand, rest = args. */
+/**
+ * Colour a shell command: word 0 = manager, then the subcommand, rest = args.
+ *
+ * A runner's package is part of the subcommand — `npx shadcn@latest add` is
+ * the verb and `@acme/chart` the argument — and so is `pnpm dlx`'s. The last
+ * word is always an argument, so `npx create-next-app my-app` still lights up.
+ */
 export function commandSpans(
   text: string,
   argColor: string = CMD_ARG_COLOR,
 ): Array<{ text: string; color: string }> {
   const out: Array<{ text: string; color: string }> = [];
+  const words = text.split(/\s+/).filter(Boolean);
+  const verbWords = /^(npx|pnpx|bunx)$/.test(words[0] ?? "")
+    ? 2
+    : /^(dlx|exec|x)$/.test(words[1] ?? "")
+      ? 3
+      : 1;
+  const argsFrom = Math.max(2, Math.min(1 + verbWords, words.length - 1));
   let wordIndex = -1;
   for (const part of text.split(/(\s+)/)) {
     if (part.length === 0) continue;
@@ -319,7 +407,7 @@ export function commandSpans(
     const color =
       wordIndex === 0
         ? CMD_MANAGER_COLOR
-        : wordIndex === 1
+        : wordIndex < argsFrom
           ? CMD_SUBCOMMAND_COLOR
           : argColor;
     out.push({ text: part, color });
@@ -460,9 +548,9 @@ const GHOSTS = [
 ];
 
 export function TerminalSimulator({
-  lines = DEFAULT_LINES,
+  lines: linesProp = DEFAULT_LINES,
   intro = DEFAULT_INTRO,
-  command = DEFAULT_COMMAND,
+  command: commandProp = DEFAULT_COMMAND,
   background,
   borderColor,
   theme,
@@ -492,6 +580,8 @@ export function TerminalSimulator({
       : mixOklch(t.background, "#000", 0.35);
 
   const hasIntro = intro != null && intro.trim().length > 0;
+  const command = toCommand(commandProp);
+  const lines = toLines(linesProp);
   const hasCommand = command != null && command.text.trim().length > 0;
   const camera = resolveZoom(zoom);
   const landingZoom = camera.enabled ? camera.scale : 1.5;
@@ -759,7 +849,13 @@ function CommandStation({
   const spans = commandSpans(command.text, argColor);
 
   const tabFont = Math.round(20 * fontScale);
-  const rowFont = Math.round(33 * fontScale);
+  // A long command shrinks to the panel instead of running out of it; the
+  // default's 20 characters never reach this cap. Mono advance ≈ 0.6em, +1 for
+  // the cursor.
+  const rowFont = Math.min(
+    Math.round(33 * fontScale),
+    Math.floor((CMD_W - 48) / ((command.text.length + 1) * 0.6)),
+  );
 
   return (
     <div
@@ -875,7 +971,15 @@ function TerminalStation({
   primary: boolean;
 }) {
   const starts = computeLineStarts(lines, charsPerFrame, chunkSize, typeStart);
-  const font = Math.round(TERM_FONT * fontScale);
+  // The longest line has to fit the frame at the landing zoom (TERM_FIT_W);
+  // the default's 18 characters never reach this cap.
+  const longest = Math.max(1, ...lines.map((l) => l.text.length));
+  const font = Math.min(
+    Math.round(TERM_FONT * fontScale),
+    Math.floor(TERM_FIT_W / (longest * 0.6)),
+  );
+  // Past TERM_VISIBLE_LINES the buffer steps up a row per line, like a shell.
+  const scrolled = computeScrollRows(frame, starts, TERM_VISIBLE_LINES);
   const blink = Math.floor((frame / fps) * 2) % 2 === 0;
 
   return (
@@ -897,7 +1001,7 @@ function TerminalStation({
         style={{
           position: "absolute",
           left: TERM_POS.x - TERM_TEXT_OFFSET,
-          top: TERM_POS.y - TERM_BLOCK_TOP,
+          top: TERM_POS.y - TERM_BLOCK_TOP - scrolled * TERM_LINE_H,
           fontFamily: MONO_FAMILY,
         }}
       >

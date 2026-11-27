@@ -1,7 +1,14 @@
 "use client";
 
 import { loadFont as loadSans } from "@remotion/google-fonts/Inter";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   AbsoluteFill,
   continueRender,
@@ -240,6 +247,50 @@ const PUNCH_EASE = Easing.bezier(0.65, 0, 0.35, 1);
 const RUSH_EASE = Easing.bezier(1, 0, 0.48, 1);
 
 /**
+ * Bumps every time the page finishes loading a font, and holds the render while
+ * one is loading.
+ *
+ * A width read while a face is still loading is the *fallback's* width. A clip
+ * dropped into a timeline that loads its typeface through a `<link>` mounts
+ * before that face arrives, measures Times or Arial, and fits every line to the
+ * wrong size — measured: all three cards running edge to edge (0–1280px) under
+ * a late-loading Unbounded, against 55–1222px once the face is in. So measure
+ * again when the font set settles, and call `settle()` after that measurement
+ * commits; the render waits for it.
+ */
+function useFontLoads(label: string): { epoch: number; settle: () => void } {
+  const [epoch, setEpoch] = useState(0);
+  const hold = useRef<number | null>(null);
+  const settle = useCallback(() => {
+    if (hold.current === null) return;
+    if (typeof document !== "undefined" && document.fonts?.status === "loading")
+      return;
+    continueRender(hold.current);
+    hold.current = null;
+  }, []);
+  useEffect(() => {
+    const fonts = typeof document === "undefined" ? undefined : document.fonts;
+    if (!fonts) return;
+    const onLoading = () => {
+      hold.current ??= delayRender(`${label}: re-measure once the face loads`);
+    };
+    const onDone = () => setEpoch((n) => n + 1);
+    if (fonts.status === "loading") onLoading();
+    fonts.addEventListener("loading", onLoading);
+    fonts.addEventListener("loadingdone", onDone);
+    fonts.addEventListener("loadingerror", onDone);
+    return () => {
+      fonts.removeEventListener("loading", onLoading);
+      fonts.removeEventListener("loadingdone", onDone);
+      fonts.removeEventListener("loadingerror", onDone);
+      if (hold.current !== null) continueRender(hold.current);
+      hold.current = null;
+    };
+  }, [label]);
+  return { epoch, settle };
+}
+
+/**
  * The furthest a slide card's line ever gets from centre, in em — its start, or
  * the far side of its overshoot, whichever is bigger. Needed to fit a card: the
  * line has to be inside the frame at both ends of the swing, not just at rest.
@@ -431,7 +482,9 @@ export function PunchLines({
   const [handle] = useState(() => delayRender("punch-lines: measure the face"));
   const [metrics, setMetrics] = useState<FaceMetrics | null>(null);
   const [lineWidths, setLineWidths] = useState<number[] | null>(null);
+  const fonts = useFontLoads("punch-lines");
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: fonts.epoch is the trigger — re-measure when a face finishes loading.
   useEffect(() => {
     const probe = probeRef.current;
     if (!probe) {
@@ -471,13 +524,15 @@ export function PunchLines({
         .map((el) => (el ? el.offsetWidth : 0)),
     );
     setMetrics({ baseline, inkAscent, inkDescent });
-  }, [handle, face, fontWeight, beats]);
+  }, [handle, face, fontWeight, beats, fonts.epoch]);
 
   // Release the render only once the measurement has re-rendered, so the very
   // first captured frame already carries the correct geometry.
   useEffect(() => {
-    if (metrics) continueRender(handle);
-  }, [metrics, handle]);
+    if (!metrics) return;
+    continueRender(handle);
+    fonts.settle();
+  }, [metrics, handle, fonts.settle]);
 
   const M: FaceMetrics = metrics ?? {
     baseline: 88,

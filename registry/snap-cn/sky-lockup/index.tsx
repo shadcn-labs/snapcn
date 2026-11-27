@@ -63,14 +63,17 @@ import {
   WORD_RISE,
 } from "./data";
 
-const { fontFamily: GEIST } = loadGeist("normal", {
+const { fontFamily: GEIST, waitUntilDone: geistDone } = loadGeist("normal", {
   weights: ["500"],
   subsets: ["latin"],
 });
-const { fontFamily: POPPINS } = loadPoppins("normal", {
-  weights: ["600"],
-  subsets: ["latin"],
-});
+const { fontFamily: POPPINS, waitUntilDone: poppinsDone } = loadPoppins(
+  "normal",
+  {
+    weights: ["600"],
+    subsets: ["latin"],
+  },
+);
 
 const STAGE_W = 1920;
 const STAGE_H = 1080;
@@ -87,6 +90,13 @@ export interface SkyLockupProps {
   wordmark?: string;
   /** Your mark as SVG paths, like Cut Lockup's `logo`. Defaults to the snapcn mark. */
   logo?: { width: number; height: number; shapes: readonly string[] };
+  /**
+   * Or the mark as an image URL, drawn in the mark's box (`contain`) and wins
+   * over `logo`. Left out, `logo`. `""` means "no logo": the snapcn mark only
+   * beside the wordmark snapcn; beside any other, no mark and no tile — the
+   * line closes up and the wordmark lands alone, centred.
+   */
+  logoSrc?: string;
   /** The words left of the mark. */
   before?: string;
   /** The words right of the mark. */
@@ -116,6 +126,35 @@ export interface SkyLockupProps {
   speed?: number;
   theme?: Partial<SnapCnTheme>;
   mode?: "light" | "dark";
+}
+
+/** The snapcn mark belongs beside the snapcn wordmark and nowhere else. */
+const isSnapcn = (name: string) => name.trim().toLowerCase() === "snapcn";
+
+/** Past this much upscaling a raster icon's edges go visibly soft. */
+const MAX_UPSCALE = 1.5;
+
+/**
+ * How much of the mark's box an image may fill. A site icon is often 64px and
+ * the box is ~74 device px at 1080p (twice that at 4K), so a raster mark is
+ * capped at MAX_UPSCALE x its natural size and sits smaller, centred, rather
+ * than blown up to a blur. SVGs scale freely.
+ */
+function useIconFit(src: string | undefined, boxPx: number): number {
+  const [natural, setNatural] = useState(0);
+  useEffect(() => {
+    setNatural(0);
+    if (!src || /\.svg(\?|#|$)|^data:image\/svg/i.test(src)) return;
+    const handle = delayRender(`sky-lockup: measuring ${src}`);
+    const img = new Image();
+    img.onload = img.onerror = () => {
+      setNatural(Math.max(img.naturalWidth, img.naturalHeight));
+      continueRender(handle);
+    };
+    img.src = src;
+    return () => continueRender(handle);
+  }, [src]);
+  return natural > 0 ? Math.min(1, (natural * MAX_UPSCALE) / boxPx) : 1;
 }
 
 /** Sample a measured table at a fractional index; holds both ends. */
@@ -271,6 +310,7 @@ export const SkyLockupScene: React.FC<SkyLockupProps & { source: number }> = ({
   source: s,
   wordmark = "snapcn",
   logo = SNAPCN_MARK,
+  logoSrc,
   before = "your animations",
   after = "as one install",
   sky = SKY,
@@ -297,6 +337,8 @@ export const SkyLockupScene: React.FC<SkyLockupProps & { source: number }> = ({
   const left = before.trim().split(/\s+/).filter(Boolean);
   const right = after.trim().split(/\s+/).filter(Boolean);
   const letters = Array.from(wordmark);
+  const hasMark = logoSrc !== "" || isSnapcn(wordmark);
+  const iconFit = useIconFit(logoSrc || undefined, LOCKUP_MARK * px);
 
   const [m, setM] = useState<Metrics | null>(null);
   const [handle] = useState(() => delayRender("sky-lockup: measuring type"));
@@ -305,11 +347,19 @@ export const SkyLockupScene: React.FC<SkyLockupProps & { source: number }> = ({
   const trackKey = tracks.join();
   useEffect(() => {
     let live = true;
-    // measuring a fallback face measures the wrong face
-    Promise.all([
-      document.fonts.load(`${fontWeight} 100px ${face}`, text),
-      document.fonts.load(`${wordmarkWeight} 100px ${markFace}`, wordmark),
-    ])
+    // measuring a fallback face measures the wrong face. `fonts.load` alone is
+    // not enough: until the loaders have registered Geist and Poppins it finds
+    // no matching face and resolves at once, and the canvas measures the
+    // fallback — "animations" 438.8 vs 513.6 painted, so every word ran into
+    // the next ("youranimations").
+    Promise.all([geistDone(), poppinsDone()])
+      .catch(() => undefined)
+      .then(() =>
+        Promise.all([
+          document.fonts.load(`${fontWeight} 100px ${face}`, text),
+          document.fonts.load(`${wordmarkWeight} 100px ${markFace}`, wordmark),
+        ]),
+      )
       .catch(() => undefined)
       .then(() => {
         if (live) {
@@ -353,14 +403,14 @@ export const SkyLockupScene: React.FC<SkyLockupProps & { source: number }> = ({
           m.before.map((w) => w * size),
           m.after.map((w) => w * size),
           (WORD_GAP * size) / TYPE_SIZE,
-          tile72,
+          // No mark: no tile, and the halves close up to one word gap.
+          hasMark ? tile72 : (-WORD_GAP * size) / TYPE_SIZE,
         )
       : null;
   const full = lineAt(fontSize);
   // Only the type gives way to a long line: the tile stays the size of the mark.
-  const fit = full
-    ? Math.min(1, (MAX_LINE - tile72) / (full.width - tile72))
-    : 1;
+  const tileW = hasMark ? tile72 : 0;
+  const fit = full ? Math.min(1, (MAX_LINE - tileW) / (full.width - tileW)) : 1;
   const rest = lineAt(fontSize * fit);
 
   // The measured line sat `centre` off its tile. Any other sentence stays centred on
@@ -368,8 +418,11 @@ export const SkyLockupScene: React.FC<SkyLockupProps & { source: number }> = ({
   const lineShift = rest
     ? LINE_CENTER - sample(MARK_X, LAYOUT_FRAME) - rest.centre
     : 0;
+  // Where the wordmark starts, from the mark's centre (the lockup's left edge
+  // sits LOCKUP_MARK / 2 left of it, mark or not).
+  const lettersAt = hasMark ? LOCKUP_MARK / 2 + wordmarkGap : -LOCKUP_MARK / 2;
   const lockupWidth = m
-    ? LOCKUP_MARK + wordmarkGap + m.wordmark * wordmarkSize
+    ? (hasMark ? LOCKUP_MARK + wordmarkGap : 0) + m.wordmark * wordmarkSize
     : 0;
   const lockupShift = m
     ? LOCKUP_CENTER -
@@ -503,12 +556,7 @@ export const SkyLockupScene: React.FC<SkyLockupProps & { source: number }> = ({
               <Word
                 // biome-ignore lint/suspicious/noArrayIndexKey: letters of a fixed string
                 key={i}
-                x={
-                  markX +
-                  LOCKUP_MARK / 2 +
-                  wordmarkGap +
-                  (m.letters[i] ?? 0) * wordmarkSize
-                }
+                x={markX + lettersAt + (m.letters[i] ?? 0) * wordmarkSize}
                 y={LOCKUP_Y + sample(LETTER_RISE, k)}
                 scale={1}
                 opacity={k < 0 ? 0 : fade}
@@ -529,29 +577,62 @@ export const SkyLockupScene: React.FC<SkyLockupProps & { source: number }> = ({
             );
           })}
 
-        <g transform={`translate(${markX} ${markY})`}>
-          <rect
-            x={-tile / 2}
-            y={-tile / 2}
-            width={tile}
-            height={tile}
-            rx={(tile / 2) * TILE_RADIUS}
-            fill={t.card}
-            stroke={mixOklch(t.border, t.card, TILE_LINE)}
-            strokeWidth={TILE_STROKE}
-            opacity={sample(TILE_FADE, s - FLIP_FROM)}
-          />
-          <g
-            transform={`scale(${markScale * logoScale}) translate(${-logo.width / 2} ${-logo.height / 2})`}
-          >
-            {logo.shapes.map((d) => (
-              <path key={d} d={d} fillRule="evenodd" fill={`url(#${uid}p)`} />
-            ))}
-            {logo.shapes.map((d) => (
-              <path key={d} d={d} fillRule="evenodd" fill={`url(#${uid}i)`} />
-            ))}
+        {hasMark && (
+          <g transform={`translate(${markX} ${markY})`}>
+            <rect
+              x={-tile / 2}
+              y={-tile / 2}
+              width={tile}
+              height={tile}
+              rx={(tile / 2) * TILE_RADIUS}
+              fill={t.card}
+              stroke={mixOklch(t.border, t.card, TILE_LINE)}
+              strokeWidth={TILE_STROKE}
+              opacity={sample(TILE_FADE, s - FLIP_FROM)}
+            />
+            {logoSrc ? (
+              // An image keeps its own colours: it has no paper/ink to flip.
+              <g transform={`scale(${markScale})`}>
+                <foreignObject
+                  x={(-LOCKUP_MARK * iconFit) / 2}
+                  y={(-LOCKUP_MARK * iconFit) / 2}
+                  width={LOCKUP_MARK * iconFit}
+                  height={LOCKUP_MARK * iconFit}
+                >
+                  <Img
+                    src={logoSrc}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                </foreignObject>
+              </g>
+            ) : (
+              <g
+                transform={`scale(${markScale * logoScale}) translate(${-logo.width / 2} ${-logo.height / 2})`}
+              >
+                {logo.shapes.map((d) => (
+                  <path
+                    key={d}
+                    d={d}
+                    fillRule="evenodd"
+                    fill={`url(#${uid}p)`}
+                  />
+                ))}
+                {logo.shapes.map((d) => (
+                  <path
+                    key={d}
+                    d={d}
+                    fillRule="evenodd"
+                    fill={`url(#${uid}i)`}
+                  />
+                ))}
+              </g>
+            )}
           </g>
-        </g>
+        )}
 
         {words.map(({ w, x, at }, i) => {
           const k = s - at;

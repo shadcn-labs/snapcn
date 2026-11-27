@@ -430,7 +430,11 @@ export interface PortalIntroProps {
   brand?: string;
   /** The mark, drawn in `currentColor` in a MARK_SIZE box. Defaults to snapcn's. */
   logo?: React.ReactNode;
-  /** Or the mark as an image URL, when it cannot be passed as an element. */
+  /**
+   * Or the mark as an image URL, when it cannot be passed as an element.
+   * Left out, the snapcn mark. `""` means "no logo": the snapcn mark only
+   * beside the name snapcn, and the name alone, centred, beside any other.
+   */
   logoSrc?: string;
   /** The ink of the title, the mark and the name over the picture. */
   overlay?: string;
@@ -623,6 +627,11 @@ export function PortalIntro({
         : { l: 0, t: 0, w: REF_W, h: REF_H, r: 0 };
   }
 
+  const iconFit = useIconFit(
+    logoSrc ? resolveSrc(logoSrc) : undefined,
+    MARK_SIZE * k,
+  );
+
   const bgScale = at(BG_SCALE, r);
   const bgBlur = at(BG_BLUR, r);
 
@@ -720,12 +729,12 @@ export function PortalIntro({
                 <Img
                   src={resolveSrc(logoSrc)}
                   style={{
-                    width: "100%",
-                    height: "100%",
+                    width: `${iconFit * 100}%`,
+                    height: `${iconFit * 100}%`,
                     objectFit: "contain",
                   }}
                 />
-              ) : (
+              ) : logoSrc === "" && !isSnapcn(brand) ? null : (
                 <SnapCnMark />
               ))
             }
@@ -907,29 +916,32 @@ function Brand({
       ? at(MARK_Y, r)
       : MARK_REST + (at(MARK_Y, last) - MARK_REST) * MARK_SETTLE ** (r - last);
   const adv = m.pre[text.length] ?? 0;
-  const left = BRAND_CENTRE - (MARK_SIZE + BRAND_GAP + adv) / 2;
-  const textAt = left + MARK_SIZE + BRAND_GAP;
+  const markW = logo ? MARK_SIZE + BRAND_GAP : 0;
+  const left = BRAND_CENTRE - (markW + adv) / 2;
+  const textAt = left + markW;
   return (
     <>
-      <div
-        style={{
-          position: "absolute",
-          left,
-          top: 0,
-          // A transform, not `top`: Chrome rounds a box's top edge to the device
-          // pixel, which would step the mark up a whole pixel at a time.
-          transform: `translateY(${y - MARK_SIZE / 2}px)`,
-          width: MARK_SIZE,
-          height: MARK_SIZE,
-          color,
-          opacity: at(MARK_OPACITY, r),
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {logo}
-      </div>
+      {logo ? (
+        <div
+          style={{
+            position: "absolute",
+            left,
+            top: 0,
+            // A transform, not `top`: Chrome rounds a box's top edge to the device
+            // pixel, which would step the mark up a whole pixel at a time.
+            transform: `translateY(${y - MARK_SIZE / 2}px)`,
+            width: MARK_SIZE,
+            height: MARK_SIZE,
+            color,
+            opacity: at(MARK_OPACITY, r),
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {logo}
+        </div>
+      ) : null}
       {[...text].map((c, i) => {
         const kk = r - BRAND_FROM - BRAND_STAGGER * i;
         if (kk < 0 || c === " ") return null;
@@ -952,6 +964,35 @@ function Brand({
       })}
     </>
   );
+}
+
+/** The snapcn mark belongs beside the snapcn name and nowhere else. */
+const isSnapcn = (name: string) => name.trim().toLowerCase() === "snapcn";
+
+/** Past this much upscaling a raster icon's edges go visibly soft. */
+const MAX_UPSCALE = 1.5;
+
+/**
+ * How much of its box an image mark may fill. A site icon is often 64px and
+ * the box is ~80 device px at 1080p (and twice that at 4K), so a raster mark
+ * is capped at MAX_UPSCALE x its natural size and sits smaller, centred,
+ * rather than blown up to a blur. SVGs scale freely.
+ */
+function useIconFit(src: string | undefined, boxPx: number): number {
+  const [natural, setNatural] = useState(0);
+  useEffect(() => {
+    setNatural(0);
+    if (!src || /\.svg(\?|#|$)|^data:image\/svg/i.test(src)) return;
+    const handle = delayRender(`portal-intro: measuring ${src}`);
+    const img = new Image();
+    img.onload = img.onerror = () => {
+      setNatural(Math.max(img.naturalWidth, img.naturalHeight));
+      continueRender(handle);
+    };
+    img.src = src;
+    return () => continueRender(handle);
+  }, [src]);
+  return natural > 0 ? Math.min(1, (natural * MAX_UPSCALE) / boxPx) : 1;
 }
 
 /** snapcn's mark, on `currentColor`. */

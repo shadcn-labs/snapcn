@@ -18,6 +18,19 @@ export const portalIntroConfig: ComponentConfig = {
     trail: { type: "text", default: "in code", label: "After the chip" },
     title: { type: "text", default: "Introducing", label: "Title" },
     brand: { type: "text", default: "snapcn", label: "Name" },
+    logoSrc: {
+      type: "image",
+      // Empty = no logo: the snapcn mark beside the name snapcn, nothing
+      // beside any other name. A brand kit's logo lands here.
+      default: "",
+      label: "Logo",
+      brand: "logo",
+    },
+    image: {
+      type: "image",
+      default: "https://media.snapcn.dev/demos/showcase/portal-intro.jpg",
+      label: "Picture",
+    },
     mode: {
       type: "select",
       default: "light",

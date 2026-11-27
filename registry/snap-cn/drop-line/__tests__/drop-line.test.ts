@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cardAt, sample, timeline } from "../index";
+import { cardAt, parseWords, sample, timeline } from "../index";
 
 describe("drop-line", () => {
   it("cuts four words on the measured beats", () => {
@@ -22,5 +22,15 @@ describe("drop-line", () => {
     expect(sample([0, 10], 0.5)).toBe(5);
     expect(sample([0, 10], -3)).toBe(0);
     expect(sample([0, 10], 9)).toBe(10);
+  });
+
+  it("takes words as a comma string or an array", () => {
+    expect(parseWords("then, ships, the, film")).toEqual([
+      "then",
+      "ships",
+      "the",
+      "film",
+    ]);
+    expect(parseWords(["a", "b"])).toEqual(["a", "b"]);
   });
 });

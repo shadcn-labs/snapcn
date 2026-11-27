@@ -31,10 +31,11 @@ import { BOLT, ENTRY, ICON_BOX, SWEEP } from "./data";
  * band.
  */
 
-const { fontFamily: INTER } = loadFont("normal", {
+const interFace = loadFont("normal", {
   weights: ["500"],
   subsets: ["latin"],
 });
+const INTER = interFace.fontFamily;
 
 export type SpecSegmentRole = "lead" | "icon" | "accent" | "muted";
 
@@ -50,7 +51,21 @@ export interface SpecSegment {
 }
 
 export interface SpecSweepProps {
+  /**
+   * The line, in full control: any order, any roles. When set it wins over the
+   * four strings below, which are the customizer's and the Studio's way in.
+   */
   segments?: SpecSegment[];
+  // Plain strings for the default shape: lead [icon] highlight connector tail.
+  // An empty string drops its part.
+  /** Rides the highlight, then greys. Before the icon. */
+  lead?: string;
+  /** Stays lit once the highlight reaches it. */
+  highlight?: string;
+  /** Capped at `mutedLevel`: the small word between the two lit ones. */
+  connector?: string;
+  /** Stays lit, like `highlight`. */
+  tail?: string;
   /** SVG path data of the icon, drawn in an `iconBox` viewBox. */
   icon?: string;
   /** viewBox width and height of `icon`. */
@@ -161,16 +176,26 @@ const makeMeasure = (font: string, size: number) => {
   return (text: string) => ctx.measureText(text).width;
 };
 
-const DEFAULT_SEGMENTS: SpecSegment[] = [
-  { text: "Ship", role: "lead" },
+/** The four strings as segments, in the default line's order and roles. */
+export const segmentsFrom = (
+  lead: string,
+  highlight: string,
+  connector: string,
+  tail: string,
+): SpecSegment[] => [
+  { text: lead, role: "lead" },
   { role: "icon" },
-  { text: "a launch film", role: "accent" },
-  { text: "in", role: "muted" },
-  { text: "20 minutes", role: "accent" },
+  { text: highlight, role: "accent" },
+  { text: connector, role: "muted" },
+  { text: tail, role: "accent" },
 ];
 
 export const SpecSweep = ({
-  segments = DEFAULT_SEGMENTS,
+  segments: segmentsProp,
+  lead = "Ship",
+  highlight = "a launch film",
+  connector = "in",
+  tail = "20 minutes",
   icon = BOLT,
   iconBox = ICON_BOX,
   iconSize = 1.452,
@@ -197,9 +222,20 @@ export const SpecSweep = ({
   const id = useId().replace(/:/g, "");
   const family = resolveFont(fontFamily ?? t.fontFamily) ?? INTER;
   const stage = Math.min(width / 1920, height / 1080);
+  // Memoised: the layout below re-measures whenever this identity moves.
+  const segments = useMemo(
+    () => segmentsProp ?? segmentsFrom(lead, highlight, connector, tail),
+    [segmentsProp, lead, highlight, connector, tail],
+  );
 
   // A width measured before the face lands is a width for the fallback, so the
   // layout waits on it; a render holds its first frame until that has re-rendered.
+  //
+  // `document.fonts.load()` alone is not that wait: @remotion/google-fonts only
+  // adds the face to `document.fonts` once it has fetched it, so until then
+  // there is no "Inter" to load and the promise resolves at once. Every word was
+  // then placed with the canvas's serif fallback (~12% narrower than Inter), and
+  // the painted words ran into each other. `waitUntilDone()` is the face itself.
   const [fontTick, setFontTick] = useState(0);
   const [handle] = useState(() =>
     getRemotionEnvironment().isRendering
@@ -209,8 +245,10 @@ export const SpecSweep = ({
   const fontSpec = `${fontWeight} 100px ${family}`;
   useEffect(() => {
     let alive = true;
-    document.fonts
-      .load(fontSpec)
+    interFace
+      .waitUntilDone()
+      .catch(() => undefined)
+      .then(() => document.fonts.load(fontSpec))
       .catch(() => [])
       .then(() => {
         if (alive) setFontTick((n) => n + 1);
@@ -223,8 +261,14 @@ export const SpecSweep = ({
     if (fontTick > 0 && handle != null) continueRender(handle);
   }, [fontTick, handle]);
 
+  // The face's own width, read every frame: if a face lands later than the wait
+  // above knows about (a family from `fonts.ts`, or one of your own), the layout
+  // below sees the change and re-measures instead of keeping fallback widths.
+  const faceKey = makeMeasure(fontSpec, 100)("Hamburgefonstiv");
+
   const line = useMemo(() => {
     void fontTick;
+    void faceKey;
     const place = (size: number) =>
       layoutLine(
         segments,
@@ -238,6 +282,7 @@ export const SpecSweep = ({
     return { ...fitted, size: size * fit, left: (width - fitted.width) / 2 };
   }, [
     fontTick,
+    faceKey,
     segments,
     fontWeight,
     family,

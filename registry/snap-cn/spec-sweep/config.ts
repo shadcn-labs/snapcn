@@ -10,6 +10,12 @@ export const specSweepConfig: ComponentConfig = {
   componentName: "SpecSweep",
   importPath: "@/components/snap-cn/spec-sweep",
   controls: {
+    // The line reads lead [icon] highlight connector tail. Any of them may be
+    // empty. Long copy shrinks to fit and its words enter faster.
+    lead: { type: "text", default: "Ship", label: "Lead" },
+    highlight: { type: "text", default: "a launch film", label: "Highlight" },
+    connector: { type: "text", default: "in", label: "Connector (dim)" },
+    tail: { type: "text", default: "20 minutes", label: "Tail" },
     accentColor: {
       type: "color",
       default: "#3577e0",
