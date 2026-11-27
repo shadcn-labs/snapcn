@@ -802,6 +802,43 @@ For help, reply to this email or write to ${SUPPORT}.
 }
 
 /**
+ * A regional price paid with a card from another country: refunded, and told
+ * how to buy at the standard price. No blame — a traveller or an expat hits
+ * this too.
+ */
+export function regionalRefundEmail(to: string, country: string): Email {
+  const place =
+    new Intl.DisplayNames("en", { type: "region" }).of(country) ?? country;
+  const url = `${SITE}/docs/pricing`;
+  const lead = `Our ${place} price is for cards issued in ${place}, and the card used was issued elsewhere — so we've refunded the payment in full. It should be back on your card within 5–10 business days.`;
+  const text = `Your snapcn payment was refunded.
+
+${lead}
+
+You can buy at the standard price here: ${url}
+
+If you do live in ${place} and this is a mistake, reply to this email and we'll sort it out.
+
+— Sri`;
+
+  return {
+    to,
+    subject: "Your snapcn payment was refunded",
+    reply_to: SUPPORT,
+    text,
+    html: accountShell({
+      preheader: "Regional prices need a card from that country.",
+      greeting: "Hi,",
+      heading: "Your payment was refunded",
+      lead: esc(lead),
+      rows: [["Refunded", "In full"]],
+      cta: { label: "See standard prices", href: url },
+      note: `Live in ${esc(place)} and think this is wrong? Just reply.`,
+    }),
+  };
+}
+
+/**
  * An invitation onto someone's Commercial licence. The seat is already theirs:
  * signing in with this address is the whole of accepting it.
  */
